@@ -1,4 +1,3 @@
-baseurl = "http://replace-this-with-your-hugo-site.com/"
-languageCode = "zh-cn"
-title = "My New Hugo Site"
-SectionPagesMenu = "main"
+baseurl = "http://zjykzk.github.io/"
+languageCode = "zh-CN"
+title = "网志"
