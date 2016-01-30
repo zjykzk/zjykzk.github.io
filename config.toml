@@ -1,4 +1,9 @@
 baseurl = "http://replace-this-with-your-hugo-site.com/"
 languageCode = "zh-cn"
-title = "My New Hugo Site"
+title = "zenk's site"
 SectionPagesMenu = "main"
+[[menu.main]]
+        name = "This is the blog section"
+        weight = -110
+        identifier = "posts"
+        url = "/content/post/"

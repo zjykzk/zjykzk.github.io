@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-      <title> on My New Hugo Site </title>
+    <title>zenk&#39;s site</title>
     <link>http://localhost:1313/</link>
-    <language>en-us</language>
-    <author>Alexander Ivanov</author>
-    <updated>2015-09-03 17:23:34 &#43;0800 CST</updated>
-    
-    <item>
-      <title>about</title>
-      <link>http://localhost:1313/about/</link>
-      <pubDate>Thu, 03 Sep 2015 17:23:34 CST</pubDate>
-      <author>Alexander Ivanov</author>
-      <guid>http://localhost:1313/about/</guid>
-      <description></description>
-    </item>
+    <description>Recent content on zenk&#39;s site</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     
   </channel>
 </rss>
