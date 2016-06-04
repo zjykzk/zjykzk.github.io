@@ -5,31 +5,65 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>老码农的自留地 </title>
+  <title>增加bug的编程实践  &middot; 老码农的自留地</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="HandheldFriendly" content="True">
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-<meta name="description" content="" />
+<meta name="description" content="description" />
 
-<meta name="keywords" content="">
+<meta name="keywords" content="编程, bug, ">
 
 
-<meta property="og:title" content="老码农的自留地 ">
+<meta property="og:title" content="增加bug的编程实践  &middot; 老码农的自留地 ">
 <meta property="og:site_name" content="老码农的自留地"/>
-<meta property="og:url" content="http://zjykzk.github.io/" />
+<meta property="og:url" content="http://zjykzk.github.io/bug-op/" />
 <meta property="og:locale" content="zh-CN">
 
 
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="og:description" content="description"/>
+<meta property="og:article:published_time" content="2016-06-04T11:12:13&#43;08:00" />
+<meta property="og:article:modified_time" content="2016-06-04T11:12:13&#43;08:00" />
+
+  
+    
+<meta property="og:article:tag" content="编程">
+    
+<meta property="og:article:tag" content="bug">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<meta name="twitter:creator" content="@" />
+<meta name="twitter:title" content="增加bug的编程实践" />
+<meta name="twitter:description" content="description" />
+<meta name="twitter:url" content="http://zjykzk.github.io/bug-op/" />
+<meta name="twitter:domain" content="http://zjykzk.github.io/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "增加bug的编程实践",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2016-06-04",
+    "description": "description",
+    "wordCount":  21 
+  }
+</script>
 
 
 
-<link href="http://zjykzk.github.io/index.xml" rel="alternate" type="application/rss+xml" title="老码农的自留地" />
-
-<link rel="canonical" href="http://zjykzk.github.io/" />
+<link rel="canonical" href="http://zjykzk.github.io/bug-op/" />
 
 <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://zjykzk.github.io/touch-icon-144-precomposed.png">
 <link href="http://zjykzk.github.io/favicon.png" rel="icon">
@@ -114,23 +148,31 @@
 </header>
 
 
-  <div class="container">
-    
-    
-    
-      <div class="row">
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <div>
-  <h2><a href="http://zjykzk.github.io/bug-op/">增加bug的编程实践</a>
-</h2>
+<div class="container">
+<div class="row">
 
-  <div class="margin-10">
-    <small>
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <div class="text-center">
+
+    <h1>增加bug的编程实践
+</h1>
+
+    <div class="metas">
+<small>
   <i class="fa fa-calendar"></i>
   <time datetime="2016-06-04">4 Jun, 2016</time>
 </small>
 
-    
+
+  <small>
+    &middot; by zenk
+  
+  &middot; Read in about 1 min
+  &middot; (21 Words)
+</small>
+
+
+<div class="margin-10">
   <i class="fa fa-tags"></i>
   
   <a href="http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B" class="label label-primary">编程</a>
@@ -139,141 +181,89 @@
   
 
 
-  </div>
 </div>
-
-    <p>
-  
-  
-    description
-  
-
-
-</p>
-
-
-    <p class="lead"><a href="http://zjykzk.github.io/bug-op/" class="btn btn-default">Read more &rarr;</a></p>
-
+<br>
+</div>
 
   </div>
 </div>
 
-    
-      <div class="row">
+  <div class="container content">
+  
+
+<p>最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。</p>
+
+<h2 id="思路不清晰:fde64685af38b7f697ddbea649e90617">思路不清晰</h2>
+
+<p>思路没有完全确定情况下写代码。造成不确定的情况有多方面：</p>
+
+<pre><code>1. 求快，把相似的需求当做一样的需求
+2. 缺少设计，大体明白实现方案，就开始编码
+3. 知识不充分，集中在前端的css、布局
+</code></pre>
+
+<p><strong>怎么办？</strong></p>
+
+<p><em>快是可以做到，心里不要慌就是。</em></p>
+
+<pre><code>1. 需求分析到位
+2. 仔细查看现有的代码
+3. 遗留代码多问老员工
+4. 放下别人对你问代码时的负面情绪
+</code></pre>
+
+<h2 id="破窗原理:fde64685af38b7f697ddbea649e90617">破窗原理</h2>
+
+<p>在一个代码质量差的项目里面，就很容易被一种“别人也是这样，我也就这样得了”，尤其是在你不熟悉代码的情况下。<strong>短期内，代码是写给自己的，维护的人是自己，长期内是给别人的，都自己好就是对别人好，还有就是执行力</strong></p>
+
+</div>
+
+
+  <footer>
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <div>
-  <h2><a href="http://zjykzk.github.io/flume/">flume</a>
-</h2>
-
-  <div class="margin-10">
-    <small>
-  <i class="fa fa-calendar"></i>
-  <time datetime="2016-03-27">27 Mar, 2016</time>
-</small>
+      
+  
+    <nav><ul class="pager">
+    
+        <li class="previous">
+          <a href="http://zjykzk.github.io/flume/" title="flume">
+            <span aria-hidden="true">&larr;</span>Previous
+          </a>
+        </li>
+    
 
     
-  <i class="fa fa-tags"></i>
-  
-  <a href="http://zjykzk.github.io/tags/%E6%8A%80%E6%9C%AF" class="label label-primary">技术</a>
-  
-  <a href="http://zjykzk.github.io/tags/flume" class="label label-primary">flume</a>
-  
-  <a href="http://zjykzk.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE" class="label label-primary">大数据</a>
+    </ul> </nav>
   
 
 
-  </div>
 </div>
 
-    <p>
-  
-  
-    description
-  
-
-
-</p>
-
-
-    <p class="lead"><a href="http://zjykzk.github.io/flume/" class="btn btn-default">Read more &rarr;</a></p>
-
-
-  </div>
-</div>
-
-    
-      <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <div>
-  <h2><a href="http://zjykzk.github.io/friend-links/">价值博客</a>
-</h2>
-
-  <div class="margin-10">
-    <small>
-  <i class="fa fa-calendar"></i>
-  <time datetime="2016-02-15">15 Feb, 2016</time>
-</small>
-
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
     
+    
+    if (window.location.hostname == "localhost")
+      return;
 
-  </div>
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//zenk.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
 </div>
 
-    <p>
-  
-  
-    价值博客
-  
+</footer>
 
 
-</p>
-
-
-    <p class="lead"><a href="http://zjykzk.github.io/friend-links/" class="btn btn-default">Read more &rarr;</a></p>
-
-
-  </div>
 </div>
-
-    
-      <div class="row">
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <div>
-  <h2><a href="http://zjykzk.github.io/about/">about</a>
-</h2>
-
-  <div class="margin-10">
-    <small>
-  <i class="fa fa-calendar"></i>
-  <time datetime="2016-02-02">2 Feb, 2016</time>
-</small>
-
-    
-
-  </div>
 </div>
-
-    <p>
-  
-  
-    还在努力学习思考。。。
-  
-
-
-</p>
-
-
-    <p class="lead"><a href="http://zjykzk.github.io/about/" class="btn btn-default">Read more &rarr;</a></p>
-
-
-  </div>
-</div>
-
-    
-    
-
-  </div>
-
       <footer class="footer">
     <div class="container hidden-print">
     <div class="row">
