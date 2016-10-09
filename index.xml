@@ -9,8 +9,109 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2016 zenk.</copyright>
-    <lastBuildDate>Sat, 04 Jun 2016 11:12:13 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 09 Oct 2016 14:45:21 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>prometheus</title>
+      <link>http://zjykzk.github.io/prometheus/</link>
+      <pubDate>Sun, 09 Oct 2016 14:45:21 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/prometheus/</guid>
+      <description>
+
+&lt;p&gt;prometheus是开源的现代监控系统。它用go开发，发布于2012。
+社区热度比较高，功能比较丰富灵活。&lt;/p&gt;
+
+&lt;h2 id=&#34;架构&#34;&gt;架构&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/promutheus.arch.svg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;基本概念&#34;&gt;基本概念&lt;/h2&gt;
+
+&lt;h3 id=&#34;数据模型&#34;&gt;数据模型&lt;/h3&gt;
+
+&lt;p&gt;prometheus把数据当作时间序列进行存储。
+每个时间序列通过 &lt;strong&gt;metric name&lt;/strong&gt;和 &lt;strong&gt;key-value pairs&lt;/strong&gt;(也叫做 &lt;strong&gt;label&lt;/strong&gt;)标识。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;metric name&lt;/strong&gt;表示需要进行测量的系统指标。
+它允许包含ASCII字母，数字，下划线和分号。
+正则表示为：[a-zA-Z&lt;em&gt;:][a-zA-Z0-9&lt;/em&gt;:]*。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;label&lt;/strong&gt;表示一个系统指标的维度，可以按照这个维度进行查询统计。
+Label名字允许包含ASCII字母，数字以及下划线。
+正则表示为：[a-zA-Z&lt;em&gt;][a-zA-Z0-9&lt;/em&gt;]*。同时，“__”开头的名字系统保留的。
+Label值允许任意的Unicode字符&lt;/p&gt;
+
+&lt;h3 id=&#34;度量类型&#34;&gt;度量类型&lt;/h3&gt;
+
+&lt;h4 id=&#34;counter&#34;&gt;Counter&lt;/h4&gt;
+
+&lt;p&gt;累计统计度量的单个值。适用于只增不减度量，比如累计请求数量。&lt;/p&gt;
+
+&lt;h4 id=&#34;gauge&#34;&gt;Gauge&lt;/h4&gt;
+
+&lt;p&gt;统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。&lt;/p&gt;
+
+&lt;h4 id=&#34;histogram&#34;&gt;Histogram&lt;/h4&gt;
+
+&lt;p&gt;统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。&lt;/p&gt;
+
+&lt;p&gt;这个度量类型有三个时间序列统计：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;lt;base_name&amp;gt;_bucket{le=&amp;laquo;upper inclusive bound&amp;raquo;}：小于某个阀值的度量事件发生的次数&lt;/li&gt;
+&lt;li&gt;&amp;lt;base_name&amp;gt;_sum：度量值的和&lt;/li&gt;
+&lt;li&gt;&amp;lt;base_name&amp;gt;_count：度量事件发生的次数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;summary&#34;&gt;Summary&lt;/h4&gt;
+
+&lt;p&gt;统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。&lt;/p&gt;
+
+&lt;p&gt;这个度量类型有三个时间序列统计：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;lt;base_name&amp;gt;{quantile=&amp;raquo;&amp;lt;p&amp;gt;&amp;laquo;}：度量值在前百分之p的度量事件发生的次数&lt;/li&gt;
+&lt;li&gt;&amp;lt;base_name&amp;gt;_sum：度量值的和&lt;/li&gt;
+&lt;li&gt;&amp;lt;base_name&amp;gt;_count：度量事件发生的次数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;job-instance&#34;&gt;Job &amp;amp; Instance&lt;/h3&gt;
+
+&lt;p&gt;在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如
+一个支付进程。Job代表一个监控的逻辑单位。
+比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;job: payment-server
+
+&lt;ul&gt;
+&lt;li&gt;instance 1: 1.2.3.4:5678&lt;/li&gt;
+&lt;li&gt;instance 2: 1.2.3.5:5689&lt;/li&gt;
+&lt;li&gt;instance 3: 1.2.3.6:5689&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;自动生成的label和时间序列&#34;&gt;自动生成的label和时间序列&lt;/h4&gt;
+
+&lt;p&gt;当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。&lt;/p&gt;
+
+&lt;p&gt;label:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;job: 配置好的job名字&lt;/li&gt;
+&lt;li&gt;instance:&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;格式的url&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;时间序列：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;up{job=&amp;raquo;&amp;lt;job-name&amp;gt;&amp;laquo;, instance=&amp;raquo;&amp;lt;host:port&amp;gt;&amp;laquo;}：1 表示监控目标活着，0表示挂了&lt;/li&gt;
+&lt;li&gt;scrape_duration_seconds{job=&amp;raquo;&amp;lt;job-name&amp;gt;&amp;laquo;, instance=&amp;raquo;&amp;lt;host:port&amp;gt;&amp;laquo;}：抓取日志的时间&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>增加bug的编程实践</title>

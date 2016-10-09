@@ -5,34 +5,34 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>flume  &middot; 老码农的自留地</title>
+  <title>prometheus  &middot; 老码农的自留地</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="HandheldFriendly" content="True">
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-<meta name="description" content="description" />
+<meta name="description" content="prometheus介绍" />
 
-<meta name="keywords" content="flume, 日志收集, ">
+<meta name="keywords" content="monitor, prometheus, ">
 
 
-<meta property="og:title" content="flume  &middot; 老码农的自留地 ">
+<meta property="og:title" content="prometheus  &middot; 老码农的自留地 ">
 <meta property="og:site_name" content="老码农的自留地"/>
-<meta property="og:url" content="http://zjykzk.github.io/flume/" />
+<meta property="og:url" content="http://zjykzk.github.io/prometheus/" />
 <meta property="og:locale" content="zh-CN">
 
 
 <meta property="og:type" content="article" />
-<meta property="og:description" content="description"/>
-<meta property="og:article:published_time" content="2016-03-27T22:17:17&#43;08:00" />
-<meta property="og:article:modified_time" content="2016-03-27T22:17:17&#43;08:00" />
+<meta property="og:description" content="prometheus介绍"/>
+<meta property="og:article:published_time" content="2016-10-09T14:45:21&#43;08:00" />
+<meta property="og:article:modified_time" content="2016-10-09T14:45:21&#43;08:00" />
 
   
     
-<meta property="og:article:tag" content="flume">
+<meta property="og:article:tag" content="monitor">
     
-<meta property="og:article:tag" content="日志收集">
+<meta property="og:article:tag" content="prometheus">
     
   
 
@@ -40,9 +40,9 @@
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:site" content="@" />
 <meta name="twitter:creator" content="@" />
-<meta name="twitter:title" content="flume" />
-<meta name="twitter:description" content="description" />
-<meta name="twitter:url" content="http://zjykzk.github.io/flume/" />
+<meta name="twitter:title" content="prometheus" />
+<meta name="twitter:description" content="prometheus介绍" />
+<meta name="twitter:url" content="http://zjykzk.github.io/prometheus/" />
 <meta name="twitter:domain" content="http://zjykzk.github.io/">
   
 
@@ -50,20 +50,20 @@
   {
     "@context": "http://schema.org",
     "@type": "Article",
-    "headline": "flume",
+    "headline": "prometheus",
     "author": {
       "@type": "Person",
       "name": "http://profiles.google.com/+?rel=author"
     },
-    "datePublished": "2016-03-27",
-    "description": "description",
-    "wordCount":  29 
+    "datePublished": "2016-10-09",
+    "description": "prometheus介绍",
+    "wordCount":  68 
   }
 </script>
 
 
 
-<link rel="canonical" href="http://zjykzk.github.io/flume/" />
+<link rel="canonical" href="http://zjykzk.github.io/prometheus/" />
 
 <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://zjykzk.github.io/touch-icon-144-precomposed.png">
 <link href="http://zjykzk.github.io/favicon.png" rel="icon">
@@ -154,13 +154,13 @@
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="text-center">
 
-    <h1>flume
+    <h1>prometheus
 </h1>
 
     <div class="metas">
 <small>
   <i class="fa fa-calendar"></i>
-  <time datetime="2016-03-27">27 Mar, 2016</time>
+  <time datetime="2016-10-09">9 Oct, 2016</time>
 </small>
 
 
@@ -168,7 +168,7 @@
     &middot; by zenk
   
   &middot; Read in about 1 min
-  &middot; (29 Words)
+  &middot; (68 Words)
 </small>
 
 
@@ -177,9 +177,7 @@
   
   <a href="http://zjykzk.github.io/tags/%E6%8A%80%E6%9C%AF" class="label label-primary">技术</a>
   
-  <a href="http://zjykzk.github.io/tags/flume" class="label label-primary">flume</a>
-  
-  <a href="http://zjykzk.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE" class="label label-primary">大数据</a>
+  <a href="http://zjykzk.github.io/tags/%E7%9B%91%E6%8E%A7" class="label label-primary">监控</a>
   
 
 
@@ -193,57 +191,96 @@
   <div class="container content">
   
 
-<h1 id="简介:4c6caa589b1ebf1283611b7dfb3df9e8">简介</h1>
+<p>prometheus是开源的现代监控系统。它用go开发，发布于2012。
+社区热度比较高，功能比较丰富灵活。</p>
 
-<p>flume是通用的数据收集框架。特点是分布式、高可靠、高可用、高可定制化。</p>
+<h2 id="架构">架构</h2>
 
-<h1 id="架构:4c6caa589b1ebf1283611b7dfb3df9e8">架构</h1>
+<p><img src="/imgs/promutheus.arch.svg" alt="" /></p>
 
-<p><img src="/imgs/flume.dot.png" alt="" /></p>
+<h2 id="基本概念">基本概念</h2>
 
-<h1 id="概念:4c6caa589b1ebf1283611b7dfb3df9e8">概念</h1>
+<h3 id="数据模型">数据模型</h3>
 
-<h2 id="source:4c6caa589b1ebf1283611b7dfb3df9e8">source</h2>
+<p>prometheus把数据当作时间序列进行存储。
+每个时间序列通过 <strong>metric name</strong>和 <strong>key-value pairs</strong>(也叫做 <strong>label</strong>)标识。</p>
 
-<p>数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个<strong>event</strong>。</p>
+<p><strong>metric name</strong>表示需要进行测量的系统指标。
+它允许包含ASCII字母，数字，下划线和分号。
+正则表示为：[a-zA-Z<em>:][a-zA-Z0-9</em>:]*。</p>
 
-<h3 id="event:4c6caa589b1ebf1283611b7dfb3df9e8">event</h3>
+<p><strong>label</strong>表示一个系统指标的维度，可以按照这个维度进行查询统计。
+Label名字允许包含ASCII字母，数字以及下划线。
+正则表示为：[a-zA-Z<em>][a-zA-Z0-9</em>]*。同时，“__”开头的名字系统保留的。
+Label值允许任意的Unicode字符</p>
 
-<p>数据单元，从<strong>source</strong>产生，直到被序列化到存储中。<strong>event</strong>包含*header*，*body*两个部分：</p>
+<h3 id="度量类型">度量类型</h3>
+
+<h4 id="counter">Counter</h4>
+
+<p>累计统计度量的单个值。适用于只增不减度量，比如累计请求数量。</p>
+
+<h4 id="gauge">Gauge</h4>
+
+<p>统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。</p>
+
+<h4 id="histogram">Histogram</h4>
+
+<p>统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。</p>
+
+<p>这个度量类型有三个时间序列统计：</p>
 
 <ul>
-<li>header: 一个map数据，可以被<strong>interceptor</strong>引用</li>
-<li>body: 一个字节序列，具体日志数据</li>
+<li>&lt;base_name&gt;_bucket{le=&laquo;upper inclusive bound&raquo;}：小于某个阀值的度量事件发生的次数</li>
+<li>&lt;base_name&gt;_sum：度量值的和</li>
+<li>&lt;base_name&gt;_count：度量事件发生的次数</li>
 </ul>
 
-<h3 id="interceptor:4c6caa589b1ebf1283611b7dfb3df9e8">interceptor</h3>
+<h4 id="summary">Summary</h4>
 
-<p><strong>source</strong>读取一个<strong>event</strong>在放到<strong>channel</strong>中之前，<strong>event</strong>可以被添加数据。比如说：采集机器的主机名称，时间戳。</p>
+<p>统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。</p>
 
-<h2 id="channel:4c6caa589b1ebf1283611b7dfb3df9e8">channel</h2>
+<p>这个度量类型有三个时间序列统计：</p>
 
-<p>数据队列，高可用的保障。<strong>source</strong>产生的数据先放到这里，<strong>sink</strong>接着从这里取出来放到存储当中。</p>
+<ul>
+<li>&lt;base_name&gt;{quantile=&raquo;&lt;p&gt;&laquo;}：度量值在前百分之p的度量事件发生的次数</li>
+<li>&lt;base_name&gt;_sum：度量值的和</li>
+<li>&lt;base_name&gt;_count：度量事件发生的次数</li>
+</ul>
 
-<h3 id="channel-selector:4c6caa589b1ebf1283611b7dfb3df9e8">channel selector</h3>
+<h3 id="job-instance">Job &amp; Instance</h3>
 
-<p>两个作用：</p>
+<p>在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如
+一个支付进程。Job代表一个监控的逻辑单位。
+比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。</p>
 
-<ol>
-<li>复制：把一个<strong>event</strong>写到一个或者多个<strong>channel</strong>中</li>
-<li>路由：根据<strong>event</strong>中的某个属性值，把数据写到指定的<strong>channel</strong>中</li>
-</ol>
+<ul>
+<li>job: payment-server
 
-<h2 id="sink:4c6caa589b1ebf1283611b7dfb3df9e8">sink</h2>
+<ul>
+<li>instance 1: 1.2.3.4:5678</li>
+<li>instance 2: 1.2.3.5:5689</li>
+<li>instance 3: 1.2.3.6:5689</li>
+</ul></li>
+</ul>
 
-<p>负责把<strong>channel</strong>中的数据写入目标存储。</p>
+<h4 id="自动生成的label和时间序列">自动生成的label和时间序列</h4>
 
-<h3 id="sink-processor:4c6caa589b1ebf1283611b7dfb3df9e8">sink processor</h3>
+<p>当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。</p>
 
-<p>选择<strong>sink</strong>，在这里可以完成负载均衡和容错处理。</p>
+<p>label:</p>
 
-<h3 id="event-serializer:4c6caa589b1ebf1283611b7dfb3df9e8">event serializer</h3>
+<ul>
+<li>job: 配置好的job名字</li>
+<li>instance:&lt;host&gt;:&lt;port&gt;格式的url</li>
+</ul>
 
-<p>把<strong>event</strong>中的数据，转换成存储需要的格式。</p>
+<p>时间序列：</p>
+
+<ul>
+<li>up{job=&raquo;&lt;job-name&gt;&laquo;, instance=&raquo;&lt;host:port&gt;&laquo;}：1 表示监控目标活着，0表示挂了</li>
+<li>scrape_duration_seconds{job=&raquo;&lt;job-name&gt;&laquo;, instance=&raquo;&lt;host:port&gt;&laquo;}：抓取日志的时间</li>
+</ul>
 
 </div>
 
@@ -255,18 +292,12 @@
     <nav><ul class="pager">
     
         <li class="previous">
-          <a href="http://zjykzk.github.io/friend-links/" title="价值博客">
+          <a href="http://zjykzk.github.io/bug-op/" title="增加bug的编程实践">
             <span aria-hidden="true">&larr;</span>Previous
           </a>
         </li>
     
 
-    
-      <li class="next">
-        <a href="http://zjykzk.github.io/bug-op/" title="增加bug的编程实践">
-            Next <span aria-hidden="true">&rarr;</span>
-        </a>
-      </li>
     
     </ul> </nav>
   
