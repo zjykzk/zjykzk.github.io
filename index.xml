@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>zencode</title>
-    <link>http://zjykzk.github.io/</link>
+    <link>http://zjykzk.github.io/index.xml</link>
     <description>Recent content on zencode</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
@@ -114,6 +114,102 @@ Label值允许任意的Unicode字符&lt;/p&gt;
     </item>
     
     <item>
+      <title>浮点数 IEEE 754</title>
+      <link>http://zjykzk.github.io/ieee-754/</link>
+      <pubDate>Sun, 05 Jun 2016 20:21:39 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/ieee-754/</guid>
+      <description>
+
+&lt;h2 id=&#34;表示&#34;&gt;表示&lt;/h2&gt;
+
+&lt;p&gt;标准IEEE 754中，浮点数由三部分组成符号、指数、尾数。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;符号：表示正负，用&lt;strong&gt;S&lt;/strong&gt;表示，用&lt;strong&gt;Sn&lt;/strong&gt;表示使用的bit数&lt;/li&gt;
+&lt;li&gt;指数：2的幂次，用&lt;strong&gt;E&lt;/strong&gt;表示，用&lt;strong&gt;En&lt;/strong&gt;表示使用的bit数&lt;/li&gt;
+&lt;li&gt;尾数：小数部分，用&lt;strong&gt;M&lt;/strong&gt;表示，用&lt;strong&gt;Mn&lt;/strong&gt;表示使用的bit数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;
++-----+------+--------+
+|  S  |   E  |    M   |
++-----+------+--------+
+&lt;/pre&gt;
+
+&lt;h3 id=&#34;单-双精度的bit位数&#34;&gt;单、双精度的bit位数&lt;/h3&gt;
+
+&lt;p&gt;|类型|Sn|En|Mn|Sn+En+Mn|
+|&amp;mdash;-|&amp;ndash;|&amp;ndash;|&amp;ndash;|&amp;mdash;&amp;mdash;-|
+|单精度|1|8|23|32|
+|双精度|1|11|52|64|&lt;/p&gt;
+
+&lt;p&gt;浮点数从二进制到十进制数值的转化分两种情况：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;normalized, E!=0&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;公式：value = (-1)^S * 2^(E - 2^(En - 1) + 1) * (1+M/2^Mn)
+例子：&lt;/p&gt;
+
+&lt;p&gt;1.5&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;单精度&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;
+|&lt;-S-&gt;|&lt;--E---&gt;|&lt;---------M-----------&gt;|
++-----+--------+-----------------------+
+|  0  |01111111|10000000000000000000000|
++-----+--------+-----------------------+
+&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;双精度
+&lt;pre&gt;
+|&amp;lt;-S-&amp;gt;|&amp;lt;&amp;mdash;-E&amp;mdash;-&amp;gt;|&amp;lt;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;-M&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;&amp;gt;|
++&amp;mdash;&amp;ndash;+&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;+&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;+
+|  0  |01111111111|100000000000000000000000000000000000000000000000000000|
++&amp;mdash;&amp;ndash;+&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;+&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;+
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+&lt;li&gt;denormalized, E==0&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;公式：value = (-1)^S * 2^(2 - 2^(En - 1)) * (M/2^Mn)&lt;/p&gt;
+
+&lt;h3 id=&#34;范围&#34;&gt;范围&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;NAN:not a number，E==2^En - 1，M!=0&lt;/li&gt;
+&lt;li&gt;无穷大(小)Infinity: E==2^En - 1, M == 0&lt;/li&gt;
+&lt;li&gt;normalized: E!=0&lt;/li&gt;
+&lt;li&gt;denormalized: E==0&lt;/li&gt;
+&lt;li&gt;最大值：2^(2^(En-1)+1) * (2-2^-Mn)&lt;/li&gt;
+&lt;li&gt;最小值：-2^(2 - 2^(En - 1)) * (1-&amp;frac12;^Mn)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;精度&#34;&gt;精度&lt;/h3&gt;
+
+&lt;p&gt;IEEE 754用有限的位数表示整个实数，肯定是不精确。主要表现在几个方面：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;无法覆盖所有实数，也就是说有些数根本无法表示，比如说：0.000000000000000000000001&lt;/li&gt;
+&lt;li&gt;无法精确表达某些数，比如：0.3&lt;/li&gt;
+&lt;li&gt;十进制精度(两浮点数的差，正确的小数个数)：1/2^Mn，单精度：1/2^23 = 0.0000001192092895507812，精确到6位；双精度：1/2^52 = 0.0000000000000002220446049250313，精确到15位。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;加法&#34;&gt;加法&lt;/h2&gt;
+
+&lt;h2 id=&#34;减法&#34;&gt;减法&lt;/h2&gt;
+</description>
+    </item>
+    
+    <item>
       <title>增加bug的编程实践</title>
       <link>http://zjykzk.github.io/bug-op/</link>
       <pubDate>Sat, 04 Jun 2016 11:12:13 +0800</pubDate>
@@ -123,7 +219,7 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 
 &lt;p&gt;最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。&lt;/p&gt;
 
-&lt;h2 id=&#34;思路不清晰:fde64685af38b7f697ddbea649e90617&#34;&gt;思路不清晰&lt;/h2&gt;
+&lt;h2 id=&#34;思路不清晰&#34;&gt;思路不清晰&lt;/h2&gt;
 
 &lt;p&gt;思路没有完全确定情况下写代码。造成不确定的情况有多方面：&lt;/p&gt;
 
@@ -142,7 +238,7 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 4. 放下别人对你问代码时的负面情绪
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;破窗原理:fde64685af38b7f697ddbea649e90617&#34;&gt;破窗原理&lt;/h2&gt;
+&lt;h2 id=&#34;破窗原理&#34;&gt;破窗原理&lt;/h2&gt;
 
 &lt;p&gt;在一个代码质量差的项目里面，就很容易被一种“别人也是这样，我也就这样得了”，尤其是在你不熟悉代码的情况下。&lt;strong&gt;短期内，代码是写给自己的，维护的人是自己，长期内是给别人的，都自己好就是对别人好，还有就是执行力&lt;/strong&gt;&lt;/p&gt;
 </description>
