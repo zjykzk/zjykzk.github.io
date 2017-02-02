@@ -55,6 +55,8 @@
 
 &lt;p&gt;下表表示了utf8的编码，z表示用于编码的bit&lt;/p&gt;
 
+&lt;p&gt;​&lt;/p&gt;
+
 &lt;p&gt;| unicode范围                       | utf8编码                              |
    | &amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;- | &amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash; |
    | 十六进制表示                          | 二进制表示                               |
