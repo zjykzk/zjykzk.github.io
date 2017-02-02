@@ -196,9 +196,10 @@
 <p>标准IEEE 754中，浮点数由三部分组成符号、指数、尾数。</p>
 
 <ul>
-<li>符号：表示正负，用<strong>S</strong>表示，用<strong>Sn</strong>表示使用的bit数</li>
-<li>指数：2的幂次，用<strong>E</strong>表示，用<strong>En</strong>表示使用的bit数</li>
-<li>尾数：小数部分，用<strong>M</strong>表示，用<strong>Mn</strong>表示使用的bit数</li>
+<li>符号：表示正负，用<strong>S</strong>表示，用<strong>Sn</strong>表示使用的bit数<br /></li>
+<li>指数：2的幂次，用<strong>E</strong>表示，用<strong>En</strong>表示使用的bit数<br /></li>
+<li>尾数：小数部分，用<strong>M</strong>表示，用<strong>Mn</strong>表示使用的bit数<br />
+<br /></li>
 </ul>
 
 <pre>
@@ -209,24 +210,26 @@
 
 <h3 id="单-双精度的bit位数">单、双精度的bit位数</h3>
 
-<p>|类型|Sn|En|Mn|Sn+En+Mn|
-|&mdash;-|&ndash;|&ndash;|&ndash;|&mdash;&mdash;-|
-|单精度|1|8|23|32|
+<p>|类型|Sn|En|Mn|Sn+En+Mn|<br />
+|&mdash;-|&ndash;|&ndash;|&ndash;|&mdash;&mdash;-|<br />
+|单精度|1|8|23|32|<br />
 |双精度|1|11|52|64|</p>
 
 <p>浮点数从二进制到十进制数值的转化分两种情况：</p>
 
 <ol>
-<li>normalized, E!=0</li>
+<li>normalized, E!=0<br />
+<br /></li>
 </ol>
 
-<p>公式：value = (-1)^S * 2^(E - 2^(En - 1) + 1) * (1+M/2^Mn)
+<p>公式：value = (-1)^S * 2^(E - 2^(En - 1) + 1) * (1+M/2^Mn)<br />
 例子：</p>
 
 <p>1.5</p>
 
 <ul>
-<li>单精度</li>
+<li>单精度<br />
+<br /></li>
 </ul>
 
 <pre>
@@ -237,17 +240,19 @@
 </pre>
 
 <ul>
-<li>双精度
-<pre>
-|&lt;-S-&gt;|&lt;&mdash;-E&mdash;-&gt;|&lt;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-M&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;&gt;|
-+&mdash;&ndash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+
-|  0  |01111111111|100000000000000000000000000000000000000000000000000000|
-+&mdash;&ndash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+
-</pre></li>
+<li>双精度<br />
+<pre><br />
+|&lt;-S-&gt;|&lt;&mdash;-E&mdash;-&gt;|&lt;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-M&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;&gt;|<br />
++&mdash;&ndash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+<br />
+|  0  |01111111111|100000000000000000000000000000000000000000000000000000|<br />
++&mdash;&ndash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+<br />
+</pre><br />
+<br /></li>
 </ul>
 
 <ol>
-<li>denormalized, E==0</li>
+<li>denormalized, E==0<br />
+<br /></li>
 </ol>
 
 <p>公式：value = (-1)^S * 2^(2 - 2^(En - 1)) * (M/2^Mn)</p>
@@ -255,12 +260,13 @@
 <h3 id="范围">范围</h3>
 
 <ul>
-<li>NAN:not a number，E==2^En - 1，M!=0</li>
-<li>无穷大(小)Infinity: E==2^En - 1, M == 0</li>
-<li>normalized: E!=0</li>
-<li>denormalized: E==0</li>
-<li>最大值：2^(2^(En-1)+1) * (2-2^-Mn)</li>
-<li>最小值：-2^(2 - 2^(En - 1)) * (1-&frac12;^Mn)</li>
+<li>NAN:not a number，E==2^En - 1，M!=0<br /></li>
+<li>无穷大(小)Infinity: E==2^En - 1, M == 0<br /></li>
+<li>normalized: E!=0<br /></li>
+<li>denormalized: E==0<br /></li>
+<li>最大值：2^(2^(En-1)+1) * (2-2^-Mn)<br /></li>
+<li>最小值：-2^(2 - 2^(En - 1)) * (1-&frac12;^Mn)<br />
+<br /></li>
 </ul>
 
 <h3 id="精度">精度</h3>
@@ -268,9 +274,10 @@
 <p>IEEE 754用有限的位数表示整个实数，肯定是不精确。主要表现在几个方面：</p>
 
 <ol>
-<li>无法覆盖所有实数，也就是说有些数根本无法表示，比如说：0.000000000000000000000001</li>
-<li>无法精确表达某些数，比如：0.3</li>
-<li>十进制精度(两浮点数的差，正确的小数个数)：1/2^Mn，单精度：1/2^23 = 0.0000001192092895507812，精确到6位；双精度：1/2^52 = 0.0000000000000002220446049250313，精确到15位。</li>
+<li>无法覆盖所有实数，也就是说有些数根本无法表示，比如说：0.000000000000000000000001<br /></li>
+<li>无法精确表达某些数，比如：0.3<br /></li>
+<li>十进制精度(两浮点数的差，正确的小数个数)：1/2^Mn，单精度：1/2^23 = 0.0000001192092895507812，精确到6位；双精度：1/2^52 = 0.0000000000000002220446049250313，精确到15位。<br />
+<br /></li>
 </ol>
 
 <h2 id="加法">加法</h2>
@@ -360,7 +367,7 @@
     
 <div class="container copyright">
   
-  &copy; 2016 zenk.
+  &copy; 2017 zenk.
 
 
 </div>
