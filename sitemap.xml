@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://zjykzk.github.io/str/</loc>
+    <lastmod>2017-01-19T14:05:14+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/prometheus/</loc>
     <lastmod>2016-10-09T14:45:21+08:00</lastmod>
   </url>
@@ -33,7 +38,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/</loc>
-    <lastmod>2016-10-09T14:45:21+08:00</lastmod>
+    <lastmod>2017-01-19T14:05:14+08:00</lastmod>
     <priority>0</priority>
   </url>
   
