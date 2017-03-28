@@ -2,15 +2,200 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>zencode</title>
-    <link>http://zjykzk.github.io/index.xml</link>
+    <link>http://zjykzk.github.io/</link>
     <description>Recent content on zencode</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Thu, 19 Jan 2017 14:05:14 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 28 Mar 2017 11:22:09 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>GO 内存模型</title>
+      <link>http://zjykzk.github.io/go-memory-model/</link>
+      <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/go-memory-model/</guid>
+      <description>
+
+&lt;h2 id=&#34;内存模型&#34;&gt;内存模型&lt;/h2&gt;
+
+&lt;p&gt;内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。&lt;/p&gt;
+
+&lt;h2 id=&#34;happens-before&#34;&gt;Happens Before&lt;/h2&gt;
+
+&lt;p&gt;编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;int a = 0;
+int b = 1;
+print(a);
+print(b);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;int a = 0;
+print(a);
+int b = 1;
+print(b);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;happens before&lt;/strong&gt;定义了内存操作的顺序，它是一种偏序。&lt;em&gt;e1&lt;/em&gt; happens before &lt;em&gt;e2&lt;/em&gt;, &lt;em&gt;e2&lt;/em&gt; happens after &lt;em&gt;e1&lt;/em&gt; 。如果 &lt;em&gt;e1&lt;/em&gt; 既不happens before &lt;em&gt;e2&lt;/em&gt; 也不happens after &lt;em&gt;e2&lt;/em&gt; ，那么 &lt;em&gt;e1&lt;/em&gt; 和 *e2*是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;在一个goroutine中，happens before的顺序就是代码表达的顺序。&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;共享变量 &lt;em&gt;v&lt;/em&gt; 的读操作 &lt;em&gt;r&lt;/em&gt; ，能够读到是另一个对变量 &lt;em&gt;v&lt;/em&gt; 写操作 &lt;em&gt;w&lt;/em&gt; 写入的值的条件是：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;em&gt;w&lt;/em&gt; happens before &lt;em&gt;r&lt;/em&gt;&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;没有其他的对变量 &lt;em&gt;v&lt;/em&gt; 写操作happens before &lt;em&gt;r&lt;/em&gt; 并且happens after &lt;em&gt;w&lt;/em&gt;&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;这两个条件并不能保证有一个与 &lt;em&gt;r&amp;amp;w&lt;/em&gt; 没有任何happens before关系的对共享变量 &lt;em&gt;v&lt;/em&gt; 写操作 &lt;em&gt;w&amp;rsquo;&lt;/em&gt; 的存在，导致 &lt;em&gt;r&lt;/em&gt; 读到的是 &lt;em&gt;w&amp;rsquo;&lt;/em&gt; 的结果。所以，保证 &lt;em&gt;r&lt;/em&gt; 的结果是 &lt;em&gt;w&lt;/em&gt; 的值的条件是：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;em&gt;w&lt;/em&gt; happens before &lt;em&gt;r&lt;/em&gt;&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;在 &lt;em&gt;w&lt;/em&gt; 和 &lt;em&gt;r&lt;/em&gt; 之间没有任何写操作，也就是说其他的写操作要么happens before &lt;em&gt;w&lt;/em&gt; ，要么happens after &lt;em&gt;r&lt;/em&gt;&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;在只有一个goroutine中1和2是等价的。 &lt;em&gt;r&lt;/em&gt; 的结果一定是最近一次 &lt;em&gt;w&lt;/em&gt; 的结果。&lt;strong&gt;如果多个goroutine访问共享变量，就会产生竞争，必须要通过同步机制建立happens before关系才能确定共享变量的值&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;另外，1) 变量自动的初始化为其类型对应的0时，相当于是一个写操作，也会产生竞争；2) 对多个机器字进行读写的时候，哪个字先读写是不确定的。&lt;/p&gt;
+
+&lt;h2 id=&#34;同步机制&#34;&gt;同步机制&lt;/h2&gt;
+
+&lt;h3 id=&#34;初始化&#34;&gt;初始化&lt;/h3&gt;
+
+&lt;p&gt;程序的初始化是通过一个goroutine执行的，这个goroutine会生成一个新的goroutine，因此会有竞争存在。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;包 &lt;em&gt;p&lt;/em&gt; 依赖 &lt;em&gt;q&lt;/em&gt; ， &lt;em&gt;q&lt;/em&gt; 的 &lt;em&gt;init&lt;/em&gt; 函数happens before包 &lt;em&gt;p&lt;/em&gt; 的任何操作&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;所有 &lt;em&gt;init&lt;/em&gt; 函数执行结束happens before *main.main*函数&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;goroutine-创建&#34;&gt;Goroutine 创建&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;go&lt;/em&gt; 语句happens before新创建的goroutine的运行。以下代码中，&lt;strong&gt;&lt;em&gt;1&lt;/em&gt;&lt;/strong&gt; happens before &lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt;，&lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt; happens before 函数&lt;strong&gt;&lt;em&gt;f&lt;/em&gt;&lt;/strong&gt;的执行，在将来的某个时刻所以打印&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;（可能是在hello函数返回之后）。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
+
+func f() {
+	print(a)
+}
+
+func hello() {
+	a = &amp;quot;hello, world&amp;quot; // 1
+	go f()			  // 2
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;goroutine-销毁&#34;&gt;Goroutine 销毁&lt;/h3&gt;
+
+&lt;p&gt;goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证&lt;strong&gt;&lt;em&gt;print(a)&lt;/em&gt;&lt;/strong&gt;的结果就是&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。事实上，编译器完全有可能把 &lt;em&gt;go&lt;/em&gt; 语句完全的删除掉。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
+
+func hello() {
+	go func() { a = &amp;quot;hello&amp;quot; }()
+	print(a)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;channel通信&#34;&gt;Channel通信&lt;/h3&gt;
+
+&lt;p&gt;channel在golang里面是同步的一个重要手段。channel上面的每个发送操作，都唯一对应着一个channel上面的接受操作，显然发送／接受操作在不同的goroutine下面才需要讨论。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。&lt;/strong&gt;以下代码中，按照本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var c = make(chan int, 10)
+var a string
+
+func f() {
+	a = &amp;quot;hello, world&amp;quot;
+	c &amp;lt;- 0		// 1
+}
+
+func main() {
+	go f()
+	&amp;lt;-c			// 2
+	print(a)	 // 3
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;channel的关闭操作happens before因为关闭channel读到的0值。&lt;/strong&gt;上面例子中，用 &lt;em&gt;close( c)&lt;/em&gt; 代替 &lt;em&gt;ch &amp;lt;- 0&lt;/em&gt; 同样能够保证 &lt;em&gt;1&lt;/em&gt;  happens before &lt;em&gt;2&lt;/em&gt;  。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var c = make(chan int)
+var a string
+
+func f() {
+	a = &amp;quot;hello, world&amp;quot;
+	&amp;lt;-c					// 1
+}
+
+func main() {
+	go f()
+	c &amp;lt;- 0				// 2
+	print(a)			// 3
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;如果一个channel有 &lt;em&gt;C&lt;/em&gt; 容量的缓冲，第 &lt;em&gt;k&lt;/em&gt; 个接受操作happens before第 &lt;em&gt;k+C&lt;/em&gt; 个发送操作。&lt;/strong&gt;根据这个规则可以用带缓冲的channel来模拟信号量。以下程序就保证了，同时最多只有3个goroutine同时执行 &lt;em&gt;w&lt;/em&gt; 函数。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var limit = make(chan int, 3)
+
+func main() {
+	for _, w := range work {
+		go func(w func()) {
+			limit &amp;lt;- 1
+			w()
+			&amp;lt;-limit
+		}(w)
+	}
+	select{}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;locks&#34;&gt;Locks&lt;/h3&gt;
+
+&lt;p&gt;包 &lt;em&gt;sync&lt;/em&gt; 实现了两类锁分别是： &lt;em&gt;sync.Mutex&lt;/em&gt; 和 &lt;em&gt;sync.RWMutex。&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;给定类型为 &lt;em&gt;sync.Mutex&lt;/em&gt; 或者是 &lt;em&gt;sync.RWMutex&lt;/em&gt; 的变量 &lt;em&gt;l&lt;/em&gt; ,以及满足 &lt;em&gt;n&amp;lt;m&lt;/em&gt; 条件的整数。调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock()&lt;/em&gt;  happens before 调用 &lt;em&gt;m&lt;/em&gt; 次 &lt;em&gt;l.Lock()&lt;/em&gt; （返回）。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var l sync.Mutex
+var a string
+
+func f() {
+	a = &amp;quot;hello, world&amp;quot;
+	l.Unlock()		// 1
+}
+
+func main() {
+	l.Lock()
+	go f()
+	l.Lock()		// 2
+	print(a)		// 3
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;对于 &lt;em&gt;sync.RWMutex&lt;/em&gt; 类型的变量l，存在一个整数 &lt;em&gt;n&lt;/em&gt; ， &lt;em&gt;l.RLock&lt;/em&gt; 的调用happens after(返回)调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock&lt;/em&gt; ，与这个 &lt;em&gt;l.RLock&lt;/em&gt; 想对应的 &lt;em&gt;l.RUnlock&lt;/em&gt; happens before 第 &lt;em&gt;n+1&lt;/em&gt; 的 &lt;em&gt;l.Lock&lt;/em&gt; 。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;once&#34;&gt;Once&lt;/h3&gt;
+
+&lt;p&gt;Once提供了保证某段代码只执行一次的机制。对某个函数 &lt;em&gt;f&lt;/em&gt; ， &lt;em&gt;once.Do(f)&lt;/em&gt; 调用保证了 &lt;em&gt;f&lt;/em&gt; 只被执行一次，如果有多个goroutine执行 &lt;em&gt;once.Do(f)&lt;/em&gt; ，其中一个执行了，其他就等待直到f执行完毕。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;调用 &lt;em&gt;once.Do(f)&lt;/em&gt; 中 &lt;em&gt;f&lt;/em&gt; (返回)happens before 其他 &lt;em&gt;once.Do(f)&lt;/em&gt; 调用完成。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;为了更有效率的执行程序，编译器，CPU都会一某种方式进行优化。当程序是并发执行的时候，内存的数据就变得无法根据程序代码判断内存中的值。内存模型的作用就是在程序的层面规定内存的操作顺序，以达到确定内存值的目的。而happens before是一个定义这个操作顺序的规范。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>字符串</title>
@@ -20,31 +205,28 @@
       <guid>http://zjykzk.github.io/str/</guid>
       <description>
 
-&lt;h1 id=&#34;为什么要字符&#34;&gt;为什么要字符&lt;/h1&gt;
+&lt;h1 id=&#34;为什么要字符:ac17de707b25e0d35e0202713fd3401b&#34;&gt;为什么要字符&lt;/h1&gt;
 
 &lt;p&gt;人类发明了文字，同时想用计算机来处理文字。由此，就产生了字符。每个字符代码一个文字的图形。&lt;/p&gt;
 
-&lt;h1 id=&#34;字符串的表示&#34;&gt;字符串的表示&lt;/h1&gt;
+&lt;h1 id=&#34;字符串的表示:ac17de707b25e0d35e0202713fd3401b&#34;&gt;字符串的表示&lt;/h1&gt;
 
 &lt;p&gt;在计算机内部，只有01的信息。因此，为了能让计算机能够认识字符串，每个字符就的被映射成01数据。这个映射功能就叫编码。&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;ASCII&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;ASCII&lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如&lt;code&gt;A&lt;/code&gt;的编码是&lt;code&gt;01000001&lt;/code&gt;&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;Unicode&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;Unicode&lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;世界语言文字异常丰富，每个国家都有自己独特的语言文字。ASCII的编码无法编码所有的文字，因此产生了很多编码，比如中文的BIG5，GB2312等等。这些编码无法兼容，比如&lt;code&gt;中&lt;/code&gt;在GB2312编码是&lt;code&gt;1101011011010000&lt;/code&gt;，BIG5的编码是&lt;code&gt;1010010010100100&lt;/code&gt;。因此，Unicode就出现了。Unicode规定了每个字符的唯一编号，目前已经有100多万个字符。需要注意的是Unicode只规定了字符的编号，没有规定二进制的表示。&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;Utf8编码&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;Utf8编码&lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。&lt;/p&gt;
@@ -53,8 +235,7 @@
 
 &lt;ol&gt;
 &lt;li&gt;一个字节的编码，最高位为0，其他的位表示unicode编号&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;n个字节的编码（n&amp;gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;n个字节的编码（n&amp;gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号&lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;下表表示了utf8的编码，z表示用于编码的bit&lt;/p&gt;
@@ -95,23 +276,23 @@
 &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;h1 id=&#34;环境中的编码&#34;&gt;环境中的编码&lt;/h1&gt;
+&lt;h1 id=&#34;环境中的编码:ac17de707b25e0d35e0202713fd3401b&#34;&gt;环境中的编码&lt;/h1&gt;
 
 &lt;p&gt;一个程序读取字符的输入的时候，读取的是二进制的数据。如果程序需要理解这个字符串是什么意思，必须了解字符的编码。同理，程序输出字符串的时候必须告知字符串的编码，不然使用者就无法理解程序的输出。程序中遇到乱码的问题，都是因为一个程序输出的字符串的编码和另一个程序接受字符串时使用的编码不一致导致的。因此，在解决编码的问题的思路就是搞清楚涉及到了哪几个环境。&lt;/p&gt;
 
 &lt;p&gt;比如：一个程序打印一个字符串到终端。程序的编码是utf8，终端显示的编码是gbk。这样就会造成乱码。&lt;/p&gt;
 
-&lt;h1 id=&#34;不同语言的字符串的支持&#34;&gt;不同语言的字符串的支持&lt;/h1&gt;
+&lt;h1 id=&#34;不同语言的字符串的支持:ac17de707b25e0d35e0202713fd3401b&#34;&gt;不同语言的字符串的支持&lt;/h1&gt;
 
-&lt;h2 id=&#34;python-中的字符串&#34;&gt;python 中的字符串&lt;/h2&gt;
+&lt;h2 id=&#34;python-中的字符串:ac17de707b25e0d35e0202713fd3401b&#34;&gt;python 中的字符串&lt;/h2&gt;
 
-&lt;h3 id=&#34;python-2&#34;&gt;python 2&lt;/h3&gt;
+&lt;h3 id=&#34;python-2:ac17de707b25e0d35e0202713fd3401b&#34;&gt;python 2&lt;/h3&gt;
 
-&lt;h4 id=&#34;字符类型&#34;&gt;字符类型&lt;/h4&gt;
+&lt;h4 id=&#34;字符类型:ac17de707b25e0d35e0202713fd3401b&#34;&gt;字符类型&lt;/h4&gt;
 
 &lt;p&gt;分为byte字符串(str)和unicode(unicode)，前者的内容是字节，后者的内容是unicode中的编号。默认的是byte字符串。&lt;/p&gt;
 
-&lt;h4 id=&#34;重要方法&#34;&gt;重要方法&lt;/h4&gt;
+&lt;h4 id=&#34;重要方法:ac17de707b25e0d35e0202713fd3401b&#34;&gt;重要方法&lt;/h4&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-py&#34;&gt;# &amp;lt;type &#39;str&#39;&amp;gt; to &amp;lt;type &#39;unicode&#39;&amp;gt;
 # 如果 s 是&#39;unicode&#39;类型，python会先通过encode函数把s转换成&#39;str&#39;类型，而encode函数的encoding是sys.getdefaultencoding()的值
@@ -133,28 +314,26 @@ reload(sys) # 因为python初始化的时候会把setdefaultencoding方法给删
 sys.setdefaultencoding(&#39;utf8&#39;)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h4 id=&#34;codecs&#34;&gt;codecs&lt;/h4&gt;
+&lt;h4 id=&#34;codecs:ac17de707b25e0d35e0202713fd3401b&#34;&gt;codecs&lt;/h4&gt;
 
 &lt;p&gt;指定encoding参数生成file-object-like对象，利用：&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;函数&lt;code&gt;read&lt;/code&gt; 读取byte字符串，按照encoding的编码返回unicode&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;write&lt;/code&gt; 输入unicode，按照encoding的编码转换成byte字符串写入文件&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;write&lt;/code&gt; 输入unicode，按照encoding的编码转换成byte字符串写入文件&lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&#34;python-3&#34;&gt;python 3&lt;/h3&gt;
+&lt;h3 id=&#34;python-3:ac17de707b25e0d35e0202713fd3401b&#34;&gt;python 3&lt;/h3&gt;
 
 &lt;p&gt;显然，python2中的字符串处理方式会变得复杂，因此在python3中字符串统一都是unicode。&lt;/p&gt;
 
-&lt;h2 id=&#34;go中的字符串&#34;&gt;go中的字符串&lt;/h2&gt;
+&lt;h2 id=&#34;go中的字符串:ac17de707b25e0d35e0202713fd3401b&#34;&gt;go中的字符串&lt;/h2&gt;
 
 &lt;p&gt;go中有两种类型支持字符串分别是：&lt;code&gt;string&lt;/code&gt;和&lt;code&gt;rune&lt;/code&gt;。&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;string表示字节slice（分片）&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;rune表示unicode的编码（code point）&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;rune表示unicode的编码（code point）&lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;go对utf8有天然的支持。go的源代码是utf8编码，&lt;code&gt;for ... range&lt;/code&gt;循环字符串的时候也是按照utf8编码来处理每个字符，而不是字节。&lt;/p&gt;
@@ -172,13 +351,13 @@ sys.setdefaultencoding(&#39;utf8&#39;)
 &lt;p&gt;prometheus是开源的现代监控系统。它用go开发，发布于2012。&lt;br /&gt;
 社区热度比较高，功能比较丰富灵活。&lt;/p&gt;
 
-&lt;h2 id=&#34;架构&#34;&gt;架构&lt;/h2&gt;
+&lt;h2 id=&#34;架构:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;架构&lt;/h2&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/promutheus.arch.svg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;基本概念&#34;&gt;基本概念&lt;/h2&gt;
+&lt;h2 id=&#34;基本概念:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;基本概念&lt;/h2&gt;
 
-&lt;h3 id=&#34;数据模型&#34;&gt;数据模型&lt;/h3&gt;
+&lt;h3 id=&#34;数据模型:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;数据模型&lt;/h3&gt;
 
 &lt;p&gt;prometheus把数据当作时间序列进行存储。&lt;br /&gt;
 每个时间序列通过 &lt;strong&gt;metric name&lt;/strong&gt;和 &lt;strong&gt;key-value pairs&lt;/strong&gt;(也叫做 &lt;strong&gt;label&lt;/strong&gt;)标识。&lt;/p&gt;
@@ -192,17 +371,17 @@ Label名字允许包含ASCII字母，数字以及下划线。&lt;br /&gt;
 正则表示为：[a-zA-Z&lt;em&gt;][a-zA-Z0-9&lt;/em&gt;]*。同时，“__”开头的名字系统保留的。&lt;br /&gt;
 Label值允许任意的Unicode字符&lt;/p&gt;
 
-&lt;h3 id=&#34;度量类型&#34;&gt;度量类型&lt;/h3&gt;
+&lt;h3 id=&#34;度量类型:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;度量类型&lt;/h3&gt;
 
-&lt;h4 id=&#34;counter&#34;&gt;Counter&lt;/h4&gt;
+&lt;h4 id=&#34;counter:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;Counter&lt;/h4&gt;
 
 &lt;p&gt;累计统计度量的单个值。适用于只增不减度量，比如累计请求数量。&lt;/p&gt;
 
-&lt;h4 id=&#34;gauge&#34;&gt;Gauge&lt;/h4&gt;
+&lt;h4 id=&#34;gauge:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;Gauge&lt;/h4&gt;
 
 &lt;p&gt;统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。&lt;/p&gt;
 
-&lt;h4 id=&#34;histogram&#34;&gt;Histogram&lt;/h4&gt;
+&lt;h4 id=&#34;histogram:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;Histogram&lt;/h4&gt;
 
 &lt;p&gt;统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。&lt;/p&gt;
 
@@ -211,11 +390,10 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&amp;lt;base_name&amp;gt;_bucket{le=&amp;laquo;upper inclusive bound&amp;raquo;}：小于某个阀值的度量事件发生的次数&lt;br /&gt;&lt;/li&gt;
 &lt;li&gt;&amp;lt;base_name&amp;gt;_sum：度量值的和&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;&amp;lt;base_name&amp;gt;_count：度量事件发生的次数&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;&amp;lt;base_name&amp;gt;_count：度量事件发生的次数&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h4 id=&#34;summary&#34;&gt;Summary&lt;/h4&gt;
+&lt;h4 id=&#34;summary:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;Summary&lt;/h4&gt;
 
 &lt;p&gt;统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。&lt;/p&gt;
 
@@ -224,11 +402,10 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&amp;lt;base_name&amp;gt;{quantile=&amp;raquo;&amp;lt;p&amp;gt;&amp;laquo;}：度量值在前百分之p的度量事件发生的次数&lt;br /&gt;&lt;/li&gt;
 &lt;li&gt;&amp;lt;base_name&amp;gt;_sum：度量值的和&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;&amp;lt;base_name&amp;gt;_count：度量事件发生的次数&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;&amp;lt;base_name&amp;gt;_count：度量事件发生的次数&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;job-instance&#34;&gt;Job &amp;amp; Instance&lt;/h3&gt;
+&lt;h3 id=&#34;job-instance:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;Job &amp;amp; Instance&lt;/h3&gt;
 
 &lt;p&gt;在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如&lt;br /&gt;
 一个支付进程。Job代表一个监控的逻辑单位。&lt;br /&gt;
@@ -240,12 +417,11 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;instance 1: 1.2.3.4:5678&lt;br /&gt;&lt;/li&gt;
 &lt;li&gt;instance 2: 1.2.3.5:5689&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;instance 3: 1.2.3.6:5689&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;instance 3: 1.2.3.6:5689&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h4 id=&#34;自动生成的label和时间序列&#34;&gt;自动生成的label和时间序列&lt;/h4&gt;
+&lt;h4 id=&#34;自动生成的label和时间序列:94e1a00111b903ee2bc7218c2e11294b&#34;&gt;自动生成的label和时间序列&lt;/h4&gt;
 
 &lt;p&gt;当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。&lt;/p&gt;
 
@@ -253,8 +429,7 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;job: 配置好的job名字&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;instance:&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;格式的url&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;instance:&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;格式的url&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;时间序列：&lt;/p&gt;
@@ -263,109 +438,6 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 &lt;li&gt;up{job=&amp;raquo;&amp;lt;job-name&amp;gt;&amp;laquo;, instance=&amp;raquo;&amp;lt;host:port&amp;gt;&amp;laquo;}：1 表示监控目标活着，0表示挂了&lt;br /&gt;&lt;/li&gt;
 &lt;li&gt;scrape_duration_seconds{job=&amp;raquo;&amp;lt;job-name&amp;gt;&amp;laquo;, instance=&amp;raquo;&amp;lt;host:port&amp;gt;&amp;laquo;}：抓取日志的时间&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>浮点数 IEEE 754</title>
-      <link>http://zjykzk.github.io/ieee-754/</link>
-      <pubDate>Sun, 05 Jun 2016 20:21:39 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/ieee-754/</guid>
-      <description>
-
-&lt;h2 id=&#34;表示&#34;&gt;表示&lt;/h2&gt;
-
-&lt;p&gt;标准IEEE 754中，浮点数由三部分组成符号、指数、尾数。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;符号：表示正负，用&lt;strong&gt;S&lt;/strong&gt;表示，用&lt;strong&gt;Sn&lt;/strong&gt;表示使用的bit数&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;指数：2的幂次，用&lt;strong&gt;E&lt;/strong&gt;表示，用&lt;strong&gt;En&lt;/strong&gt;表示使用的bit数&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;尾数：小数部分，用&lt;strong&gt;M&lt;/strong&gt;表示，用&lt;strong&gt;Mn&lt;/strong&gt;表示使用的bit数&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;
-+-----+------+--------+
-|  S  |   E  |    M   |
-+-----+------+--------+
-&lt;/pre&gt;
-
-&lt;h3 id=&#34;单-双精度的bit位数&#34;&gt;单、双精度的bit位数&lt;/h3&gt;
-
-&lt;p&gt;|类型|Sn|En|Mn|Sn+En+Mn|&lt;br /&gt;
-|&amp;mdash;-|&amp;ndash;|&amp;ndash;|&amp;ndash;|&amp;mdash;&amp;mdash;-|&lt;br /&gt;
-|单精度|1|8|23|32|&lt;br /&gt;
-|双精度|1|11|52|64|&lt;/p&gt;
-
-&lt;p&gt;浮点数从二进制到十进制数值的转化分两种情况：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;normalized, E!=0&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;公式：value = (-1)^S * 2^(E - 2^(En - 1) + 1) * (1+M/2^Mn)&lt;br /&gt;
-例子：&lt;/p&gt;
-
-&lt;p&gt;1.5&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;单精度&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;
-|&lt;-S-&gt;|&lt;--E---&gt;|&lt;---------M-----------&gt;|
-+-----+--------+-----------------------+
-|  0  |01111111|10000000000000000000000|
-+-----+--------+-----------------------+
-&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;双精度&lt;br /&gt;
-&lt;pre&gt;&lt;br /&gt;
-|&amp;lt;-S-&amp;gt;|&amp;lt;&amp;mdash;-E&amp;mdash;-&amp;gt;|&amp;lt;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;-M&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;&amp;gt;|&lt;br /&gt;
-+&amp;mdash;&amp;ndash;+&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;+&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;+&lt;br /&gt;
-|  0  |01111111111|100000000000000000000000000000000000000000000000000000|&lt;br /&gt;
-+&amp;mdash;&amp;ndash;+&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;+&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;+&lt;br /&gt;
-&lt;/pre&gt;&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;ol&gt;
-&lt;li&gt;denormalized, E==0&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;公式：value = (-1)^S * 2^(2 - 2^(En - 1)) * (M/2^Mn)&lt;/p&gt;
-
-&lt;h3 id=&#34;范围&#34;&gt;范围&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;NAN:not a number，E==2^En - 1，M!=0&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;无穷大(小)Infinity: E==2^En - 1, M == 0&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;normalized: E!=0&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;denormalized: E==0&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;最大值：2^(2^(En-1)+1) * (2-2^-Mn)&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;最小值：-2^(2 - 2^(En - 1)) * (1-&amp;frac12;^Mn)&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;精度&#34;&gt;精度&lt;/h3&gt;
-
-&lt;p&gt;IEEE 754用有限的位数表示整个实数，肯定是不精确。主要表现在几个方面：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;无法覆盖所有实数，也就是说有些数根本无法表示，比如说：0.000000000000000000000001&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;无法精确表达某些数，比如：0.3&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;十进制精度(两浮点数的差，正确的小数个数)：1/2^Mn，单精度：1/2^23 = 0.0000001192092895507812，精确到6位；双精度：1/2^52 = 0.0000000000000002220446049250313，精确到15位。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;加法&#34;&gt;加法&lt;/h2&gt;
-
-&lt;h2 id=&#34;减法&#34;&gt;减法&lt;/h2&gt;
 </description>
     </item>
     
@@ -379,7 +451,7 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 
 &lt;p&gt;最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。&lt;/p&gt;
 
-&lt;h2 id=&#34;思路不清晰&#34;&gt;思路不清晰&lt;/h2&gt;
+&lt;h2 id=&#34;思路不清晰:fde64685af38b7f697ddbea649e90617&#34;&gt;思路不清晰&lt;/h2&gt;
 
 &lt;p&gt;思路没有完全确定情况下写代码。造成不确定的情况有多方面：&lt;/p&gt;
 
@@ -398,7 +470,7 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 4. 放下别人对你问代码时的负面情绪
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;破窗原理&#34;&gt;破窗原理&lt;/h2&gt;
+&lt;h2 id=&#34;破窗原理:fde64685af38b7f697ddbea649e90617&#34;&gt;破窗原理&lt;/h2&gt;
 
 &lt;p&gt;在一个代码质量差的项目里面，就很容易被一种“别人也是这样，我也就这样得了”，尤其是在你不熟悉代码的情况下。&lt;strong&gt;短期内，代码是写给自己的，维护的人是自己，长期内是给别人的，都自己好就是对别人好，还有就是执行力&lt;/strong&gt;&lt;/p&gt;
 </description>
@@ -412,57 +484,55 @@ Label值允许任意的Unicode字符&lt;/p&gt;
       <guid>http://zjykzk.github.io/flume/</guid>
       <description>
 
-&lt;h1 id=&#34;简介&#34;&gt;简介&lt;/h1&gt;
+&lt;h1 id=&#34;简介:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;简介&lt;/h1&gt;
 
 &lt;p&gt;flume是通用的数据收集框架。特点是分布式、高可靠、高可用、高可定制化。&lt;/p&gt;
 
-&lt;h1 id=&#34;架构&#34;&gt;架构&lt;/h1&gt;
+&lt;h1 id=&#34;架构:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;架构&lt;/h1&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/flume.dot.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;h1 id=&#34;概念&#34;&gt;概念&lt;/h1&gt;
+&lt;h1 id=&#34;概念:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;概念&lt;/h1&gt;
 
-&lt;h2 id=&#34;source&#34;&gt;source&lt;/h2&gt;
+&lt;h2 id=&#34;source:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;source&lt;/h2&gt;
 
 &lt;p&gt;数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个&lt;strong&gt;event&lt;/strong&gt;。&lt;/p&gt;
 
-&lt;h3 id=&#34;event&#34;&gt;event&lt;/h3&gt;
+&lt;h3 id=&#34;event:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;event&lt;/h3&gt;
 
 &lt;p&gt;数据单元，从&lt;strong&gt;source&lt;/strong&gt;产生，直到被序列化到存储中。&lt;strong&gt;event&lt;/strong&gt;包含*header*，*body*两个部分：&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;header: 一个map数据，可以被&lt;strong&gt;interceptor&lt;/strong&gt;引用&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;body: 一个字节序列，具体日志数据&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;body: 一个字节序列，具体日志数据&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;interceptor&#34;&gt;interceptor&lt;/h3&gt;
+&lt;h3 id=&#34;interceptor:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;interceptor&lt;/h3&gt;
 
 &lt;p&gt;&lt;strong&gt;source&lt;/strong&gt;读取一个&lt;strong&gt;event&lt;/strong&gt;在放到&lt;strong&gt;channel&lt;/strong&gt;中之前，&lt;strong&gt;event&lt;/strong&gt;可以被添加数据。比如说：采集机器的主机名称，时间戳。&lt;/p&gt;
 
-&lt;h2 id=&#34;channel&#34;&gt;channel&lt;/h2&gt;
+&lt;h2 id=&#34;channel:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;channel&lt;/h2&gt;
 
 &lt;p&gt;数据队列，高可用的保障。&lt;strong&gt;source&lt;/strong&gt;产生的数据先放到这里，&lt;strong&gt;sink&lt;/strong&gt;接着从这里取出来放到存储当中。&lt;/p&gt;
 
-&lt;h3 id=&#34;channel-selector&#34;&gt;channel selector&lt;/h3&gt;
+&lt;h3 id=&#34;channel-selector:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;channel selector&lt;/h3&gt;
 
 &lt;p&gt;两个作用：&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;复制：把一个&lt;strong&gt;event&lt;/strong&gt;写到一个或者多个&lt;strong&gt;channel&lt;/strong&gt;中&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;路由：根据&lt;strong&gt;event&lt;/strong&gt;中的某个属性值，把数据写到指定的&lt;strong&gt;channel&lt;/strong&gt;中&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;路由：根据&lt;strong&gt;event&lt;/strong&gt;中的某个属性值，把数据写到指定的&lt;strong&gt;channel&lt;/strong&gt;中&lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2 id=&#34;sink&#34;&gt;sink&lt;/h2&gt;
+&lt;h2 id=&#34;sink:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;sink&lt;/h2&gt;
 
 &lt;p&gt;负责把&lt;strong&gt;channel&lt;/strong&gt;中的数据写入目标存储。&lt;/p&gt;
 
-&lt;h3 id=&#34;sink-processor&#34;&gt;sink processor&lt;/h3&gt;
+&lt;h3 id=&#34;sink-processor:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;sink processor&lt;/h3&gt;
 
 &lt;p&gt;选择&lt;strong&gt;sink&lt;/strong&gt;，在这里可以完成负载均衡和容错处理。&lt;/p&gt;
 
-&lt;h3 id=&#34;event-serializer&#34;&gt;event serializer&lt;/h3&gt;
+&lt;h3 id=&#34;event-serializer:4c6caa589b1ebf1283611b7dfb3df9e8&#34;&gt;event serializer&lt;/h3&gt;
 
 &lt;p&gt;把&lt;strong&gt;event&lt;/strong&gt;中的数据，转换成存储需要的格式。&lt;/p&gt;
 </description>
