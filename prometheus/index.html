@@ -1,206 +1,60 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<html lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>prometheus  &middot; zencode</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>prometheus – zenk 随笔</title>
+<meta name="description" content="prometheus介绍">
+<meta name="created" content="2016-10-09T14:45:21&#43;0800">
+<meta name="author" content="zenk"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.21" />
 
-
-<meta name="description" content="prometheus介绍" />
-
-<meta name="keywords" content="monitor, prometheus, ">
-
-
-<meta property="og:title" content="prometheus  &middot; zencode ">
-<meta property="og:site_name" content="zencode"/>
-<meta property="og:url" content="http://zjykzk.github.io/prometheus/" />
-<meta property="og:locale" content="zh-CN">
-
-
-<meta property="og:type" content="article" />
-<meta property="og:description" content="prometheus介绍"/>
-<meta property="og:article:published_time" content="2016-10-09T14:45:21&#43;08:00" />
-<meta property="og:article:modified_time" content="2016-10-09T14:45:21&#43;08:00" />
-
-  
-    
-<meta property="og:article:tag" content="monitor">
-    
-<meta property="og:article:tag" content="prometheus">
-    
-  
-
-  
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:site" content="@" />
-<meta name="twitter:creator" content="@" />
-<meta name="twitter:title" content="prometheus" />
-<meta name="twitter:description" content="prometheus介绍" />
-<meta name="twitter:url" content="http://zjykzk.github.io/prometheus/" />
-<meta name="twitter:domain" content="http://zjykzk.github.io/">
-  
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "Article",
-    "headline": "prometheus",
-    "author": {
-      "@type": "Person",
-      "name": "http://profiles.google.com/+?rel=author"
-    },
-    "datePublished": "2016-10-09",
-    "description": "prometheus介绍",
-    "wordCount":  68 
-  }
-</script>
-
-
-
-<link rel="canonical" href="http://zjykzk.github.io/prometheus/" />
-
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://zjykzk.github.io/touch-icon-144-precomposed.png">
-<link href="http://zjykzk.github.io/favicon.png" rel="icon">
-
-<meta name="generator" content="Hugo 0.16-DEV" />
-
-  <!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-<![endif]-->
-
-
-
-    <link rel="stylesheet" href="http://zjykzk.github.io/css/theme/default.css">
-
-
-<link rel="stylesheet" href="http://zjykzk.github.io/css/font-awesome.min.css">
-<link rel="stylesheet" href="http://zjykzk.github.io/css/style.css">
-
-
-  <link rel="stylesheet" href="http://zjykzk.github.io/css/highlight/default.css">
-
-
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="http://zjykzk.github.io/prometheus/">
 </head>
-<body>
-    <header id="main-header">
-  <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="http://zjykzk.github.io/">zencode</a>
-      </div>
-      <div id="navbar" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav navbar-right">
-          
-          <li>
 
-            <a href="http://zjykzk.github.io/about"
-            >
-
-            
-                <i class="fa fa-info-circle"></i>
-            
-            
-            About
-            </a>
-          </li>
-          
-          <li>
-
-            <a href="http://zjykzk.github.io/post"
-             title="Show list of posts">
-
-            
-            
-            Posts
-            </a>
-          </li>
-          
-          <li>
-
-            <a href="http://zjykzk.github.io/tags"
-             title="Show list of tags">
-
-            
-            
-            Tags
-            </a>
-          </li>
-          
-        </ul>
-      </div>
-      
-    </div>
-  </nav>
-
+<body class="one-sidebar sidebar-second">
+<div class="layout-center">
+<header class="header" role="banner">
+<a href="http://zjykzk.github.io/" title="Home" rel="home" class="header__logo"><img src="/images/logo.png" alt="Home" class="header__logo-image" /></a><h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>zenk 随笔</span></a>
+</h1>
+<div class="header__region region region-header"></div>
 </header>
 
+<div class="layout-3col layout-swap">
+<main class="layout-3col__left-content" role="main">
+<h1 class="title title-submitted">prometheus</h1>
+<article class=" single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2016-10-09T14:45:21&#43;08:00">2016-10-09</time>
+</p>
 
-<div class="container">
-<div class="row">
-
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <div class="text-center">
-
-    <h1>prometheus
-</h1>
-
-    <div class="metas">
-<small>
-  <i class="fa fa-calendar"></i>
-  <time datetime="2016-10-09">9 Oct, 2016</time>
-</small>
-
-
-  <small>
-    &middot; by zenk
-  
-  &middot; Read in about 1 min
-  &middot; (68 Words)
-</small>
-
-
-<div class="margin-10">
-  <i class="fa fa-tags"></i>
-  
-  <a href="http://zjykzk.github.io/tags/%E6%8A%80%E6%9C%AF" class="label label-primary">技术</a>
-  
-  <a href="http://zjykzk.github.io/tags/%E7%9B%91%E6%8E%A7" class="label label-primary">监控</a>
-  
-
-
-</div>
-<br>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/%E6%8A%80%E6%9C%AF">技术</a></li>
+<li><a href="/tags/%E7%9B%91%E6%8E%A7">监控</a></li>
+</ul>
 </div>
 
-  </div>
-</div>
+</header>
+<div class="content">
 
-  <div class="container content">
-  
 
 <p>prometheus是开源的现代监控系统。它用go开发，发布于2012。<br />
 社区热度比较高，功能比较丰富灵活。</p>
 
-<h2 id="架构:94e1a00111b903ee2bc7218c2e11294b">架构</h2>
+<h2 id="架构">架构</h2>
 
 <p><img src="/imgs/promutheus.arch.svg" alt="" /></p>
 
-<h2 id="基本概念:94e1a00111b903ee2bc7218c2e11294b">基本概念</h2>
+<h2 id="基本概念">基本概念</h2>
 
-<h3 id="数据模型:94e1a00111b903ee2bc7218c2e11294b">数据模型</h3>
+<h3 id="数据模型">数据模型</h3>
 
 <p>prometheus把数据当作时间序列进行存储。<br />
 每个时间序列通过 <strong>metric name</strong>和 <strong>key-value pairs</strong>(也叫做 <strong>label</strong>)标识。</p>
@@ -214,17 +68,17 @@ Label名字允许包含ASCII字母，数字以及下划线。<br />
 正则表示为：[a-zA-Z<em>][a-zA-Z0-9</em>]*。同时，“__”开头的名字系统保留的。<br />
 Label值允许任意的Unicode字符</p>
 
-<h3 id="度量类型:94e1a00111b903ee2bc7218c2e11294b">度量类型</h3>
+<h3 id="度量类型">度量类型</h3>
 
-<h4 id="counter:94e1a00111b903ee2bc7218c2e11294b">Counter</h4>
+<h4 id="counter">Counter</h4>
 
 <p>累计统计度量的单个值。适用于只增不减度量，比如累计请求数量。</p>
 
-<h4 id="gauge:94e1a00111b903ee2bc7218c2e11294b">Gauge</h4>
+<h4 id="gauge">Gauge</h4>
 
 <p>统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。</p>
 
-<h4 id="histogram:94e1a00111b903ee2bc7218c2e11294b">Histogram</h4>
+<h4 id="histogram">Histogram</h4>
 
 <p>统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。</p>
 
@@ -233,10 +87,11 @@ Label值允许任意的Unicode字符</p>
 <ul>
 <li>&lt;base_name&gt;_bucket{le=&laquo;upper inclusive bound&raquo;}：小于某个阀值的度量事件发生的次数<br /></li>
 <li>&lt;base_name&gt;_sum：度量值的和<br /></li>
-<li>&lt;base_name&gt;_count：度量事件发生的次数<br /></li>
+<li>&lt;base_name&gt;_count：度量事件发生的次数<br />
+<br /></li>
 </ul>
 
-<h4 id="summary:94e1a00111b903ee2bc7218c2e11294b">Summary</h4>
+<h4 id="summary">Summary</h4>
 
 <p>统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。</p>
 
@@ -245,10 +100,11 @@ Label值允许任意的Unicode字符</p>
 <ul>
 <li>&lt;base_name&gt;{quantile=&raquo;&lt;p&gt;&laquo;}：度量值在前百分之p的度量事件发生的次数<br /></li>
 <li>&lt;base_name&gt;_sum：度量值的和<br /></li>
-<li>&lt;base_name&gt;_count：度量事件发生的次数<br /></li>
+<li>&lt;base_name&gt;_count：度量事件发生的次数<br />
+<br /></li>
 </ul>
 
-<h3 id="job-instance:94e1a00111b903ee2bc7218c2e11294b">Job &amp; Instance</h3>
+<h3 id="job-instance">Job &amp; Instance</h3>
 
 <p>在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如<br />
 一个支付进程。Job代表一个监控的逻辑单位。<br />
@@ -260,11 +116,12 @@ Label值允许任意的Unicode字符</p>
 <ul>
 <li>instance 1: 1.2.3.4:5678<br /></li>
 <li>instance 2: 1.2.3.5:5689<br /></li>
-<li>instance 3: 1.2.3.6:5689<br /></li>
+<li>instance 3: 1.2.3.6:5689<br />
+<br /></li>
 </ul></li>
 </ul>
 
-<h4 id="自动生成的label和时间序列:94e1a00111b903ee2bc7218c2e11294b">自动生成的label和时间序列</h4>
+<h4 id="自动生成的label和时间序列">自动生成的label和时间序列</h4>
 
 <p>当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。</p>
 
@@ -272,7 +129,8 @@ Label值允许任意的Unicode字符</p>
 
 <ul>
 <li>job: 配置好的job名字<br /></li>
-<li>instance:&lt;host&gt;:&lt;port&gt;格式的url<br /></li>
+<li>instance:&lt;host&gt;:&lt;port&gt;格式的url<br />
+<br /></li>
 </ul>
 
 <p>时间序列：</p>
@@ -283,126 +141,43 @@ Label值允许任意的Unicode字符</p>
 </ul>
 
 </div>
+</article>
+</main>
 
 
-  <footer>
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      
-  
-    <nav><ul class="pager">
-    
-        <li class="previous">
-          <a href="http://zjykzk.github.io/bug-op/" title="增加bug的编程实践">
-            <span aria-hidden="true">&larr;</span>Previous
-          </a>
-        </li>
-    
 
-    
-      <li class="next">
-        <a href="http://zjykzk.github.io/str/" title="字符串">
-            Next <span aria-hidden="true">&rarr;</span>
-        </a>
-      </li>
-    
-    </ul> </nav>
-  
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu" role="navigation">
+<h2 class="visually-hidden">Main menu</h2>
+<ul class="navbar clearfix">
+<li><a class="" href="/">Home</a></li>
+<li><a class="" href="/complement/">补码</a></li>
+<li><a class="" href="/go-memory-model/">GO 内存模型</a></li>
+<li><a class="" href="/str/">字符串</a></li>
+<li><a class="active" href="/prometheus/">prometheus</a></li>
+<li><a class="" href="/ieee-754/">浮点数 IEEE 754</a></li>
+<li><a class="" href="/bug-op/">增加bug的编程实践</a></li>
+<li><a class="" href="/flume/">flume</a></li>
+<li><a class="" href="/friend-links/">价值博客</a></li>
+<li><a class="" href="/about/">about</a></li>
+</ul>
+</nav>
+</div>
 
+
+<aside class="layout-3col__right-sidebar" role="complementary">
+</aside>
 
 </div>
 
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-  (function() {
-    
-    
-    if (window.location.hostname == "localhost")
-      return;
+<footer class="footer" role="contentinfo">
 
-    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
-    dsq.src = '//zenk.disqus.com/embed.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-  })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-
-</div>
-
+<p><span>© zenk 随笔</span></p>
 </footer>
-
-
-</div>
-</div>
-      <footer class="footer">
-    <div class="container hidden-print">
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-           <div class="pull-left">
-  <a class="toplink" href="#">back to top</a>
-</div>
-<div class="pull-right">
-  
-  <a href="http://zjykzk.github.io/license" >license</a>
-  
-</div>
-
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
-          <small>
-              
-    
-<div class="container footline">
-  
-  code with <i class='fa fa-heart'></i>
-
-
-</div>
-
-
-    
-<div class="container copyright">
-  
-  &copy; 2017 zenk.
-
-
 </div>
 
 
 
-          </small>
-        </div>
-     </div>
-    </div>
-</footer>
 
-    <script src="http://zjykzk.github.io/js/jquery.min-2.1.4.js"></script>
-<script src="http://zjykzk.github.io/js/bootstrap.min-3.3.5.js"></script>
-
-
-
-<script type="text/javascript">
-  (function() {
-    
-    
-    if (window.location.hostname == "localhost")
-      return;
-
-    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
-    dsq.src = '//zenk.disqus.com/count.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-  })();
-</script>
-
-
-<script src="http://zjykzk.github.io/js/highlight.pack.js"></script>
-<script src="http://zjykzk.github.io/js/site.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
-
-
-
-  </body>
+</body>
 </html>
-

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>补码 – zenk 随笔</title>
+<meta name="description" content="complement representation of number">
+<meta name="created" content="2017-05-30T23:18:02&#43;0800">
+<meta name="author" content="zenk"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.21" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="http://zjykzk.github.io/complement/">
+</head>
+
+<body class="one-sidebar sidebar-second">
+<div class="layout-center">
+<header class="header" role="banner">
+<a href="http://zjykzk.github.io/" title="Home" rel="home" class="header__logo"><img src="/images/logo.png" alt="Home" class="header__logo-image" /></a><h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>zenk 随笔</span></a>
+</h1>
+<div class="header__region region region-header"></div>
+</header>
+
+<div class="layout-3col layout-swap">
+<main class="layout-3col__left-content" role="main">
+<h1 class="title title-submitted">补码</h1>
+<article class=" single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2017-05-30T23:18:02&#43;08:00">2017-05-30</time>
+</p>
+
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/%E7%BC%96%E7%A8%8B">编程</a></li>
+<li><a href="/tags/%E6%8A%80%E6%9C%AF">技术</a></li>
+</ul>
+</div>
+
+</header>
+<div class="content">
+
+
+<h1 id="补码">补码</h1>
+
+<h2 id="加法">加法</h2>
+
+<p>2个十进制数字的非正式算法：两个数字中相同位置的数相加，如果结果超过10产生进位，该进位在下一位数相加时加上。直到两个数字的所有位数都加完为止。</p>
+
+<p>考虑十进制的2位数加法，例如：16 + 26。</p>
+
+<pre><code>    1 6
+  + 2 6
+ -------
+    4 2
+</code></pre>
+
+<p>上例中的加法过程是：</p>
+
+<ol>
+<li><code>6+6</code> 得2，产生进位<br /></li>
+<li><code>1 + 2 + 1</code> 的4，其中最后加1是<code>1</code>步骤的几位，最终结果是 <code>42</code><br />
+<br /></li>
+</ol>
+
+<h2 id="减法">减法</h2>
+
+<p>2个10进制数字的非正式算法：</p>
+
+<ol>
+<li>如果被减数大于等于减数，两个数字中相同位置的数相减，如果被减数小于减数，从高位借一位，轮到高位计算时要多减去一个1。直到两个数字的所有位都减完为止。<br /></li>
+<li>如果被减数小于减数，交互减数与被减数的位置进行 <code>1</code> 操作，把结果加一个负号<br />
+<br /></li>
+</ol>
+
+<p>考虑十进制的2位数减法，例如：16 - 25。</p>
+
+<pre><code>    1 6
+  + 2 5
+ -------
+    - 9
+</code></pre>
+
+<p>上例中的加法过程是：</p>
+
+<ol>
+<li><code>16</code> 比<code>25</code>小，交换两个数的位置<br /></li>
+<li><code>5</code>比 <code>6</code> 小产生借位， <code>15-6</code> 得到 <code>9</code><br /></li>
+<li><code>2-1-1</code> 得到0，最后一个 <code>1</code>是借位<br /></li>
+<li>加上负号，最终的结果是 <code>-9</code><br />
+<br /></li>
+</ol>
+
+<h2 id="补码-1">补码</h2>
+
+<p>加法需要记录进位，而减法需要记录借位，比较大小，记录符号。这样减法的复杂度就要比较加法高。</p>
+
+<h3 id="减法变加法">减法变加法</h3>
+
+<p>注意到<code>16-25=16+(-25)</code>，如果<code>-25</code>能够表示成一个正数，那么减法就变成了加法。</p>
+
+<p>2位10进制的整数范围0-99，取一半用来做正数和零，一半做负数，分布如下：</p>
+
+<pre><code>0 - 0
+1 - 1
+...
+49 - 49
+50 - -50
+51 - -49
+...
+99 - -1
+</code></pre>
+
+<p>按照这个分布，<code>-25</code>对应着<code>75</code>，从而得到<code>16-25=16+75=91</code>，再根据上面的正负数的分布<code>91</code>就是<code>-9</code>，完全与<code>16-25=-9</code>吻合。</p>
+
+<p>另外，如果两个数和超过100，只需要减去100就是对应的结果。</p>
+
+<p>这种用正数表示负数的编码方式叫做补码。由于每个负数正好是100减去表示这个负数的正数，所以叫10的补码。而在二进制情况下，就叫2的补码。因为，二进制下10表示十进制的2.</p>
+
+<h3 id="二进制版本">二进制版本</h3>
+
+<p>一个6位数的二进制版本，正负数编码：</p>
+
+<pre><code>000000 - 000000
+000001 - 000001
+...
+011111 - 011111
+100000 - -100000
+...
+111111 - -000001
+
+</code></pre>
+
+<p><code>16</code>的二进制<code>010000</code>，<code>-25</code>的二进制<code>100110</code>，<code>16-15=&gt;010000+100110=110110=&gt;-9</code>。</p>
+
+<p>注意到<code>25</code>的二进制是<code>011001</code>，而<code>-25</code>的二进制<code>100110=1000000-011011=111111-011001+000001</code>，恰好是对<code>011001</code>取反加1。</p>
+
+<p>这个结果对计算机来说非常有价值，因为计算机组件有一些逻辑门构成，而逻辑门只能处理真假两个值，这正好可以用01来表示，加法和减法一样简单。</p>
+
+</div>
+</article>
+</main>
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu" role="navigation">
+<h2 class="visually-hidden">Main menu</h2>
+<ul class="navbar clearfix">
+<li><a class="" href="/">Home</a></li>
+<li><a class="active" href="/complement/">补码</a></li>
+<li><a class="" href="/go-memory-model/">GO 内存模型</a></li>
+<li><a class="" href="/str/">字符串</a></li>
+<li><a class="" href="/prometheus/">prometheus</a></li>
+<li><a class="" href="/ieee-754/">浮点数 IEEE 754</a></li>
+<li><a class="" href="/bug-op/">增加bug的编程实践</a></li>
+<li><a class="" href="/flume/">flume</a></li>
+<li><a class="" href="/friend-links/">价值博客</a></li>
+<li><a class="" href="/about/">about</a></li>
+</ul>
+</nav>
+</div>
+
+
+<aside class="layout-3col__right-sidebar" role="complementary">
+</aside>
+
+</div>
+
+<footer class="footer" role="contentinfo">
+
+<p><span>© zenk 随笔</span></p>
+</footer>
+</div>
+
+
+
+
+</body>
+</html>

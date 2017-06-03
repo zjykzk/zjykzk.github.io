@@ -1,195 +1,49 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<html lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>浮点数 IEEE 754  &middot; zencode</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>浮点数 IEEE 754 – zenk 随笔</title>
+<meta name="description" content="IEEE 754">
+<meta name="created" content="2016-06-05T20:21:39&#43;0800">
+<meta name="author" content="zenk"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.21" />
 
-
-<meta name="description" content="IEEE 754" />
-
-<meta name="keywords" content="编程, 编程基础, ">
-
-
-<meta property="og:title" content="浮点数 IEEE 754  &middot; zencode ">
-<meta property="og:site_name" content="zencode"/>
-<meta property="og:url" content="http://zjykzk.github.io/ieee-754/" />
-<meta property="og:locale" content="zh-CN">
-
-
-<meta property="og:type" content="article" />
-<meta property="og:description" content="IEEE 754"/>
-<meta property="og:article:published_time" content="2016-06-05T20:21:39&#43;08:00" />
-<meta property="og:article:modified_time" content="2016-06-05T20:21:39&#43;08:00" />
-
-  
-    
-<meta property="og:article:tag" content="编程">
-    
-<meta property="og:article:tag" content="编程基础">
-    
-  
-
-  
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:site" content="@" />
-<meta name="twitter:creator" content="@" />
-<meta name="twitter:title" content="浮点数 IEEE 754" />
-<meta name="twitter:description" content="IEEE 754" />
-<meta name="twitter:url" content="http://zjykzk.github.io/ieee-754/" />
-<meta name="twitter:domain" content="http://zjykzk.github.io/">
-  
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "Article",
-    "headline": "浮点数 IEEE 754",
-    "author": {
-      "@type": "Person",
-      "name": "http://profiles.google.com/+?rel=author"
-    },
-    "datePublished": "2016-06-05",
-    "description": "IEEE 754",
-    "wordCount":  104 
-  }
-</script>
-
-
-
-<link rel="canonical" href="http://zjykzk.github.io/ieee-754/" />
-
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://zjykzk.github.io/touch-icon-144-precomposed.png">
-<link href="http://zjykzk.github.io/favicon.png" rel="icon">
-
-<meta name="generator" content="Hugo 0.18.1" />
-
-  <!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-<![endif]-->
-
-
-
-    <link rel="stylesheet" href="http://zjykzk.github.io/css/theme/default.css">
-
-
-<link rel="stylesheet" href="http://zjykzk.github.io/css/font-awesome.min.css">
-<link rel="stylesheet" href="http://zjykzk.github.io/css/style.css">
-
-
-  <link rel="stylesheet" href="http://zjykzk.github.io/css/highlight/default.css">
-
-
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="http://zjykzk.github.io/ieee-754/">
 </head>
-<body>
-    <header id="main-header">
-  <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="http://zjykzk.github.io/">zencode</a>
-      </div>
-      <div id="navbar" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav navbar-right">
-          
-          <li>
 
-            <a href="http://zjykzk.github.io/about"
-            >
-
-            
-                <i class="fa fa-info-circle"></i>
-            
-            
-            About
-            </a>
-          </li>
-          
-          <li>
-
-            <a href="http://zjykzk.github.io/post"
-             title="Show list of posts">
-
-            
-            
-            Posts
-            </a>
-          </li>
-          
-          <li>
-
-            <a href="http://zjykzk.github.io/tags"
-             title="Show list of tags">
-
-            
-            
-            Tags
-            </a>
-          </li>
-          
-        </ul>
-      </div>
-      
-    </div>
-  </nav>
-
+<body class="one-sidebar sidebar-second">
+<div class="layout-center">
+<header class="header" role="banner">
+<a href="http://zjykzk.github.io/" title="Home" rel="home" class="header__logo"><img src="/images/logo.png" alt="Home" class="header__logo-image" /></a><h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>zenk 随笔</span></a>
+</h1>
+<div class="header__region region region-header"></div>
 </header>
 
+<div class="layout-3col layout-swap">
+<main class="layout-3col__left-content" role="main">
+<h1 class="title title-submitted">浮点数 IEEE 754</h1>
+<article class=" single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2016-06-05T20:21:39&#43;08:00">2016-06-05</time>
+</p>
 
-<div class="container">
-<div class="row">
-
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <div class="text-center">
-
-    <h1>浮点数 IEEE 754
-</h1>
-
-    <div class="metas">
-<small>
-  <i class="fa fa-calendar"></i>
-  <time datetime="2016-06-05">5 Jun, 2016</time>
-</small>
-
-
-  <small>
-    &middot; by zenk
-  
-  &middot; Read in about 1 min
-  &middot; (104 Words)
-</small>
-
-
-<div class="margin-10">
-  <i class="fa fa-tags"></i>
-  
-  <a href="http://zjykzk.github.io/tags/%E6%B5%AE%E7%82%B9%E6%95%B0" class="label label-primary">浮点数</a>
-  
-  <a href="http://zjykzk.github.io/tags/%E4%BA%8C%E8%BF%9B%E5%88%B6" class="label label-primary">二进制</a>
-  
-
-
-</div>
-<br>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/%E6%B5%AE%E7%82%B9%E6%95%B0">浮点数</a></li>
+<li><a href="/tags/%E4%BA%8C%E8%BF%9B%E5%88%B6">二进制</a></li>
+</ul>
 </div>
 
-  </div>
-</div>
+</header>
+<div class="content">
 
-  <div class="container content">
-  
 
 <h2 id="表示">表示</h2>
 
@@ -285,126 +139,43 @@
 <h2 id="减法">减法</h2>
 
 </div>
+</article>
+</main>
 
 
-  <footer>
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      
-  
-    <nav><ul class="pager">
-    
-        <li class="previous">
-          <a href="http://zjykzk.github.io/bug-op/" title="增加bug的编程实践">
-            <span aria-hidden="true">&larr;</span>Previous
-          </a>
-        </li>
-    
 
-    
-      <li class="next">
-        <a href="http://zjykzk.github.io/prometheus/" title="prometheus">
-            Next <span aria-hidden="true">&rarr;</span>
-        </a>
-      </li>
-    
-    </ul> </nav>
-  
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu" role="navigation">
+<h2 class="visually-hidden">Main menu</h2>
+<ul class="navbar clearfix">
+<li><a class="" href="/">Home</a></li>
+<li><a class="" href="/complement/">补码</a></li>
+<li><a class="" href="/go-memory-model/">GO 内存模型</a></li>
+<li><a class="" href="/str/">字符串</a></li>
+<li><a class="" href="/prometheus/">prometheus</a></li>
+<li><a class="active" href="/ieee-754/">浮点数 IEEE 754</a></li>
+<li><a class="" href="/bug-op/">增加bug的编程实践</a></li>
+<li><a class="" href="/flume/">flume</a></li>
+<li><a class="" href="/friend-links/">价值博客</a></li>
+<li><a class="" href="/about/">about</a></li>
+</ul>
+</nav>
+</div>
 
+
+<aside class="layout-3col__right-sidebar" role="complementary">
+</aside>
 
 </div>
 
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-  (function() {
-    
-    
-    if (window.location.hostname == "localhost")
-      return;
+<footer class="footer" role="contentinfo">
 
-    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
-    dsq.src = '//zenk.disqus.com/embed.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-  })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-
-</div>
-
+<p><span>© zenk 随笔</span></p>
 </footer>
-
-
-</div>
-</div>
-      <footer class="footer">
-    <div class="container hidden-print">
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-           <div class="pull-left">
-  <a class="toplink" href="#">back to top</a>
-</div>
-<div class="pull-right">
-  
-  <a href="http://zjykzk.github.io/license" >license</a>
-  
-</div>
-
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
-          <small>
-              
-    
-<div class="container footline">
-  
-  code with <i class='fa fa-heart'></i>
-
-
-</div>
-
-
-    
-<div class="container copyright">
-  
-  &copy; 2017 zenk.
-
-
 </div>
 
 
 
-          </small>
-        </div>
-     </div>
-    </div>
-</footer>
 
-    <script src="http://zjykzk.github.io/js/jquery.min-2.1.4.js"></script>
-<script src="http://zjykzk.github.io/js/bootstrap.min-3.3.5.js"></script>
-
-
-
-<script type="text/javascript">
-  (function() {
-    
-    
-    if (window.location.hostname == "localhost")
-      return;
-
-    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
-    dsq.src = '//zenk.disqus.com/count.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-  })();
-</script>
-
-
-<script src="http://zjykzk.github.io/js/highlight.pack.js"></script>
-<script src="http://zjykzk.github.io/js/site.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
-
-
-
-  </body>
+</body>
 </html>
-
