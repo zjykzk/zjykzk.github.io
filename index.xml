@@ -107,14 +107,19 @@
 100000 - -100000
 ...
 111111 - -000001
-
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;code&gt;16&lt;/code&gt;的二进制&lt;code&gt;010000&lt;/code&gt;，&lt;code&gt;-25&lt;/code&gt;的二进制&lt;code&gt;100110&lt;/code&gt;，&lt;code&gt;16-15=&amp;gt;010000+100110=110110=&amp;gt;-9&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;16&lt;/code&gt;的二进制&lt;code&gt;010000&lt;/code&gt;，&lt;code&gt;-25&lt;/code&gt;的二进制&lt;code&gt;100110&lt;/code&gt;，&lt;code&gt;16-15=&amp;gt;010000+100110=110110=&amp;gt;-9&lt;/code&gt;。注意到&lt;code&gt;25&lt;/code&gt;的二进制是&lt;code&gt;011001&lt;/code&gt;，而&lt;code&gt;-25&lt;/code&gt;的二进制&lt;code&gt;100110=1000000-011011=111111-011001+000001&lt;/code&gt;，恰好是对&lt;code&gt;011001&lt;/code&gt;取反加1。&lt;/p&gt;
 
-&lt;p&gt;注意到&lt;code&gt;25&lt;/code&gt;的二进制是&lt;code&gt;011001&lt;/code&gt;，而&lt;code&gt;-25&lt;/code&gt;的二进制&lt;code&gt;100110=1000000-011011=111111-011001+000001&lt;/code&gt;，恰好是对&lt;code&gt;011001&lt;/code&gt;取反加1。&lt;/p&gt;
+&lt;p&gt;同时，二进制转化成十进制：&lt;/p&gt;
 
-&lt;p&gt;这个结果对计算机来说非常有价值，因为计算机组件有一些逻辑门构成，而逻辑门只能处理真假两个值，这正好可以用01来表示，加法和减法一样简单。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;111111 = -(1000000 - 111111) = -(2^6 - 2^5 - 2^4 - 2^3 - 2^2 - 2^1 - 2^0) = -(2^5 - 2^4 - 2^3 - 2^2 - 2^1 - 2^0) = -2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^0
+011111 = 2^4 + 2^3 + 2^2 + 2^1 + 2^0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最高位的转化取负数，其他会取正数，然后求和正好是十进制的数。&lt;/p&gt;
+
+&lt;p&gt;这个结果对计算机来说非常有价值，因为计算机组件有一些逻辑门构成，而逻辑门只能处理真假两个值，这正好可以用01来表示，取反，加1都能很方便的用逻辑门来实现，达到了加法和减法统一，简化逻辑电路的设计。&lt;/p&gt;
 </description>
     </item>
     
