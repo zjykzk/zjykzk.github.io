@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on zenk 随笔</title>
+    <link>http://zjykzk.github.io/categories/</link>
+    <description>Recent content in Categories on zenk 随笔</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
+    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <copyright>(c) 2017 zenk.</copyright>
+    <atom:link href="http://zjykzk.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Cs</title>
+      <link>http://zjykzk.github.io/categories/cs/</link>
+      <pubDate>Tue, 30 May 2017 23:18:02 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/categories/cs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Test</title>
+      <link>http://zjykzk.github.io/categories/test/</link>
+      <pubDate>Sat, 04 Jun 2016 11:12:13 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/categories/test/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

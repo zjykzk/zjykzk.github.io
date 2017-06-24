@@ -53,19 +53,24 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/cs/</loc>
-    <lastmod>2017-03-28T11:22:09+08:00</lastmod>
+    <loc>http://zjykzk.github.io/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/cs/</loc>
-    <lastmod>2017-03-28T11:22:09+08:00</lastmod>
+    <loc>http://zjykzk.github.io/categories/cs/</loc>
+    <lastmod>2017-05-30T23:18:02+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/cs/golang/</loc>
+    <loc>http://zjykzk.github.io/tags/go/</loc>
+    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/golang/</loc>
     <lastmod>2017-03-28T11:22:09+08:00</lastmod>
     <priority>0</priority>
   </url>
@@ -77,7 +82,31 @@
   </url>
   
   <url>
+    <loc>http://zjykzk.github.io/tags/</loc>
+    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/categories/test/</loc>
+    <lastmod>2016-06-04T11:12:13+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/</loc>
+    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/%E6%8A%80%E6%9C%AF/</loc>
+    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</loc>
     <lastmod>2017-06-15T19:13:25+08:00</lastmod>
     <priority>0</priority>
   </url>

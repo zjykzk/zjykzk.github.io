@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Test on zenk 随笔</title>
+    <link>http://zjykzk.github.io/categories/test/</link>
+    <description>Recent content in Test on zenk 随笔</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
+    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <copyright>(c) 2017 zenk.</copyright>
+    <lastBuildDate>Sat, 04 Jun 2016 11:12:13 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/categories/test/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>增加bug的编程实践</title>
+      <link>http://zjykzk.github.io/post/cs/bug-op/</link>
+      <pubDate>Sat, 04 Jun 2016 11:12:13 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/bug-op/</guid>
+      <description>
+
+&lt;p&gt;最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。&lt;/p&gt;
+
+&lt;h2 id=&#34;思路不清晰&#34;&gt;思路不清晰&lt;/h2&gt;
+
+&lt;p&gt;思路没有完全确定情况下写代码。造成不确定的情况有多方面：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;1. 求快，把相似的需求当做一样的需求
+2. 缺少设计，大体明白实现方案，就开始编码
+3. 知识不充分，集中在前端的css、布局
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;怎么办？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;快是可以做到，心里不要慌就是。&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;1. 需求分析到位
+2. 仔细查看现有的代码
+3. 遗留代码多问老员工
+4. 放下别人对你问代码时的负面情绪
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;破窗原理&#34;&gt;破窗原理&lt;/h2&gt;
+
+&lt;p&gt;在一个代码质量差的项目里面，就很容易被一种“别人也是这样，我也就这样得了”，尤其是在你不熟悉代码的情况下。&lt;strong&gt;短期内，代码是写给自己的，维护的人是自己，长期内是给别人的，都自己好就是对别人好，还有就是执行力&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

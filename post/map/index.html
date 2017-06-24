@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>map 内部实现 – zenk 随笔</title>
-<meta name="description" content="map 内部实现  ^ &#43;-----------------&#43; ^ | | bucket0 | |------&amp;gt; &#43;------------&#43; | &#43;-----------------&#43; v | tophash 0 | | | bucket1 | &#43;------------&#43; | &#43;-----------------&#43; | tophash 1 | 2^h.B | ....... | &#43;------------&#43; | &#43;-----------------&#43; | ......... | | | bucket2^h.B - 2 | &#43;------------&#43; | &#43;-----------------&#43; | tophash 6 | | | bucket2^h.B - 1 | &#43;------------&#43; v &#43;-----------------&#43; | tophash 7 | &#43;------------&#43; | key 0 | &#43;------------&#43; | key 1 | &#43;------------&#43; | .">
+<meta name="description" content="内存布局  ^ &#43;-----------------&#43; ^ | | bucket0 | |------&amp;gt; &#43;------------&#43; | &#43;-----------------&#43; v | tophash 0 | | | bucket1 | &#43;------------&#43; | &#43;-----------------&#43; | tophash 1 | 2^h.B | ....... | &#43;------------&#43; | &#43;-----------------&#43; | ......... | | | bucket2^h.B - 2 | &#43;------------&#43; | &#43;-----------------&#43; | tophash 6 | | | bucket2^h.B - 1 | &#43;------------&#43; v &#43;-----------------&#43; | tophash 7 | &#43;------------&#43; | key 0 | &#43;------------&#43; | key 1 | &#43;------------&#43; | .">
 <meta name="created" content="2017-06-15T19:13:25&#43;0800">
 <meta name="author" content="zenk"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
@@ -30,7 +30,7 @@
 <article class="section-post single-view">
 <header>
 <p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2017-06-15T19:13:25&#43;08:00">2017-06-15</time>
+<span class="author">zenk</span> – <time class="modified-date" datetime="2017-06-15T19:13:25&#43;08:00">2017-06-15 19:13:25</time>
 </p>
 
 <div class="tags">
@@ -46,7 +46,7 @@ Tags:
 <div class="content">
 
 
-<h1 id="map-内部实现">map 内部实现</h1>
+<h1 id="内存布局">内存布局</h1>
 
 <pre><code>   ^   +-----------------+  ^
    |   |       bucket0   |  |------&gt; +------------+
@@ -91,16 +91,25 @@ Tags:
 
 
 
+
+
+
 <div class="layout-swap__top layout-3col__full">
 <nav class="main-menu" role="navigation">
 <h2 class="visually-hidden">Main menu</h2>
 <ul class="navbar clearfix">
 <li><a class="" href="/">Home</a></li>
 
-  <li><a class="" href="/cs">cs</a>
+
+
+  <li><a  class=""href="/categories/cs">Computer</a>
   </li>
 
-<li><a class="active" href="/post/about">About</a></li>
+  <li><a  class=""href="/categories/test">test</a>
+  </li>
+
+
+<li><a class="" href="/post/about">About</a></li>
 </ul>
 </nav>
 </div>
@@ -118,7 +127,7 @@ Tags:
 <li><a class="" href="/post/cs/bug-op/">增加bug的编程实践</a></li>
 <li><a class="" href="/post/cs/flume/">flume</a></li>
 <li><a class="" href="/post/cs/friend-links/">价值博客</a></li>
-<li><a class="" href="/post/about/">about</a></li>
+<li><a class="" href="/post/about/">About</a></li>
 </ul>
 </section>
 </aside>
