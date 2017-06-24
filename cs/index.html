@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title> – zenk 随笔</title>
+<link rel="alternate" type="application/rss" title="RSS" href="http://zjykzk.github.io/cs/index.xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.23" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="http://zjykzk.github.io/cs/">
+</head>
+
+<body class="one-sidebar sidebar-second">
+<div class="layout-center">
+<header class="header" role="banner">
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>zenk 随笔</span></a>
+</h1>
+<div class="header__region region region-header"></div>
+</header>
+
+<div class="layout-3col layout-swap">
+<main class="layout-3col__left-content" role="main">
+<h1 class="title"></h1>
+<article class="section-post list-view">
+<header>
+<h2 class="title title-submitted"><a href="/post/cs/golang/go-memory-model/">GO 内存模型</a></h2>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2017-03-28T11:22:09&#43;08:00">2017-03-28</time>
+</p>
+
+</header>
+<div class="content">
+内存模型 内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
+Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
+int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
+int a = 0; print(a); int b = 1; print(b);  但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.
+happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 *e2*是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
+在一个goroutine中，happens before的顺序就是代码表达的顺序。
+共享变量 v 的读操作 r ，能够读到是另一个对变量 v 写操作 w 写入的值的条件是：
+ w happens before r
+ 没有其他的对变量 v 写操作happens before r 并且happens after w
+</div>
+</article>
+
+<article class="section-post list-view">
+<header>
+<h2 class="title title-submitted"><a href="/post/cs/bug-op/">增加bug的编程实践</a></h2>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2016-06-04T11:12:13&#43;08:00">2016-06-04</time>
+</p>
+
+</header>
+<div class="content">
+最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。
+思路不清晰 思路没有完全确定情况下写代码。造成不确定的情况有多方面：
+1. 求快，把相似的需求当做一样的需求 2. 缺少设计，大体明白实现方案，就开始编码 3. 知识不充分，集中在前端的css、布局  怎么办？
+快是可以做到，心里不要慌就是。
+1. 需求分析到位 2. 仔细查看现有的代码 3. 遗留代码多问老员工 4. 放下别人对你问代码时的负面情绪  破窗原理 在一个代码质量差的项目里面，就很容易被一种“别人也是这样，我也就这样得了”，尤其是在你不熟悉代码的情况下。短期内，代码是写给自己的，维护的人是自己，长期内是给别人的，都自己好就是对别人好，还有就是执行力
+</div>
+</article>
+
+
+</main>
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu" role="navigation">
+<h2 class="visually-hidden">Main menu</h2>
+<ul class="navbar clearfix">
+<li><a class="" href="/">Home</a></li>
+
+  <li><a class="" href="/cs">cs</a>
+  </li>
+
+<li><a class="active" href="/post/about">About</a></li>
+</ul>
+</nav>
+</div>
+
+<aside class="layout-3col__right-sidebar" role="complementary">
+<section>
+<h4 class="menu"><a class="active" href="/post/">Posts</a></h4>
+<ul class="menu">
+<li><a class="" href="/post/map/">map 内部实现</a></li>
+<li><a class="" href="/post/cs/complement/">补码</a></li>
+<li><a class="" href="/post/cs/golang/go-memory-model/">GO 内存模型</a></li>
+<li><a class="" href="/post/cs/str/">字符串</a></li>
+<li><a class="" href="/post/cs/prometheus/">prometheus</a></li>
+<li><a class="" href="/post/cs/ieee-754/">浮点数 IEEE 754</a></li>
+<li><a class="" href="/post/cs/bug-op/">增加bug的编程实践</a></li>
+<li><a class="" href="/post/cs/flume/">flume</a></li>
+<li><a class="" href="/post/cs/friend-links/">价值博客</a></li>
+<li><a class="" href="/post/about/">about</a></li>
+</ul>
+</section>
+</aside>
+
+</div>
+
+<footer class="footer" role="contentinfo">
+
+<p><span>© zenk 随笔</span></p>
+<p>Powered by <a href="https://gohugo.io/">Hugo</a></p></footer>
+</div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>flume – zenk 随笔</title>
+<meta name="description" content="description">
+<meta name="created" content="2016-03-27T22:17:17&#43;0800">
+<meta name="author" content="zenk"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.23" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/flume/">
+</head>
+
+<body class="one-sidebar sidebar-second">
+<div class="layout-center">
+<header class="header" role="banner">
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>zenk 随笔</span></a>
+</h1>
+<div class="header__region region region-header"></div>
+</header>
+
+<div class="layout-3col layout-swap">
+<main class="layout-3col__left-content" role="main">
+<h1 class="title title-submitted">flume</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2016-03-27T22:17:17&#43;08:00">2016-03-27</time>
+</p>
+
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/%E7%BC%96%E7%A8%8B">编程</a></li>
+</ul>
+</div>
+
+</header>
+<div class="content">
+
+
+<h1 id="简介">简介</h1>
+
+<p>flume是通用的数据收集框架。特点是分布式、高可靠、高可用、高可定制化。</p>
+
+<h1 id="架构">架构</h1>
+
+<p><img src="/imgs/flume.dot.png" alt="" /></p>
+
+<h1 id="概念">概念</h1>
+
+<h2 id="source">source</h2>
+
+<p>数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个<strong>event</strong>。</p>
+
+<h3 id="event">event</h3>
+
+<p>数据单元，从<strong>source</strong>产生，直到被序列化到存储中。<strong>event</strong>包含*header*，*body*两个部分：</p>
+
+<ul>
+<li>header: 一个map数据，可以被<strong>interceptor</strong>引用<br /></li>
+<li>body: 一个字节序列，具体日志数据<br />
+<br /></li>
+</ul>
+
+<h3 id="interceptor">interceptor</h3>
+
+<p><strong>source</strong>读取一个<strong>event</strong>在放到<strong>channel</strong>中之前，<strong>event</strong>可以被添加数据。比如说：采集机器的主机名称，时间戳。</p>
+
+<h2 id="channel">channel</h2>
+
+<p>数据队列，高可用的保障。<strong>source</strong>产生的数据先放到这里，<strong>sink</strong>接着从这里取出来放到存储当中。</p>
+
+<h3 id="channel-selector">channel selector</h3>
+
+<p>两个作用：</p>
+
+<ol>
+<li>复制：把一个<strong>event</strong>写到一个或者多个<strong>channel</strong>中<br /></li>
+<li>路由：根据<strong>event</strong>中的某个属性值，把数据写到指定的<strong>channel</strong>中<br />
+<br /></li>
+</ol>
+
+<h2 id="sink">sink</h2>
+
+<p>负责把<strong>channel</strong>中的数据写入目标存储。</p>
+
+<h3 id="sink-processor">sink processor</h3>
+
+<p>选择<strong>sink</strong>，在这里可以完成负载均衡和容错处理。</p>
+
+<h3 id="event-serializer">event serializer</h3>
+
+<p>把<strong>event</strong>中的数据，转换成存储需要的格式。</p>
+
+</div>
+</article>
+</main>
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu" role="navigation">
+<h2 class="visually-hidden">Main menu</h2>
+<ul class="navbar clearfix">
+<li><a class="" href="/">Home</a></li>
+
+  <li><a class="" href="/cs">cs</a>
+  </li>
+
+<li><a class="active" href="/post/about">About</a></li>
+</ul>
+</nav>
+</div>
+
+<aside class="layout-3col__right-sidebar" role="complementary">
+<section>
+<h4 class="menu"><a class="" href="/post/">Posts</a></h4>
+<ul class="menu">
+<li><a class="" href="/post/map/">map 内部实现</a></li>
+<li><a class="" href="/post/cs/complement/">补码</a></li>
+<li><a class="" href="/post/cs/golang/go-memory-model/">GO 内存模型</a></li>
+<li><a class="" href="/post/cs/str/">字符串</a></li>
+<li><a class="" href="/post/cs/prometheus/">prometheus</a></li>
+<li><a class="" href="/post/cs/ieee-754/">浮点数 IEEE 754</a></li>
+<li><a class="" href="/post/cs/bug-op/">增加bug的编程实践</a></li>
+<li><a class="active" href="/post/cs/flume/">flume</a></li>
+<li><a class="" href="/post/cs/friend-links/">价值博客</a></li>
+<li><a class="" href="/post/about/">about</a></li>
+</ul>
+</section>
+</aside>
+
+</div>
+
+<footer class="footer" role="contentinfo">
+
+<p><span>© zenk 随笔</span></p>
+<p>Powered by <a href="https://gohugo.io/">Hugo</a></p></footer>
+</div>
+
+
+
+
+</body>
+</html>

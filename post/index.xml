@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>zenk 随笔</title>
-    <link>http://zjykzk.github.io/</link>
-    <description>Recent content on zenk 随笔</description>
+    <title>Posts on zenk 随笔</title>
+    <link>http://zjykzk.github.io/post/</link>
+    <description>Recent content in Posts on zenk 随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
     <lastBuildDate>Thu, 15 Jun 2017 19:13:25 +0800</lastBuildDate>
-    <atom:link href="http://zjykzk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://zjykzk.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>map 内部实现</title>

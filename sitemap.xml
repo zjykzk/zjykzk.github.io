@@ -3,63 +3,82 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://zjykzk.github.io/complement/</loc>
+    <loc>http://zjykzk.github.io/post/map/</loc>
+    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/post/cs/complement/</loc>
     <lastmod>2017-05-30T23:18:02+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/go-memory-model/</loc>
+    <loc>http://zjykzk.github.io/post/cs/golang/go-memory-model/</loc>
     <lastmod>2017-03-28T11:22:09+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/str/</loc>
+    <loc>http://zjykzk.github.io/post/cs/str/</loc>
     <lastmod>2017-01-19T14:05:14+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/prometheus/</loc>
+    <loc>http://zjykzk.github.io/post/cs/prometheus/</loc>
     <lastmod>2016-10-09T14:45:21+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/ieee-754/</loc>
+    <loc>http://zjykzk.github.io/post/cs/ieee-754/</loc>
     <lastmod>2016-06-05T20:21:39+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/bug-op/</loc>
+    <loc>http://zjykzk.github.io/post/cs/bug-op/</loc>
     <lastmod>2016-06-04T11:12:13+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/flume/</loc>
+    <loc>http://zjykzk.github.io/post/cs/flume/</loc>
     <lastmod>2016-03-27T22:17:17+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/friend-links/</loc>
+    <loc>http://zjykzk.github.io/post/cs/friend-links/</loc>
     <lastmod>2016-02-15T11:19:35+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/about/</loc>
+    <loc>http://zjykzk.github.io/post/about/</loc>
     <lastmod>2016-02-02T21:33:21+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/categories/</loc>
+    <loc>http://zjykzk.github.io/cs/</loc>
+    <lastmod>2017-03-28T11:22:09+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/true/</loc>
+    <loc>http://zjykzk.github.io/cs/</loc>
+    <lastmod>2017-03-28T11:22:09+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/cs/golang/</loc>
+    <lastmod>2017-03-28T11:22:09+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/post/</loc>
+    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://zjykzk.github.io/</loc>
-    <lastmod>2017-05-30T23:18:02+08:00</lastmod>
+    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
     <priority>0</priority>
   </url>
   

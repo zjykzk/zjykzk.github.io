@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>zenk 随笔</title>
-
-<meta name="description" content="">
-<meta name="created" content="2017-06-15T19:13:25&#43;0800">
+<title>Golang – zenk 随笔</title>
+<link rel="alternate" type="application/rss" title="RSS" href="http://zjykzk.github.io/cs/golang/index.xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
 <meta name="HandheldFriendly" content="true">
@@ -13,7 +11,7 @@
 
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="canonical" href="http://zjykzk.github.io/">
+<link rel="canonical" href="http://zjykzk.github.io/cs/golang/">
 </head>
 
 <body class="one-sidebar sidebar-second">
@@ -27,19 +25,38 @@
 
 <div class="layout-3col layout-swap">
 <main class="layout-3col__left-content" role="main">
-<article class="single-view">
-<div class="content">
+<h1 class="title">Golang</h1>
+<article class="section-post list-view">
+<header>
+<h2 class="title title-submitted"><a href="/post/cs/golang/go-memory-model/">GO 内存模型</a></h2>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2017-03-28T11:22:09&#43;08:00">2017-03-28</time>
+</p>
 
+</header>
+<div class="content">
+内存模型 内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
+Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
+int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
+int a = 0; print(a); int b = 1; print(b);  但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.
+happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 *e2*是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
+在一个goroutine中，happens before的顺序就是代码表达的顺序。
+共享变量 v 的读操作 r ，能够读到是另一个对变量 v 写操作 w 写入的值的条件是：
+ w happens before r
+ 没有其他的对变量 v 写操作happens before r 并且happens after w
 </div>
 </article>
+
+
 </main>
+
 
 
 <div class="layout-swap__top layout-3col__full">
 <nav class="main-menu" role="navigation">
 <h2 class="visually-hidden">Main menu</h2>
 <ul class="navbar clearfix">
-<li><a class="active" href="/">Home</a></li>
+<li><a class="" href="/">Home</a></li>
 
   <li><a class="" href="/cs">cs</a>
   </li>
