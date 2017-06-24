@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>zenk 随笔</title>
+    <title>Cs on zenk 随笔</title>
     <link>http://zjykzk.github.io/cs/</link>
-    <description>Recent content on zenk 随笔</description>
+    <description>Recent content in Cs on zenk 随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
@@ -13,18 +13,26 @@
     <atom:link href="http://zjykzk.github.io/cs/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>GO 内存模型</title>
-      <link>http://zjykzk.github.io/post/cs/golang/go-memory-model/</link>
+      <title></title>
+      <link>http://zjykzk.github.io/cs/</link>
       <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/go-memory-model/</guid>
-      <description>
-
-&lt;h2 id=&#34;内存模型&#34;&gt;内存模型&lt;/h2&gt;
-
-&lt;p&gt;内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。&lt;/p&gt;
-
-&lt;h2 id=&#34;happens-before&#34;&gt;Happens Before&lt;/h2&gt;
+      <guid>http://zjykzk.github.io/cs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Golang</title>
+      <link>http://zjykzk.github.io/cs/golang/</link>
+      <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/cs/golang/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
+fore&#34;&gt;Happens Before&lt;/h2&gt;
 
 &lt;p&gt;编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：&lt;/p&gt;
 
