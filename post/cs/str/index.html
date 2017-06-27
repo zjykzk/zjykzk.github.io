@@ -52,68 +52,57 @@ Tags:
 
 <p>在计算机内部，只有01的信息。因此，为了能让计算机能够认识字符串，每个字符就的被映射成01数据。这个映射功能就叫编码。</p>
 
-<ol>
-<li>ASCII<br />
-<br /></li>
-</ol>
+<h2 id="ascii">ASCII</h2>
 
 <p>ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如<code>A</code>的编码是<code>01000001</code></p>
 
-<ol>
-<li>Unicode<br />
-<br /></li>
-</ol>
+<h2 id="unicode">Unicode</h2>
 
 <p>世界语言文字异常丰富，每个国家都有自己独特的语言文字。ASCII的编码无法编码所有的文字，因此产生了很多编码，比如中文的BIG5，GB2312等等。这些编码无法兼容，比如<code>中</code>在GB2312编码是<code>1101011011010000</code>，BIG5的编码是<code>1010010010100100</code>。因此，Unicode就出现了。Unicode规定了每个字符的唯一编号，目前已经有100多万个字符。需要注意的是Unicode只规定了字符的编号，没有规定二进制的表示。</p>
 
-<ol>
-<li>Utf8编码<br />
-<br /></li>
-</ol>
+<h2 id="utf8编码">Utf8编码</h2>
 
 <p>utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。</p>
 
 <p>utf8编码规则：</p>
 
-<ol>
-<li>一个字节的编码，最高位为0，其他的位表示unicode编号<br /></li>
-<li>n个字节的编码（n&gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号<br />
-<br /></li>
-</ol>
+<pre><code>  1. 一个字节的编码，最高位为0，其他的位表示unicode编号
+  2. n个字节的编码（n&gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号
+</code></pre>
 
 <p>下表表示了utf8的编码，z表示用于编码的bit</p>
 
 <table>
 <thead>
 <tr>
-<th>unicode范围</th>
+<th align="left">unicode范围</th>
 <th align="left">utf8编码</th>
 </tr>
 </thead>
 
 <tbody>
 <tr>
-<td>十六进制表示</td>
+<td align="left">十六进制表示</td>
 <td align="left">二进制表示</td>
 </tr>
 
 <tr>
-<td>000000 - 00007F</td>
+<td align="left">000000 - 00007F</td>
 <td align="left">0zzzzzzz</td>
 </tr>
 
 <tr>
-<td>000080 - 0007FF</td>
+<td align="left">000080 - 0007FF</td>
 <td align="left">110zzzzz 10zzzzzz</td>
 </tr>
 
 <tr>
-<td>000800 - 00D7FF/00E000 - 00FFFF</td>
+<td align="left">000800 - 00D7FF/00E000 - 00FFFF</td>
 <td align="left">1110zzzz 10zzzzzz 10zzzzzz</td>
 </tr>
 
 <tr>
-<td>010000 - 10FFFF</td>
+<td align="left">010000 - 10FFFF</td>
 <td align="left">11110zzz 10zzzzzz 10zzzzzz 10zzzzzz</td>
 </tr>
 </tbody>
@@ -138,11 +127,13 @@ Tags:
 <h4 id="重要方法">重要方法</h4>
 
 <pre><code class="language-python"># &lt;type 'str'&gt; to &lt;type 'unicode'&gt;
-# 如果 s 是'unicode'类型，python会先通过encode函数把s转换成'str'类型，而encode函数的encoding是sys.getdefaultencoding()的值
+# 如果 s 是'unicode'类型，python会先通过encode函数把s转换成'str'类型
+# encode函数的encoding是sys.getdefaultencoding()的值
 s.decode(encoding)
 
 # &lt;type 'unicode'&gt; to &lt;type 'str'&gt;
-# 如果u是'str'类型，python会通过decode函数把u转换成'unicode'类型，而decode函数的encoding是sys.getdefaultencoding()的值
+# 如果u是'str'类型，python会通过decode函数把u转换成'unicode'类型
+# decode函数的encoding是sys.getdefaultencoding()的值
 u.encode(encoding)
 
 # 获取系统默认的编码
@@ -162,7 +153,7 @@ sys.setdefaultencoding('utf8')
 <p>指定encoding参数生成file-object-like对象，利用：</p>
 
 <ol>
-<li>函数<code>read</code> 读取byte字符串，按照encoding的编码返回unicode<br /></li>
+<li>函数 <code>read</code> 读取byte字符串，按照encoding的编码返回unicode<br /></li>
 <li><code>write</code> 输入unicode，按照encoding的编码转换成byte字符串写入文件<br />
 <br /></li>
 </ol>
@@ -173,7 +164,7 @@ sys.setdefaultencoding('utf8')
 
 <h2 id="go中的字符串">go中的字符串</h2>
 
-<p>go中有两种类型支持字符串分别是：<code>string</code>和<code>rune</code>。</p>
+<p>go中有两种类型支持字符串分别是：<code>string</code> 和 <code>rune</code> 。</p>
 
 <ol>
 <li>string表示字节slice（分片）<br /></li>
@@ -181,7 +172,7 @@ sys.setdefaultencoding('utf8')
 <br /></li>
 </ol>
 
-<p>go对utf8有天然的支持。go的源代码是utf8编码，<code>for ... range</code>循环字符串的时候也是按照utf8编码来处理每个字符，而不是字节。</p>
+<p>go对utf8有天然的支持。go的源代码是utf8编码，<code>for ... range</code> 循环字符串的时候也是按照utf8编码来处理每个字符，而不是字节。</p>
 
 </div>
 </article>
@@ -216,7 +207,7 @@ sys.setdefaultencoding('utf8')
 <section>
 <h4 class="menu"><a class="" href="/post/">Posts</a></h4>
 <ul class="menu">
-<li><a class="" href="/post/map/">map 内部实现</a></li>
+<li><a class="" href="/post/cs/golang/map/">map 内部实现</a></li>
 <li><a class="" href="/post/cs/complement/">补码</a></li>
 <li><a class="" href="/post/cs/golang/go-memory-model/">GO 内存模型</a></li>
 <li><a class="active" href="/post/cs/str/">字符串</a></li>

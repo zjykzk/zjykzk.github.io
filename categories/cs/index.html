@@ -28,6 +28,23 @@
 <h1 class="title">Computer</h1>
 <article class="section-post list-view">
 <header>
+<h2 class="title title-submitted"><a href="/post/cs/golang/map/">map 内部实现</a></h2>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2017-06-15T19:13:25&#43;08:00">2017-06-15 19:13:25</time>
+</p>
+
+</header>
+<div class="content">
+hash TODO
+查询 TODO
+删除 TODO
+更新 TODO
+线程安全 内存布局  ^ +-----------------+ ^ | | bucket0 | |------&gt; +------------+ | +-----------------+ v | tophash 0 | | | bucket1 | +------------+ | +-----------------+ | tophash 1 | 2^h.B | ....... | +------------+ | +-----------------+ | ......... | | | bucket2^h.B - 2 | +------------+ | +-----------------+ | tophash 6 | | | bucket2^h.B - 1 | +------------+ v +-----------------+ | tophash 7 | +------------+ | key 0 | +------------+ | key 1 | +------------+ | .
+</div>
+</article>
+
+<article class="section-post list-view">
+<header>
 <h2 class="title title-submitted"><a href="/post/cs/complement/">补码</a></h2>
 <p class="submitted">
 <span class="author">zenk</span> – <time class="modified-date" datetime="2017-05-30T23:18:02&#43;08:00">2017-05-30 23:18:02</time>
@@ -65,7 +82,7 @@
 Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
 int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
 int a = 0; print(a); int b = 1; print(b);  但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.
-happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 *e2*是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
+happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 e2 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
 在一个goroutine中，happens before的顺序就是代码表达的顺序。
 共享变量 v 的读操作 r ，能够读到是另一个对变量 v 写操作 w 写入的值的条件是：
  w happens before r
@@ -84,17 +101,13 @@ happens before定义了内存操作的顺序，它是一种偏序。e1 happens b
 <div class="content">
 为什么要字符 人类发明了文字，同时想用计算机来处理文字。由此，就产生了字符。每个字符代码一个文字的图形。
 字符串的表示 在计算机内部，只有01的信息。因此，为了能让计算机能够认识字符串，每个字符就的被映射成01数据。这个映射功能就叫编码。
- ASCII
-  ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如A的编码是01000001
- Unicode
-  世界语言文字异常丰富，每个国家都有自己独特的语言文字。ASCII的编码无法编码所有的文字，因此产生了很多编码，比如中文的BIG5，GB2312等等。这些编码无法兼容，比如中在GB2312编码是1101011011010000，BIG5的编码是1010010010100100。因此，Unicode就出现了。Unicode规定了每个字符的唯一编号，目前已经有100多万个字符。需要注意的是Unicode只规定了字符的编号，没有规定二进制的表示。
- Utf8编码
-  utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。
+ASCII ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如A的编码是01000001
+Unicode 世界语言文字异常丰富，每个国家都有自己独特的语言文字。ASCII的编码无法编码所有的文字，因此产生了很多编码，比如中文的BIG5，GB2312等等。这些编码无法兼容，比如中在GB2312编码是1101011011010000，BIG5的编码是1010010010100100。因此，Unicode就出现了。Unicode规定了每个字符的唯一编号，目前已经有100多万个字符。需要注意的是Unicode只规定了字符的编号，没有规定二进制的表示。
+Utf8编码 utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。
 utf8编码规则：
- 一个字节的编码，最高位为0，其他的位表示unicode编号
- n个字节的编码（n&gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号
-  下表表示了utf8的编码，z表示用于编码的bit
+ 1. 一个字节的编码，最高位为0，其他的位表示unicode编号 2. n个字节的编码（n&gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号  下表表示了utf8的编码，z表示用于编码的bit
    unicode范围 utf8编码     十六进制表示 二进制表示   000000 - 00007F 0zzzzzzz   000080 - 0007FF 110zzzzz 10zzzzzz   000800 - 00D7FF/00E000 - 00FFFF 1110zzzz 10zzzzzz 10zzzzzz   010000 - 10FFFF 11110zzz 10zzzzzz 10zzzzzz 10zzzzzz    环境中的编码 一个程序读取字符的输入的时候，读取的是二进制的数据。如果程序需要理解这个字符串是什么意思，必须了解字符的编码。同理，程序输出字符串的时候必须告知字符串的编码，不然使用者就无法理解程序的输出。程序中遇到乱码的问题，都是因为一个程序输出的字符串的编码和另一个程序接受字符串时使用的编码不一致导致的。因此，在解决编码的问题的思路就是搞清楚涉及到了哪几个环境。
+比如：一个程序打印一个字符串到终端。程序的编码是utf8，终端显示的编码是gbk。这样就会造成乱码。
 </div>
 </article>
 
@@ -246,7 +259,7 @@ event serializer 把event中的数据，转换成存储需要的格式。
 <section>
 <h4 class="menu"><a class="active" href="/post/">Posts</a></h4>
 <ul class="menu">
-<li><a class="" href="/post/map/">map 内部实现</a></li>
+<li><a class="" href="/post/cs/golang/map/">map 内部实现</a></li>
 <li><a class="" href="/post/cs/complement/">补码</a></li>
 <li><a class="" href="/post/cs/golang/go-memory-model/">GO 内存模型</a></li>
 <li><a class="" href="/post/cs/str/">字符串</a></li>

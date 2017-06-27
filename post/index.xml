@@ -14,11 +14,29 @@
     
     <item>
       <title>map 内部实现</title>
-      <link>http://zjykzk.github.io/post/map/</link>
+      <link>http://zjykzk.github.io/post/cs/golang/map/</link>
       <pubDate>Thu, 15 Jun 2017 19:13:25 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/map/</guid>
+      <guid>http://zjykzk.github.io/post/cs/golang/map/</guid>
       <description>
+
+&lt;h1 id=&#34;hash&#34;&gt;hash&lt;/h1&gt;
+
+&lt;p&gt;TODO&lt;/p&gt;
+
+&lt;h1 id=&#34;查询&#34;&gt;查询&lt;/h1&gt;
+
+&lt;p&gt;TODO&lt;/p&gt;
+
+&lt;h1 id=&#34;删除&#34;&gt;删除&lt;/h1&gt;
+
+&lt;p&gt;TODO&lt;/p&gt;
+
+&lt;h1 id=&#34;更新&#34;&gt;更新&lt;/h1&gt;
+
+&lt;p&gt;TODO&lt;/p&gt;
+
+&lt;h1 id=&#34;线程安全&#34;&gt;线程安全&lt;/h1&gt;
 
 &lt;h1 id=&#34;内存布局&#34;&gt;内存布局&lt;/h1&gt;
 
@@ -160,7 +178,10 @@
 
 &lt;p&gt;同时，二进制转化成十进制：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;111111 = -(1000000 - 111111) = -(2^6 - 2^5 - 2^4 - 2^3 - 2^2 - 2^1 - 2^0) = -(2^5 - 2^4 - 2^3 - 2^2 - 2^1 - 2^0) = -2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^0
+&lt;pre&gt;&lt;code&gt;111111 = -(1000000 - 111111)
+       = -(2^6 - 2^5 - 2^4 - 2^3 - 2^2 - 2^1 - 2^0)
+       = -(2^5 - 2^4 - 2^3 - 2^2 - 2^1 - 2^0)
+       = -2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^0
 011111 = 2^4 + 2^3 + 2^2 + 2^1 + 2^0
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -200,7 +221,7 @@ print(b);
 
 &lt;p&gt;但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;happens before&lt;/strong&gt;定义了内存操作的顺序，它是一种偏序。&lt;em&gt;e1&lt;/em&gt; happens before &lt;em&gt;e2&lt;/em&gt;, &lt;em&gt;e2&lt;/em&gt; happens after &lt;em&gt;e1&lt;/em&gt; 。如果 &lt;em&gt;e1&lt;/em&gt; 既不happens before &lt;em&gt;e2&lt;/em&gt; 也不happens after &lt;em&gt;e2&lt;/em&gt; ，那么 &lt;em&gt;e1&lt;/em&gt; 和 *e2*是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;happens before&lt;/strong&gt;定义了内存操作的顺序，它是一种偏序。&lt;em&gt;e1&lt;/em&gt; happens before &lt;em&gt;e2&lt;/em&gt;, &lt;em&gt;e2&lt;/em&gt; happens after &lt;em&gt;e1&lt;/em&gt; 。如果 &lt;em&gt;e1&lt;/em&gt; 既不happens before &lt;em&gt;e2&lt;/em&gt; 也不happens after &lt;em&gt;e2&lt;/em&gt; ，那么 &lt;em&gt;e1&lt;/em&gt; 和 &lt;em&gt;e2&lt;/em&gt; 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;在一个goroutine中，happens before的顺序就是代码表达的顺序。&lt;/em&gt;&lt;/p&gt;
 
@@ -231,14 +252,14 @@ print(b);
 &lt;p&gt;程序的初始化是通过一个goroutine执行的，这个goroutine会生成一个新的goroutine，因此会有竞争存在。&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;包 &lt;em&gt;p&lt;/em&gt; 依赖 &lt;em&gt;q&lt;/em&gt; ， &lt;em&gt;q&lt;/em&gt; 的 &lt;em&gt;init&lt;/em&gt; 函数happens before包 &lt;em&gt;p&lt;/em&gt; 的任何操作&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;所有 &lt;em&gt;init&lt;/em&gt; 函数执行结束happens before *main.main*函数&lt;br /&gt;
+&lt;li&gt;包 &lt;em&gt;p&lt;/em&gt; 依赖 *q*，&lt;em&gt;q&lt;/em&gt; 的 &lt;em&gt;init&lt;/em&gt; 函数happens before包 &lt;em&gt;p&lt;/em&gt; 的任何操作&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;所有 &lt;em&gt;init&lt;/em&gt; 函数执行结束happens before &lt;em&gt;main.main&lt;/em&gt; 函数&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3 id=&#34;goroutine-创建&#34;&gt;Goroutine 创建&lt;/h3&gt;
 
-&lt;p&gt;&lt;em&gt;go&lt;/em&gt; 语句happens before新创建的goroutine的运行。以下代码中，&lt;strong&gt;&lt;em&gt;1&lt;/em&gt;&lt;/strong&gt; happens before &lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt;，&lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt; happens before 函数&lt;strong&gt;&lt;em&gt;f&lt;/em&gt;&lt;/strong&gt;的执行，在将来的某个时刻所以打印&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;（可能是在hello函数返回之后）。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;go&lt;/em&gt; 语句happens before新创建的goroutine的运行。以下代码中，&lt;strong&gt;&lt;em&gt;1&lt;/em&gt;&lt;/strong&gt; happens before &lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt;，&lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt; happens before 函数&lt;strong&gt;&lt;em&gt;f&lt;/em&gt;&lt;/strong&gt;的执行，在将来的某个时刻所以打印 &lt;code&gt;hello, world&lt;/code&gt;（可能是在hello函数返回之后）。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
 
@@ -248,13 +269,13 @@ func f() {
 
 func hello() {
 	a = &amp;quot;hello, world&amp;quot; // 1
-	go f()			  // 2
+	go f()             // 2
 }
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;goroutine-销毁&#34;&gt;Goroutine 销毁&lt;/h3&gt;
 
-&lt;p&gt;goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证&lt;strong&gt;&lt;em&gt;print(a)&lt;/em&gt;&lt;/strong&gt;的结果就是&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。事实上，编译器完全有可能把 &lt;em&gt;go&lt;/em&gt; 语句完全的删除掉。&lt;/p&gt;
+&lt;p&gt;goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证&lt;strong&gt;&lt;em&gt;print(a)&lt;/em&gt;&lt;/strong&gt;的结果就是 &lt;code&gt;hello, world&lt;/code&gt;。事实上，编译器完全有可能把 &lt;em&gt;go&lt;/em&gt; 语句完全的删除掉。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
 
@@ -268,7 +289,7 @@ func hello() {
 
 &lt;p&gt;channel在golang里面是同步的一个重要手段。channel上面的每个发送操作，都唯一对应着一个channel上面的接受操作，显然发送／接受操作在不同的goroutine下面才需要讨论。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。&lt;/strong&gt;以下代码中，按照本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。&lt;/strong&gt;以下代码中，按照本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var c = make(chan int, 10)
 var a string
@@ -287,7 +308,7 @@ func main() {
 
 &lt;p&gt;&lt;strong&gt;channel的关闭操作happens before因为关闭channel读到的0值。&lt;/strong&gt;上面例子中，用 &lt;em&gt;close( c)&lt;/em&gt; 代替 &lt;em&gt;ch &amp;lt;- 0&lt;/em&gt; 同样能够保证 &lt;em&gt;1&lt;/em&gt;  happens before &lt;em&gt;2&lt;/em&gt;  。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; 。另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;var c = make(chan int)
 var a string
@@ -324,7 +345,7 @@ func main() {
 
 &lt;p&gt;包 &lt;em&gt;sync&lt;/em&gt; 实现了两类锁分别是： &lt;em&gt;sync.Mutex&lt;/em&gt; 和 &lt;em&gt;sync.RWMutex。&lt;/em&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;给定类型为 &lt;em&gt;sync.Mutex&lt;/em&gt; 或者是 &lt;em&gt;sync.RWMutex&lt;/em&gt; 的变量 &lt;em&gt;l&lt;/em&gt; ,以及满足 &lt;em&gt;n&amp;lt;m&lt;/em&gt; 条件的整数。调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock()&lt;/em&gt;  happens before 调用 &lt;em&gt;m&lt;/em&gt; 次 &lt;em&gt;l.Lock()&lt;/em&gt; （返回）。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;给定类型为 &lt;em&gt;sync.Mutex&lt;/em&gt; 或者是 &lt;em&gt;sync.RWMutex&lt;/em&gt; 的变量 &lt;em&gt;l&lt;/em&gt; ,以及满足 &lt;em&gt;n&amp;lt;m&lt;/em&gt; 条件的整数。调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock()&lt;/em&gt;  happens before 调用 &lt;em&gt;m&lt;/em&gt; 次 &lt;em&gt;l.Lock()&lt;/em&gt; （返回）。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var l sync.Mutex
 var a string
@@ -372,68 +393,57 @@ func main() {
 
 &lt;p&gt;在计算机内部，只有01的信息。因此，为了能让计算机能够认识字符串，每个字符就的被映射成01数据。这个映射功能就叫编码。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;ASCII&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;h2 id=&#34;ascii&#34;&gt;ASCII&lt;/h2&gt;
 
 &lt;p&gt;ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如&lt;code&gt;A&lt;/code&gt;的编码是&lt;code&gt;01000001&lt;/code&gt;&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;Unicode&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;h2 id=&#34;unicode&#34;&gt;Unicode&lt;/h2&gt;
 
 &lt;p&gt;世界语言文字异常丰富，每个国家都有自己独特的语言文字。ASCII的编码无法编码所有的文字，因此产生了很多编码，比如中文的BIG5，GB2312等等。这些编码无法兼容，比如&lt;code&gt;中&lt;/code&gt;在GB2312编码是&lt;code&gt;1101011011010000&lt;/code&gt;，BIG5的编码是&lt;code&gt;1010010010100100&lt;/code&gt;。因此，Unicode就出现了。Unicode规定了每个字符的唯一编号，目前已经有100多万个字符。需要注意的是Unicode只规定了字符的编号，没有规定二进制的表示。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;Utf8编码&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;h2 id=&#34;utf8编码&#34;&gt;Utf8编码&lt;/h2&gt;
 
 &lt;p&gt;utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。&lt;/p&gt;
 
 &lt;p&gt;utf8编码规则：&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;一个字节的编码，最高位为0，其他的位表示unicode编号&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;n个字节的编码（n&amp;gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;  1. 一个字节的编码，最高位为0，其他的位表示unicode编号
+  2. n个字节的编码（n&amp;gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;下表表示了utf8的编码，z表示用于编码的bit&lt;/p&gt;
 
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th&gt;unicode范围&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;unicode范围&lt;/th&gt;
 &lt;th align=&#34;left&#34;&gt;utf8编码&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td&gt;十六进制表示&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;十六进制表示&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;二进制表示&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td&gt;000000 - 00007F&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;000000 - 00007F&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;0zzzzzzz&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td&gt;000080 - 0007FF&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;000080 - 0007FF&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;110zzzzz 10zzzzzz&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td&gt;000800 - 00D7FF/00E000 - 00FFFF&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;000800 - 00D7FF/00E000 - 00FFFF&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;1110zzzz 10zzzzzz 10zzzzzz&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td&gt;010000 - 10FFFF&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;010000 - 10FFFF&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;11110zzz 10zzzzzz 10zzzzzz 10zzzzzz&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
@@ -458,11 +468,13 @@ func main() {
 &lt;h4 id=&#34;重要方法&#34;&gt;重要方法&lt;/h4&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# &amp;lt;type &#39;str&#39;&amp;gt; to &amp;lt;type &#39;unicode&#39;&amp;gt;
-# 如果 s 是&#39;unicode&#39;类型，python会先通过encode函数把s转换成&#39;str&#39;类型，而encode函数的encoding是sys.getdefaultencoding()的值
+# 如果 s 是&#39;unicode&#39;类型，python会先通过encode函数把s转换成&#39;str&#39;类型
+# encode函数的encoding是sys.getdefaultencoding()的值
 s.decode(encoding)
 
 # &amp;lt;type &#39;unicode&#39;&amp;gt; to &amp;lt;type &#39;str&#39;&amp;gt;
-# 如果u是&#39;str&#39;类型，python会通过decode函数把u转换成&#39;unicode&#39;类型，而decode函数的encoding是sys.getdefaultencoding()的值
+# 如果u是&#39;str&#39;类型，python会通过decode函数把u转换成&#39;unicode&#39;类型
+# decode函数的encoding是sys.getdefaultencoding()的值
 u.encode(encoding)
 
 # 获取系统默认的编码
@@ -482,7 +494,7 @@ sys.setdefaultencoding(&#39;utf8&#39;)
 &lt;p&gt;指定encoding参数生成file-object-like对象，利用：&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;函数&lt;code&gt;read&lt;/code&gt; 读取byte字符串，按照encoding的编码返回unicode&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;函数 &lt;code&gt;read&lt;/code&gt; 读取byte字符串，按照encoding的编码返回unicode&lt;br /&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;write&lt;/code&gt; 输入unicode，按照encoding的编码转换成byte字符串写入文件&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
@@ -493,7 +505,7 @@ sys.setdefaultencoding(&#39;utf8&#39;)
 
 &lt;h2 id=&#34;go中的字符串&#34;&gt;go中的字符串&lt;/h2&gt;
 
-&lt;p&gt;go中有两种类型支持字符串分别是：&lt;code&gt;string&lt;/code&gt;和&lt;code&gt;rune&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;go中有两种类型支持字符串分别是：&lt;code&gt;string&lt;/code&gt; 和 &lt;code&gt;rune&lt;/code&gt; 。&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;string表示字节slice（分片）&lt;br /&gt;&lt;/li&gt;
@@ -501,7 +513,7 @@ sys.setdefaultencoding(&#39;utf8&#39;)
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;go对utf8有天然的支持。go的源代码是utf8编码，&lt;code&gt;for ... range&lt;/code&gt;循环字符串的时候也是按照utf8编码来处理每个字符，而不是字节。&lt;/p&gt;
+&lt;p&gt;go对utf8有天然的支持。go的源代码是utf8编码，&lt;code&gt;for ... range&lt;/code&gt; 循环字符串的时候也是按照utf8编码来处理每个字符，而不是字节。&lt;/p&gt;
 </description>
     </item>
     

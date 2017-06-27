@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://zjykzk.github.io/post/map/</loc>
+    <loc>http://zjykzk.github.io/post/cs/golang/map/</loc>
     <lastmod>2017-06-15T19:13:25+08:00</lastmod>
   </url>
   
@@ -59,19 +59,13 @@
   
   <url>
     <loc>http://zjykzk.github.io/categories/cs/</loc>
-    <lastmod>2017-05-30T23:18:02+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/go/</loc>
     <lastmod>2017-06-15T19:13:25+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://zjykzk.github.io/tags/golang/</loc>
-    <lastmod>2017-03-28T11:22:09+08:00</lastmod>
+    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -95,12 +89,6 @@
   
   <url>
     <loc>http://zjykzk.github.io/</loc>
-    <lastmod>2017-06-15T19:13:25+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/%E6%8A%80%E6%9C%AF/</loc>
     <lastmod>2017-06-15T19:13:25+08:00</lastmod>
     <priority>0</priority>
   </url>

@@ -67,7 +67,7 @@ print(b);
 
 <p>但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.</p>
 
-<p><strong>happens before</strong>定义了内存操作的顺序，它是一种偏序。<em>e1</em> happens before <em>e2</em>, <em>e2</em> happens after <em>e1</em> 。如果 <em>e1</em> 既不happens before <em>e2</em> 也不happens after <em>e2</em> ，那么 <em>e1</em> 和 *e2*是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。</p>
+<p><strong>happens before</strong>定义了内存操作的顺序，它是一种偏序。<em>e1</em> happens before <em>e2</em>, <em>e2</em> happens after <em>e1</em> 。如果 <em>e1</em> 既不happens before <em>e2</em> 也不happens after <em>e2</em> ，那么 <em>e1</em> 和 <em>e2</em> 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。</p>
 
 <p><em>在一个goroutine中，happens before的顺序就是代码表达的顺序。</em></p>
 
@@ -98,14 +98,14 @@ print(b);
 <p>程序的初始化是通过一个goroutine执行的，这个goroutine会生成一个新的goroutine，因此会有竞争存在。</p>
 
 <ol>
-<li>包 <em>p</em> 依赖 <em>q</em> ， <em>q</em> 的 <em>init</em> 函数happens before包 <em>p</em> 的任何操作<br /></li>
-<li>所有 <em>init</em> 函数执行结束happens before *main.main*函数<br />
+<li>包 <em>p</em> 依赖 *q*，<em>q</em> 的 <em>init</em> 函数happens before包 <em>p</em> 的任何操作<br /></li>
+<li>所有 <em>init</em> 函数执行结束happens before <em>main.main</em> 函数<br />
 <br /></li>
 </ol>
 
 <h3 id="goroutine-创建">Goroutine 创建</h3>
 
-<p><em>go</em> 语句happens before新创建的goroutine的运行。以下代码中，<strong><em>1</em></strong> happens before <strong><em>2</em></strong>，<strong><em>2</em></strong> happens before 函数<strong><em>f</em></strong>的执行，在将来的某个时刻所以打印<code>&quot;hello, world&quot;</code>（可能是在hello函数返回之后）。</p>
+<p><em>go</em> 语句happens before新创建的goroutine的运行。以下代码中，<strong><em>1</em></strong> happens before <strong><em>2</em></strong>，<strong><em>2</em></strong> happens before 函数<strong><em>f</em></strong>的执行，在将来的某个时刻所以打印 <code>hello, world</code>（可能是在hello函数返回之后）。</p>
 
 <pre><code class="language-go">var a string
 
@@ -115,13 +115,13 @@ func f() {
 
 func hello() {
 	a = &quot;hello, world&quot; // 1
-	go f()			  // 2
+	go f()             // 2
 }
 </code></pre>
 
 <h3 id="goroutine-销毁">Goroutine 销毁</h3>
 
-<p>goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证<strong><em>print(a)</em></strong>的结果就是<code>&quot;hello, world&quot;</code>。事实上，编译器完全有可能把 <em>go</em> 语句完全的删除掉。</p>
+<p>goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证<strong><em>print(a)</em></strong>的结果就是 <code>hello, world</code>。事实上，编译器完全有可能把 <em>go</em> 语句完全的删除掉。</p>
 
 <pre><code class="language-go">var a string
 
@@ -135,7 +135,7 @@ func hello() {
 
 <p>channel在golang里面是同步的一个重要手段。channel上面的每个发送操作，都唯一对应着一个channel上面的接受操作，显然发送／接受操作在不同的goroutine下面才需要讨论。</p>
 
-<p><strong>在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。</strong>以下代码中，按照本规则 <em>1</em> happens before <em>2</em> ，另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出<code>&quot;hello, world&quot;</code>。</p>
+<p><strong>在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。</strong>以下代码中，按照本规则 <em>1</em> happens before <em>2</em> ，另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出 <code>hello, world</code>。</p>
 
 <pre><code class="language-go">var c = make(chan int, 10)
 var a string
@@ -154,7 +154,7 @@ func main() {
 
 <p><strong>channel的关闭操作happens before因为关闭channel读到的0值。</strong>上面例子中，用 <em>close( c)</em> 代替 <em>ch &lt;- 0</em> 同样能够保证 <em>1</em>  happens before <em>2</em>  。</p>
 
-<p><strong>没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。</strong>以下代码中，根据本规则 <em>1</em> happens before <em>2</em> ，另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出<code>&quot;hello, world&quot;</code>。</p>
+<p><strong>没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。</strong>以下代码中，根据本规则 <em>1</em> happens before <em>2</em> 。另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出 <code>hello, world</code>。</p>
 
 <pre><code>var c = make(chan int)
 var a string
@@ -191,7 +191,7 @@ func main() {
 
 <p>包 <em>sync</em> 实现了两类锁分别是： <em>sync.Mutex</em> 和 <em>sync.RWMutex。</em></p>
 
-<p><strong>给定类型为 <em>sync.Mutex</em> 或者是 <em>sync.RWMutex</em> 的变量 <em>l</em> ,以及满足 <em>n&lt;m</em> 条件的整数。调用 <em>n</em> 次 <em>l.Unlock()</em>  happens before 调用 <em>m</em> 次 <em>l.Lock()</em> （返回）。</strong>以下代码中，根据本规则 <em>1</em> happens before <em>2</em> ，另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出<code>&quot;hello, world&quot;</code>。</p>
+<p><strong>给定类型为 <em>sync.Mutex</em> 或者是 <em>sync.RWMutex</em> 的变量 <em>l</em> ,以及满足 <em>n&lt;m</em> 条件的整数。调用 <em>n</em> 次 <em>l.Unlock()</em>  happens before 调用 <em>m</em> 次 <em>l.Lock()</em> （返回）。</strong>以下代码中，根据本规则 <em>1</em> happens before <em>2</em> ，另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出 <code>hello, world</code>。</p>
 
 <pre><code class="language-go">var l sync.Mutex
 var a string
@@ -254,7 +254,7 @@ func main() {
 <section>
 <h4 class="menu"><a class="" href="/post/">Posts</a></h4>
 <ul class="menu">
-<li><a class="" href="/post/map/">map 内部实现</a></li>
+<li><a class="" href="/post/cs/golang/map/">map 内部实现</a></li>
 <li><a class="" href="/post/cs/complement/">补码</a></li>
 <li><a class="active" href="/post/cs/golang/go-memory-model/">GO 内存模型</a></li>
 <li><a class="" href="/post/cs/str/">字符串</a></li>

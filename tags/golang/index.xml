@@ -9,8 +9,75 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 28 Mar 2017 11:22:09 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 15 Jun 2017 19:13:25 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>map 内部实现</title>
+      <link>http://zjykzk.github.io/post/cs/golang/map/</link>
+      <pubDate>Thu, 15 Jun 2017 19:13:25 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/golang/map/</guid>
+      <description>
+
+&lt;h1 id=&#34;hash&#34;&gt;hash&lt;/h1&gt;
+
+&lt;p&gt;TODO&lt;/p&gt;
+
+&lt;h1 id=&#34;查询&#34;&gt;查询&lt;/h1&gt;
+
+&lt;p&gt;TODO&lt;/p&gt;
+
+&lt;h1 id=&#34;删除&#34;&gt;删除&lt;/h1&gt;
+
+&lt;p&gt;TODO&lt;/p&gt;
+
+&lt;h1 id=&#34;更新&#34;&gt;更新&lt;/h1&gt;
+
+&lt;p&gt;TODO&lt;/p&gt;
+
+&lt;h1 id=&#34;线程安全&#34;&gt;线程安全&lt;/h1&gt;
+
+&lt;h1 id=&#34;内存布局&#34;&gt;内存布局&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;   ^   +-----------------+  ^
+   |   |       bucket0   |  |------&amp;gt; +------------+
+   |   +-----------------+  v        | tophash 0  |
+   |   |       bucket1   |           +------------+
+   |   +-----------------+           | tophash 1  |
+2^h.B  |      .......    |           +------------+
+   |   +-----------------+           | .........  |
+   |   | bucket2^h.B - 2 |           +------------+
+   |   +-----------------+           | tophash 6  |
+   |   | bucket2^h.B - 1 |           +------------+
+   v   +-----------------+           | tophash 7  |
+                                     +------------+
+                                     |   key 0    |
+                                     +------------+
+                                     |   key 1    |
+                                     +------------+
+                                     |   .....    |
+                                     +------------+
+                                     |   key 6    |
+                                     +------------+
+                                     |   key 7    |
+                                     +------------+
+                                     |  value 0   |
+                                     +------------+
+                                     |  value 1   |
+                                     +------------+
+                                     |  .......   |
+                                     +------------+
+                                     |  value 6   |
+                                     +------------+
+                                     |  value 7   |
+                                     +------------+ ^
+                                     |overflow_ptr| |-----&amp;gt; +---------------------+-------------+----------------+--------------+
+                                     +------------+ v       | tophash0 - tophash7 | key0 - key7 | value0 - value7| overflow_ptr |
+                                                            +---------------------+-------------+----------------+--------------+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>GO 内存模型</title>
@@ -42,7 +109,7 @@ print(b);
 
 &lt;p&gt;但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;happens before&lt;/strong&gt;定义了内存操作的顺序，它是一种偏序。&lt;em&gt;e1&lt;/em&gt; happens before &lt;em&gt;e2&lt;/em&gt;, &lt;em&gt;e2&lt;/em&gt; happens after &lt;em&gt;e1&lt;/em&gt; 。如果 &lt;em&gt;e1&lt;/em&gt; 既不happens before &lt;em&gt;e2&lt;/em&gt; 也不happens after &lt;em&gt;e2&lt;/em&gt; ，那么 &lt;em&gt;e1&lt;/em&gt; 和 *e2*是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;happens before&lt;/strong&gt;定义了内存操作的顺序，它是一种偏序。&lt;em&gt;e1&lt;/em&gt; happens before &lt;em&gt;e2&lt;/em&gt;, &lt;em&gt;e2&lt;/em&gt; happens after &lt;em&gt;e1&lt;/em&gt; 。如果 &lt;em&gt;e1&lt;/em&gt; 既不happens before &lt;em&gt;e2&lt;/em&gt; 也不happens after &lt;em&gt;e2&lt;/em&gt; ，那么 &lt;em&gt;e1&lt;/em&gt; 和 &lt;em&gt;e2&lt;/em&gt; 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;在一个goroutine中，happens before的顺序就是代码表达的顺序。&lt;/em&gt;&lt;/p&gt;
 
@@ -73,14 +140,14 @@ print(b);
 &lt;p&gt;程序的初始化是通过一个goroutine执行的，这个goroutine会生成一个新的goroutine，因此会有竞争存在。&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;包 &lt;em&gt;p&lt;/em&gt; 依赖 &lt;em&gt;q&lt;/em&gt; ， &lt;em&gt;q&lt;/em&gt; 的 &lt;em&gt;init&lt;/em&gt; 函数happens before包 &lt;em&gt;p&lt;/em&gt; 的任何操作&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;所有 &lt;em&gt;init&lt;/em&gt; 函数执行结束happens before *main.main*函数&lt;br /&gt;
+&lt;li&gt;包 &lt;em&gt;p&lt;/em&gt; 依赖 *q*，&lt;em&gt;q&lt;/em&gt; 的 &lt;em&gt;init&lt;/em&gt; 函数happens before包 &lt;em&gt;p&lt;/em&gt; 的任何操作&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;所有 &lt;em&gt;init&lt;/em&gt; 函数执行结束happens before &lt;em&gt;main.main&lt;/em&gt; 函数&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3 id=&#34;goroutine-创建&#34;&gt;Goroutine 创建&lt;/h3&gt;
 
-&lt;p&gt;&lt;em&gt;go&lt;/em&gt; 语句happens before新创建的goroutine的运行。以下代码中，&lt;strong&gt;&lt;em&gt;1&lt;/em&gt;&lt;/strong&gt; happens before &lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt;，&lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt; happens before 函数&lt;strong&gt;&lt;em&gt;f&lt;/em&gt;&lt;/strong&gt;的执行，在将来的某个时刻所以打印&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;（可能是在hello函数返回之后）。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;go&lt;/em&gt; 语句happens before新创建的goroutine的运行。以下代码中，&lt;strong&gt;&lt;em&gt;1&lt;/em&gt;&lt;/strong&gt; happens before &lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt;，&lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt; happens before 函数&lt;strong&gt;&lt;em&gt;f&lt;/em&gt;&lt;/strong&gt;的执行，在将来的某个时刻所以打印 &lt;code&gt;hello, world&lt;/code&gt;（可能是在hello函数返回之后）。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
 
@@ -90,13 +157,13 @@ func f() {
 
 func hello() {
 	a = &amp;quot;hello, world&amp;quot; // 1
-	go f()			  // 2
+	go f()             // 2
 }
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;goroutine-销毁&#34;&gt;Goroutine 销毁&lt;/h3&gt;
 
-&lt;p&gt;goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证&lt;strong&gt;&lt;em&gt;print(a)&lt;/em&gt;&lt;/strong&gt;的结果就是&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。事实上，编译器完全有可能把 &lt;em&gt;go&lt;/em&gt; 语句完全的删除掉。&lt;/p&gt;
+&lt;p&gt;goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证&lt;strong&gt;&lt;em&gt;print(a)&lt;/em&gt;&lt;/strong&gt;的结果就是 &lt;code&gt;hello, world&lt;/code&gt;。事实上，编译器完全有可能把 &lt;em&gt;go&lt;/em&gt; 语句完全的删除掉。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
 
@@ -110,7 +177,7 @@ func hello() {
 
 &lt;p&gt;channel在golang里面是同步的一个重要手段。channel上面的每个发送操作，都唯一对应着一个channel上面的接受操作，显然发送／接受操作在不同的goroutine下面才需要讨论。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。&lt;/strong&gt;以下代码中，按照本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。&lt;/strong&gt;以下代码中，按照本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var c = make(chan int, 10)
 var a string
@@ -129,7 +196,7 @@ func main() {
 
 &lt;p&gt;&lt;strong&gt;channel的关闭操作happens before因为关闭channel读到的0值。&lt;/strong&gt;上面例子中，用 &lt;em&gt;close( c)&lt;/em&gt; 代替 &lt;em&gt;ch &amp;lt;- 0&lt;/em&gt; 同样能够保证 &lt;em&gt;1&lt;/em&gt;  happens before &lt;em&gt;2&lt;/em&gt;  。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; 。另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;var c = make(chan int)
 var a string
@@ -166,7 +233,7 @@ func main() {
 
 &lt;p&gt;包 &lt;em&gt;sync&lt;/em&gt; 实现了两类锁分别是： &lt;em&gt;sync.Mutex&lt;/em&gt; 和 &lt;em&gt;sync.RWMutex。&lt;/em&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;给定类型为 &lt;em&gt;sync.Mutex&lt;/em&gt; 或者是 &lt;em&gt;sync.RWMutex&lt;/em&gt; 的变量 &lt;em&gt;l&lt;/em&gt; ,以及满足 &lt;em&gt;n&amp;lt;m&lt;/em&gt; 条件的整数。调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock()&lt;/em&gt;  happens before 调用 &lt;em&gt;m&lt;/em&gt; 次 &lt;em&gt;l.Lock()&lt;/em&gt; （返回）。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出&lt;code&gt;&amp;quot;hello, world&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;给定类型为 &lt;em&gt;sync.Mutex&lt;/em&gt; 或者是 &lt;em&gt;sync.RWMutex&lt;/em&gt; 的变量 &lt;em&gt;l&lt;/em&gt; ,以及满足 &lt;em&gt;n&amp;lt;m&lt;/em&gt; 条件的整数。调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock()&lt;/em&gt;  happens before 调用 &lt;em&gt;m&lt;/em&gt; 次 &lt;em&gt;l.Lock()&lt;/em&gt; （返回）。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var l sync.Mutex
 var a string
