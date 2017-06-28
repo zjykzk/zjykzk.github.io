@@ -296,13 +296,13 @@ var a string
 
 func f() {
 	a = &amp;quot;hello, world&amp;quot;
-	c &amp;lt;- 0		// 1
+	c &amp;lt;- 0       // 1
 }
 
 func main() {
 	go f()
-	&amp;lt;-c			// 2
-	print(a)	 // 3
+	&amp;lt;-c          // 2
+	print(a)     // 3
 }
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -310,18 +310,18 @@ func main() {
 
 &lt;p&gt;&lt;strong&gt;没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; 。另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;var c = make(chan int)
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var c = make(chan int)
 var a string
 
 func f() {
 	a = &amp;quot;hello, world&amp;quot;
-	&amp;lt;-c					// 1
+	&amp;lt;-c	                 // 1
 }
 
 func main() {
 	go f()
-	c &amp;lt;- 0				// 2
-	print(a)			// 3
+	c &amp;lt;- 0               // 2
+	print(a)             // 3
 }
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -352,14 +352,14 @@ var a string
 
 func f() {
 	a = &amp;quot;hello, world&amp;quot;
-	l.Unlock()		// 1
+	l.Unlock()       // 1
 }
 
 func main() {
 	l.Lock()
 	go f()
-	l.Lock()		// 2
-	print(a)		// 3
+	l.Lock()         // 2
+	print(a)         // 3
 }
 &lt;/code&gt;&lt;/pre&gt;
 

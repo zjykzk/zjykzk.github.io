@@ -8,8 +8,9 @@
 <meta name="author" content="zenk"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
 <meta name="HandheldFriendly" content="true">
-<meta name="generator" content="Hugo 0.24.1" />
+<meta name="generator" content="Hugo 0.25-DEV" />
 
+<link href="/css/prism.css" rel="stylesheet" />
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="canonical" href="http://zjykzk.github.io/post/cs/golang/go-memory-model/">
@@ -142,13 +143,13 @@ var a string
 
 func f() {
 	a = &quot;hello, world&quot;
-	c &lt;- 0		// 1
+	c &lt;- 0       // 1
 }
 
 func main() {
 	go f()
-	&lt;-c			// 2
-	print(a)	 // 3
+	&lt;-c          // 2
+	print(a)     // 3
 }
 </code></pre>
 
@@ -156,18 +157,18 @@ func main() {
 
 <p><strong>没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。</strong>以下代码中，根据本规则 <em>1</em> happens before <em>2</em> 。另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出 <code>hello, world</code>。</p>
 
-<pre><code>var c = make(chan int)
+<pre><code class="language-go">var c = make(chan int)
 var a string
 
 func f() {
 	a = &quot;hello, world&quot;
-	&lt;-c					// 1
+	&lt;-c	                 // 1
 }
 
 func main() {
 	go f()
-	c &lt;- 0				// 2
-	print(a)			// 3
+	c &lt;- 0               // 2
+	print(a)             // 3
 }
 </code></pre>
 
@@ -198,14 +199,14 @@ var a string
 
 func f() {
 	a = &quot;hello, world&quot;
-	l.Unlock()		// 1
+	l.Unlock()       // 1
 }
 
 func main() {
 	l.Lock()
 	go f()
-	l.Lock()		// 2
-	print(a)		// 3
+	l.Lock()         // 2
+	print(a)         // 3
 }
 </code></pre>
 
@@ -278,6 +279,7 @@ func main() {
 
 
 
+<script src="/js/prism.js"></script>
 
 </body>
 </html>
