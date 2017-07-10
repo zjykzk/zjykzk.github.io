@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
 <meta name="HandheldFriendly" content="true">
-<meta name="generator" content="Hugo 0.24.1" />
+<meta name="generator" content="Hugo 0.25-DEV" />
 
 
 <link href="/css/prism.css" rel="stylesheet" />
@@ -38,11 +38,9 @@
 
 </header>
 <div class="content">
-hash TODO
-查询 TODO
-删除 TODO
-更新 TODO
-线程安全 内存布局  ^ +-----------------+ ^ | | bucket0 | |------&gt; +------------+ | +-----------------+ v | tophash 0 | | | bucket1 | +------------+ | +-----------------+ | tophash 1 | 2^h.B | ....... | +------------+ | +-----------------+ | ......... | | | bucket2^h.B - 2 | +------------+ | +-----------------+ | tophash 6 | | | bucket2^h.B - 1 | +------------+ v +-----------------+ | tophash 7 | +------------+ | key 0 | +------------+ | key 1 | +------------+ | .
+类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
+// file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap  显然，makemap 返回的是指针。
+数据结构 hashmap // hash map type hmap struct { count int // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用 // map标记: // 1. key和value是否包指针 // 2. 是否正在扩容 // 3. 是否是同样大小的扩容 // 4. 是否正在 `range`方式访问当前的buckets // 5. 是否有 `range`方式访问旧的bucket flags uint8 B uint8 // log_2(B) == bucket数量 noverflow uint16 // overflow bucket的数量，是个近似值 hash0 uint32 // hash种子 buckets unsafe.
 </div>
 </article>
 
