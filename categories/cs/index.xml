@@ -36,7 +36,9 @@ func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// hash map
 type hmap struct {
-    count     int    // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用
+    // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用
+    count     int
+
     // map标记:
     // 1. key和value是否包指针
     // 2. 是否正在扩容
