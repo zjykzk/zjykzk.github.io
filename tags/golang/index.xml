@@ -150,7 +150,7 @@ type bmap struct {
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;结果是选择触发扩容时的值，其测试数据如下：&lt;/p&gt;
+&lt;p&gt;其测试数据如下：&lt;/p&gt;
 
 &lt;table&gt;
 &lt;thead&gt;
