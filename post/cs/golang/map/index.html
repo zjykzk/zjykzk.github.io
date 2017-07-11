@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>map 内部实现 – 老K随笔</title>
-<meta name="description" content="golang 中map的实现细节">
+<meta name="description" content="golang 中map的实现细节，它是一个典型的hashmap。">
 <meta name="created" content="2017-06-15T19:13:25&#43;0800">
 <meta name="author" content="zenk"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
@@ -168,7 +168,7 @@ type bmap struct {
 
 <h2 id="装载因子">装载因子</h2>
 
-<p>装载因子决定hashmap的资源使用率以及性能高低，在实现hashmap时，考虑四个方面：</p>
+<p>装载因子决定map的资源使用率以及性能高低，在实现map时，考虑四个方面：</p>
 
 <ol>
 <li>%overflow：拥有overflow的bucket的百分比<br /></li>
@@ -204,7 +204,7 @@ type bmap struct {
 
 <h1 id="扩容">扩容</h1>
 
-<p>当进行添加元素的操作时，如果超过装载因子，或者overflow的bucket数量超出阈值，就会触发扩容的操作。如果是因为overflow的bucket数量过多引起的，hashmap的容量不会扩大，不然就扩大为原来的大小的两倍。</p>
+<p>当进行添加元素的操作时，如果超过装载因子，或者overflow的bucket数量超出阈值，就会触发扩容的操作。如果是因为overflow的bucket数量过多引起的，map的容量不会扩大，不然就扩大为原来的大小的两倍。</p>
 
 <p>在实现扩容的时候，会先为需要的bucket分配新内存，然后把旧的bucket保存起来，再把旧的内容移到新的bucket中去。</p>
 
