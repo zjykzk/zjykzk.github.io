@@ -971,7 +971,15 @@ Label值允许任意的Unicode字符&lt;/p&gt;
       <pubDate>Mon, 15 Feb 2016 11:19:35 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/friend-links/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;http://mindhacks.cn/&#34;&gt;&lt;strong&gt;刘未鹏 | MIND HACKS&lt;/strong&gt;&lt;/a&gt;|&lt;a href=&#34;https://groups.google.com/group/pongba&#34;&gt;&lt;strong&gt;TopLanguage&lt;/strong&gt;&lt;/a&gt; | &lt;a href=&#34;http://groups.google.com/group/python-cn&#34;&gt;PythonCN&lt;/a&gt; | &lt;a href=&#34;http://erlang-china.org/&#34;&gt;ErlangCN&lt;/a&gt;&lt;/p&gt;
+      <description>
+
+&lt;h3 id=&#34;python&#34;&gt;Python&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.dabeaz.com/&#34;&gt;&lt;strong&gt;David Beazley&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;others&#34;&gt;Others&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://mindhacks.cn/&#34;&gt;&lt;strong&gt;刘未鹏 | MIND HACKS&lt;/strong&gt;&lt;/a&gt;|&lt;a href=&#34;https://groups.google.com/group/pongba&#34;&gt;&lt;strong&gt;TopLanguage&lt;/strong&gt;&lt;/a&gt; | &lt;a href=&#34;http://groups.google.com/group/python-cn&#34;&gt;PythonCN&lt;/a&gt; | &lt;a href=&#34;http://erlang-china.org/&#34;&gt;ErlangCN&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://www.codinghorror.com/blog/&#34;&gt;&lt;strong&gt;Coding Horror&lt;/strong&gt;&lt;/a&gt; | &lt;a href=&#34;http://highscalability.com/&#34;&gt;High Scalability&lt;/a&gt; | &lt;a href=&#34;http://www.infoq.com/cn&#34;&gt;&lt;strong&gt;InfoQ&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
 
