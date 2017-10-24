@@ -96,7 +96,7 @@
 
 &lt;h3 id=&#34;profile程序&#34;&gt;profile程序&lt;/h3&gt;
 
-&lt;p&gt;通过golang自带的profile功能，在程序里面添加profile代码，通过&lt;code&gt;go tool pprof&lt;/code&gt;对程序做profile，用 &lt;code&gt;go-torch&lt;/code&gt;生成火焰图。发现果不其然，数据操作占每次请求的40%以上。&lt;/p&gt;
+&lt;p&gt;通过golang自带的profile功能，在程序里面添加profile代码，通过&lt;code&gt;go tool pprof&lt;/code&gt;对程序做profile，用 &lt;code&gt;go-torch&lt;/code&gt;生成火焰图。发现果不其然，一个请求过程中，数据操作耗时占整体的40%以上。&lt;/p&gt;
 
 &lt;p&gt;发送消息火焰图&lt;/p&gt;
 
@@ -113,7 +113,7 @@
 &lt;p&gt;通过看程序以及对需求的分析，程序可以做优化：&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;统计数据可以不用每次都去写数据库，把统计数据放在内存或者写本地磁盘，定期刷到数据库&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;统计数据可以不用每次都去写数据库，把它放在内存或者写本地磁盘，定期刷到数据库&lt;br /&gt;&lt;/li&gt;
 &lt;li&gt;去重以后的消息，可以放在内存，减少拉取消息时候一次cas操作&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
@@ -140,7 +140,7 @@ ts&amp;quot; : ISODate(&amp;quot;2017-10-24T07:54:08.773Z&amp;quot;), &amp;quot;
 
 &lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
 
-&lt;p&gt;本次调优最大问题是思维盲区，由于自己对mongodb不熟悉，就没有想到去查看mongodb的状态，把更多的精力放在的代码层面对数据库操作的优化，中间还做过把消息放在缓存中虽然达到预期，但是有数据不一致的问题。没有抓住重点。其实，方法没对，&lt;strong&gt;优化的最重要原则是做profile，profile一切。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;本次调优最大问题是思维盲区，由于自己对mongodb不熟悉，就没有想到去profile mongodb，把精力放在了优化代码层面的数据库操作，中间还做过把消息放在缓存中虽然达到预期，但是有数据不一致的问题。其实，方法没对，&lt;strong&gt;优化的首要原则是做profile，profile一切。&lt;/strong&gt;&lt;/p&gt;
 </description>
     </item>
     
