@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
 <meta name="HandheldFriendly" content="true">
-<meta name="generator" content="Hugo 0.25-DEV" />
+<meta name="generator" content="Hugo 0.31-DEV" />
 
 
 <link href="/css/prism.css" rel="stylesheet" />
@@ -31,6 +31,19 @@
 <h1 class="title">编程</h1>
 <article class="section-post list-view">
 <header>
+<h2 class="title title-submitted"><a href="/post/cs/first-optimal/">记一次mongo数据库优化经历</a></h2>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2017-10-24T18:46:11&#43;08:00">2017-10-24 18:46:11</time>
+</p>
+
+</header>
+<div class="content">
+优化首要的是profile，profile一切
+</div>
+</article>
+
+<article class="section-post list-view">
+<header>
 <h2 class="title title-submitted"><a href="/post/cs/golang/map/">map 内部实现</a></h2>
 <p class="submitted">
 <span class="author">zenk</span> – <time class="modified-date" datetime="2017-06-15T19:13:25&#43;08:00">2017-06-15 19:13:25</time>
@@ -38,9 +51,7 @@
 
 </header>
 <div class="content">
-类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
-// file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap  显然，makemap 返回的是指针。
-数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用 count int // map标记: // 1. key和value是否包指针 // 2. 是否正在扩容 // 3. 是否是同样大小的扩容 // 4. 是否正在 `range`方式访问当前的buckets // 5. 是否有 `range`方式访问旧的bucket flags uint8 B uint8 // log_2(B) == bucket数量 noverflow uint16 // overflow bucket的数量，是个近似值 hash0 uint32 // hash种子 buckets unsafe.
+golang 中map的实现细节，它是一个典型的hashmap。
 </div>
 </article>
 
@@ -53,20 +64,7 @@
 
 </header>
 <div class="content">
-加法 2个十进制数字的非正式算法：两个数字中相同位置的数相加，如果结果超过10产生进位，该进位在下一位数相加时加上。直到两个数字的所有位数都加完为止。
-考虑十进制的2位数加法，例如：16 + 26。
- 1 6 + 2 6 ------- 4 2  上例中的加法过程是：
- 6+6 得2，产生进位
- 1 + 2 + 1 的4，其中最后加1是1步骤的几位，最终结果是 42
-  减法 2个10进制数字的非正式算法：
- 如果被减数大于等于减数，两个数字中相同位置的数相减，如果被减数小于减数，从高位借一位，轮到高位计算时要多减去一个1。直到两个数字的所有位都减完为止。
- 如果被减数小于减数，交互减数与被减数的位置进行 1 操作，把结果加一个负号
-  考虑十进制的2位数减法，例如：16 - 25。
- 1 6 + 2 5 ------- - 9  上例中的加法过程是：
- 16 比25小，交换两个数的位置
- 5比 6 小产生借位， 15-6 得到 9
- 2-1-1 得到0，最后一个 1是借位
- 加上负号，最终的结果是 -9
+计算机通过补码来表示整数，其实补码是比较通用的一种表示数字方式。
 </div>
 </article>
 
@@ -79,15 +77,7 @@
 
 </header>
 <div class="content">
-内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
-Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
-int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
-int a = 0; print(a); int b = 1; print(b);  但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.
-happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 e2 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
-在一个goroutine中，happens before的顺序就是代码表达的顺序。
-共享变量 v 的读操作 r ，能够读到是另一个对变量 v 写操作 w 写入的值的条件是：
- w happens before r
- 没有其他的对变量 v 写操作happens before r 并且happens after w
+GO内存模型，happens before 定义
 </div>
 </article>
 
@@ -100,15 +90,7 @@ happens before定义了内存操作的顺序，它是一种偏序。e1 happens b
 
 </header>
 <div class="content">
-为什么要字符 人类发明了文字，同时想用计算机来处理文字。由此，就产生了字符。每个字符代码一个文字的图形。
-字符串的表示 在计算机内部，只有01的信息。因此，为了能让计算机能够认识字符串，每个字符就的被映射成01数据。这个映射功能就叫编码。
-ASCII ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如A的编码是01000001
-Unicode 世界语言文字异常丰富，每个国家都有自己独特的语言文字。ASCII的编码无法编码所有的文字，因此产生了很多编码，比如中文的BIG5，GB2312等等。这些编码无法兼容，比如中在GB2312编码是1101011011010000，BIG5的编码是1010010010100100。因此，Unicode就出现了。Unicode规定了每个字符的唯一编号，目前已经有100多万个字符。需要注意的是Unicode只规定了字符的编号，没有规定二进制的表示。
-Utf8编码 utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。
-utf8编码规则：
- 1. 一个字节的编码，最高位为0，其他的位表示unicode编号 2. n个字节的编码（n&gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号  下表表示了utf8的编码，z表示用于编码的bit
-   unicode范围 utf8编码     十六进制表示 二进制表示   000000 - 00007F 0zzzzzzz   000080 - 0007FF 110zzzzz 10zzzzzz   000800 - 00D7FF/00E000 - 00FFFF 1110zzzz 10zzzzzz 10zzzzzz   010000 - 10FFFF 11110zzz 10zzzzzz 10zzzzzz 10zzzzzz    环境中的编码 一个程序读取字符的输入的时候，读取的是二进制的数据。如果程序需要理解这个字符串是什么意思，必须了解字符的编码。同理，程序输出字符串的时候必须告知字符串的编码，不然使用者就无法理解程序的输出。程序中遇到乱码的问题，都是因为一个程序输出的字符串的编码和另一个程序接受字符串时使用的编码不一致导致的。因此，在解决编码的问题的思路就是搞清楚涉及到了哪几个环境。
-比如：一个程序打印一个字符串到终端。程序的编码是utf8，终端显示的编码是gbk。这样就会造成乱码。
+字符串与编码
 </div>
 </article>
 
@@ -121,68 +103,7 @@ utf8编码规则：
 
 </header>
 <div class="content">
-prometheus是开源的现代监控系统。它用go开发，发布于2012。
-社区热度比较高，功能比较丰富灵活。
-架构 基本概念 数据模型 prometheus把数据当作时间序列进行存储。
-每个时间序列通过 metric name和 key-value pairs(也叫做 label)标识。
-metric name表示需要进行测量的系统指标。
-它允许包含ASCII字母，数字，下划线和分号。
-正则表示为：[a-zA-Z:][a-zA-Z0-9:]*。
-label表示一个系统指标的维度，可以按照这个维度进行查询统计。
-Label名字允许包含ASCII字母，数字以及下划线。
-正则表示为：[a-zA-Z][a-zA-Z0-9]*。同时，“__”开头的名字系统保留的。
-Label值允许任意的Unicode字符
-度量类型 Counter 累计统计度量的单个值。适用于只增不减度量，比如累计请求数量。
-Gauge 统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。
-Histogram 统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。
-这个度量类型有三个时间序列统计：
- &lt;base_name&gt;_bucket{le=&laquo;upper inclusive bound&raquo;}：小于某个阀值的度量事件发生的次数
- &lt;base_name&gt;_sum：度量值的和
- &lt;base_name&gt;_count：度量事件发生的次数
-  Summary 统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。
-这个度量类型有三个时间序列统计：
- &lt;base_name&gt;{quantile=&raquo;&lt;p&gt;&laquo;}：度量值在前百分之p的度量事件发生的次数
- &lt;base_name&gt;_sum：度量值的和
- &lt;base_name&gt;_count：度量事件发生的次数
-  Job &amp; Instance 在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如
-一个支付进程。Job代表一个监控的逻辑单位。
-比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。
- job: payment-server
- instance 1: 1.2.3.4:5678
- instance 2: 1.2.3.5:5689
- instance 3: 1.
-</div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/ieee-754/">浮点数 IEEE 754</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2016-06-05T20:21:39&#43;08:00">2016-06-05 20:21:39</time>
-</p>
-
-</header>
-<div class="content">
-表示 标准IEEE 754中，浮点数由三部分组成符号、指数、尾数。
- 符号：表示正负，用S表示，用Sn表示使用的bit数
- 指数：2的幂次，用E表示，用En表示使用的bit数
- 尾数：小数部分，用M表示，用Mn表示使用的bit数
-   +-----+------+--------+ | S | E | M | +-----+------+--------+  单、双精度的bit位数 |类型|Sn|En|Mn|Sn+En+Mn|
-|&mdash;-|&ndash;|&ndash;|&ndash;|&mdash;&mdash;-|
-|单精度|1|8|23|32|
-|双精度|1|11|52|64|
-浮点数从二进制到十进制数值的转化分两种情况：
- normalized, E!=0
-  公式：value = (-1)^S * 2^(E - 2^(En - 1) + 1) * (1+M/2^Mn)
-例子：
-1.5
- 单精度
-   |||| +-----+--------+-----------------------+ | 0 |01111111|10000000000000000000000| +-----+--------+-----------------------+   双精度
-
-|&lt;-S-&gt;|&lt;&mdash;-E&mdash;-&gt;|&lt;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-M&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;&gt;|
-+&mdash;&ndash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+
-| 0 |01111111111|100000000000000000000000000000000000000000000000000000|
-+&mdash;&ndash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+
+prometheus是开源的现代监控系统。它用go开发，发布于2012。社区热度比较高，功能比较丰富灵活。
 </div>
 </article>
 
@@ -196,10 +117,6 @@ Histogram 统计度量事件发生的次数以及度量值的和。还支持统�
 </header>
 <div class="content">
 最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。
-思路不清晰 思路没有完全确定情况下写代码。造成不确定的情况有多方面：
-1. 求快，把相似的需求当做一样的需求 2. 缺少设计，大体明白实现方案，就开始编码 3. 知识不充分，集中在前端的css、布局  怎么办？
-快是可以做到，心里不要慌就是。
-1. 需求分析到位 2. 仔细查看现有的代码 3. 遗留代码多问老员工 4. 放下别人对你问代码时的负面情绪  破窗原理 在一个代码质量差的项目里面，就很容易被一种“别人也是这样，我也就这样得了”，尤其是在你不熟悉代码的情况下。短期内，代码是写给自己的，维护的人是自己，长期内是给别人的，都自己好就是对别人好，还有就是执行力
 </div>
 </article>
 
@@ -212,19 +129,7 @@ Histogram 统计度量事件发生的次数以及度量值的和。还支持统�
 
 </header>
 <div class="content">
-简介 flume是通用的数据收集框架。特点是分布式、高可靠、高可用、高可定制化。
-架构 概念 source 数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个event。
-event 数据单元，从source产生，直到被序列化到存储中。event包含*header*，*body*两个部分：
- header: 一个map数据，可以被interceptor引用
- body: 一个字节序列，具体日志数据
-  interceptor source读取一个event在放到channel中之前，event可以被添加数据。比如说：采集机器的主机名称，时间戳。
-channel 数据队列，高可用的保障。source产生的数据先放到这里，sink接着从这里取出来放到存储当中。
-channel selector 两个作用：
- 复制：把一个event写到一个或者多个channel中
- 路由：根据event中的某个属性值，把数据写到指定的channel中
-  sink 负责把channel中的数据写入目标存储。
-sink processor 选择sink，在这里可以完成负载均衡和容错处理。
-event serializer 把event中的数据，转换成存储需要的格式。
+通用的数据收集框架。特点是分布式、高可靠、高可用、高可定制化。
 </div>
 </article>
 
@@ -257,12 +162,12 @@ event serializer 把event中的数据，转换成存储需要的格式。
 <section>
 <h4 class="menu"><a class="active" href="/post/">Posts</a></h4>
 <ul class="menu">
+<li><a class="" href="/post/cs/first-optimal/">记一次mongo数据库优化经历</a></li>
 <li><a class="" href="/post/cs/golang/map/">map 内部实现</a></li>
 <li><a class="" href="/post/cs/complement/">补码</a></li>
 <li><a class="" href="/post/cs/golang/go-memory-model/">GO 内存模型</a></li>
 <li><a class="" href="/post/cs/str/">字符串</a></li>
 <li><a class="" href="/post/cs/prometheus/">prometheus</a></li>
-<li><a class="" href="/post/cs/ieee-754/">浮点数 IEEE 754</a></li>
 <li><a class="" href="/post/cs/bug-op/">增加bug的编程实践</a></li>
 <li><a class="" href="/post/cs/flume/">flume</a></li>
 <li><a class="" href="/post/cs/friend-links/">价值博客</a></li>
