@@ -71,7 +71,7 @@
 
 &lt;h3 id=&#34;磁盘io&#34;&gt;磁盘IO&lt;/h3&gt;
 
-&lt;p&gt;通过命令 &lt;code&gt;iotop&lt;/code&gt; 发现：mongodb写磁盘速度最快2M/s。&lt;/p&gt;
+&lt;p&gt;通过命令 &lt;code&gt;iotop&lt;/code&gt; 发现：mongodb写磁盘速度最大2M/s。&lt;/p&gt;
 
 &lt;h3 id=&#34;网络&#34;&gt;网络&lt;/h3&gt;
 
