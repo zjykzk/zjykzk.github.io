@@ -120,7 +120,7 @@
 
 &lt;h3 id=&#34;mongodb&#34;&gt;mongodb&lt;/h3&gt;
 
-&lt;p&gt;通过命令 &lt;code&gt;mongostat&lt;/code&gt; 查看mongodb的运行状态，发现随着消费线程并发的提高锁的百分比越来越高最后超过的90%。查看mongodb的版本是2.4.9，它用的全局锁。换个mongodb版本，避免锁的开销，通过了解公司线上使用的版本3.0.15，并使用wireTiger存储引擎。果断按照这个环境进行benchmark，结果仍然不尽任意。查看&lt;strong&gt;profiler&lt;/strong&gt;，一个类似mysql的慢查询的命令。通过以下命令加上专家的讲解，其中扫描对象比较多（&lt;strong&gt;从信息&amp;raquo;nscannedObjects&amp;raquo; : 71040看出&lt;/strong&gt;） 确认是缺少了一个索引。&lt;/p&gt;
+&lt;p&gt;通过命令 &lt;code&gt;mongostat&lt;/code&gt; 查看mongodb的运行状态，发现随着消费线程并发的提高锁的百分比越来越高最后超过的90%。查看mongodb的版本是2.4.9，它用的数据库锁。换个mongodb版本，避免锁的开销，通过了解公司线上使用的版本3.0.15，并使用wireTiger存储引擎。果断按照这个环境进行benchmark，结果仍然不尽任意。查看&lt;strong&gt;profiler&lt;/strong&gt;，一个类似mysql的慢查询的命令。通过以下命令加上专家的讲解，其中扫描对象比较多（&lt;strong&gt;从信息&amp;raquo;nscannedObjects&amp;raquo; : 71040看出&lt;/strong&gt;） 确认是缺少了一个索引。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;&amp;gt; db.setProfilingLevel(2);
 {&amp;quot;was&amp;quot; : 0 , &amp;quot;slowms&amp;quot; : 100, &amp;quot;ok&amp;quot; : 1} // &amp;quot;was&amp;quot; is the old setting
