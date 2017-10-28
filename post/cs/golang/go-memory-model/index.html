@@ -13,7 +13,7 @@
 <meta name="generator" content="Hugo 0.30.2" />
 
 
-<link href="/css/prism.css" rel="stylesheet" />
+<link href="/css/syntax.css" rel="stylesheet" />
 
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="canonical" href="http://zjykzk.github.io/post/cs/golang/go-memory-model/">
@@ -104,21 +104,15 @@ Tags:
 <h2 id="happens-before">Happens Before</h2>
 
 <p>编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：</p>
-
-<pre><code class="language-go">int a = 0;
-int b = 1;
-print(a);
-print(b);
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">a</span> = <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">b</span> = <span style="color:#ae81ff">1</span>;
+print(<span style="color:#a6e22e">a</span>);
+print(<span style="color:#a6e22e">b</span>);</code></pre></div>
 <p>在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：</p>
-
-<pre><code class="language-go">int a = 0;
-print(a);
-int b = 1;
-print(b);
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">a</span> = <span style="color:#ae81ff">0</span>;
+print(<span style="color:#a6e22e">a</span>);
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">b</span> = <span style="color:#ae81ff">1</span>;
+print(<span style="color:#a6e22e">b</span>);</code></pre></div>
 <p>但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.</p>
 
 <p><strong>happens before</strong>定义了内存操作的顺序，它是一种偏序。<em>e1</em> happens before <em>e2</em>, <em>e2</em> happens after <em>e1</em> 。如果 <em>e1</em> 既不happens before <em>e2</em> 也不happens after <em>e2</em> ，那么 <em>e1</em> 和 <em>e2</em> 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。</p>
@@ -160,109 +154,91 @@ print(b);
 <h3 id="goroutine-创建">Goroutine 创建</h3>
 
 <p><em>go</em> 语句happens before新创建的goroutine的运行。以下代码中，<strong><em>1</em></strong> happens before <strong><em>2</em></strong>，<strong><em>2</em></strong> happens before 函数<strong><em>f</em></strong>的执行，在将来的某个时刻所以打印 <code>hello, world</code>（可能是在hello函数返回之后）。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#66d9ef">string</span>
 
-<pre><code class="language-go">var a string
-
-func f() {
-	print(a)
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">f</span>() {
+	print(<span style="color:#a6e22e">a</span>)
 }
 
-func hello() {
-	a = &quot;hello, world&quot; // 1
-	go f()             // 2
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>() {
+	<span style="color:#a6e22e">a</span> = <span style="color:#e6db74">&#34;hello, world&#34;</span> <span style="color:#75715e">// 1
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">go</span> <span style="color:#a6e22e">f</span>()             <span style="color:#75715e">// 2
+</span><span style="color:#75715e"></span>}</code></pre></div>
 <h3 id="goroutine-销毁">Goroutine 销毁</h3>
 
 <p>goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证<strong><em>print(a)</em></strong>的结果就是 <code>hello, world</code>。事实上，编译器完全有可能把 <em>go</em> 语句完全的删除掉。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#66d9ef">string</span>
 
-<pre><code class="language-go">var a string
-
-func hello() {
-	go func() { a = &quot;hello&quot; }()
-	print(a)
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>() {
+	<span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>() { <span style="color:#a6e22e">a</span> = <span style="color:#e6db74">&#34;hello&#34;</span> }()
+	print(<span style="color:#a6e22e">a</span>)
+}</code></pre></div>
 <h3 id="channel通信">Channel通信</h3>
 
 <p>channel在golang里面是同步的一个重要手段。channel上面的每个发送操作，都唯一对应着一个channel上面的接受操作，显然发送／接受操作在不同的goroutine下面才需要讨论。</p>
 
 <p><strong>在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。</strong>以下代码中，按照本规则 <em>1</em> happens before <em>2</em> ，另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出 <code>hello, world</code>。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> = make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">int</span>, <span style="color:#ae81ff">10</span>)
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#66d9ef">string</span>
 
-<pre><code class="language-go">var c = make(chan int, 10)
-var a string
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">f</span>() {
+	<span style="color:#a6e22e">a</span> = <span style="color:#e6db74">&#34;hello, world&#34;</span>
+	<span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">0</span>       <span style="color:#75715e">// 1
+</span><span style="color:#75715e"></span>}
 
-func f() {
-	a = &quot;hello, world&quot;
-	c &lt;- 0       // 1
-}
-
-func main() {
-	go f()
-	&lt;-c          // 2
-	print(a)     // 3
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">go</span> <span style="color:#a6e22e">f</span>()
+	<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">c</span>          <span style="color:#75715e">// 2
+</span><span style="color:#75715e"></span>	print(<span style="color:#a6e22e">a</span>)     <span style="color:#75715e">// 3
+</span><span style="color:#75715e"></span>}</code></pre></div>
 <p><strong>channel的关闭操作happens before因为关闭channel读到的0值。</strong>上面例子中，用 <em>close( c)</em> 代替 <em>ch &lt;- 0</em> 同样能够保证 <em>1</em>  happens before <em>2</em>  。</p>
 
 <p><strong>没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。</strong>以下代码中，根据本规则 <em>1</em> happens before <em>2</em> 。另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出 <code>hello, world</code>。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> = make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">int</span>)
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#66d9ef">string</span>
 
-<pre><code class="language-go">var c = make(chan int)
-var a string
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">f</span>() {
+	<span style="color:#a6e22e">a</span> = <span style="color:#e6db74">&#34;hello, world&#34;</span>
+	<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">c</span>	                 <span style="color:#75715e">// 1
+</span><span style="color:#75715e"></span>}
 
-func f() {
-	a = &quot;hello, world&quot;
-	&lt;-c	                 // 1
-}
-
-func main() {
-	go f()
-	c &lt;- 0               // 2
-	print(a)             // 3
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">go</span> <span style="color:#a6e22e">f</span>()
+	<span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">0</span>               <span style="color:#75715e">// 2
+</span><span style="color:#75715e"></span>	print(<span style="color:#a6e22e">a</span>)             <span style="color:#75715e">// 3
+</span><span style="color:#75715e"></span>}</code></pre></div>
 <p><strong>如果一个channel有 <em>C</em> 容量的缓冲，第 <em>k</em> 个接受操作happens before第 <em>k+C</em> 个发送操作。</strong>根据这个规则可以用带缓冲的channel来模拟信号量。以下程序就保证了，同时最多只有3个goroutine同时执行 <em>w</em> 函数。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">limit</span> = make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">int</span>, <span style="color:#ae81ff">3</span>)
 
-<pre><code class="language-go">var limit = make(chan int, 3)
-
-func main() {
-	for _, w := range work {
-		go func(w func()) {
-			limit &lt;- 1
-			w()
-			&lt;-limit
-		}(w)
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">w</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">work</span> {
+		<span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">w</span> <span style="color:#66d9ef">func</span>()) {
+			<span style="color:#a6e22e">limit</span> <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">1</span>
+			<span style="color:#a6e22e">w</span>()
+			<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">limit</span>
+		}(<span style="color:#a6e22e">w</span>)
 	}
-	select{}
-}
-</code></pre>
-
+	<span style="color:#66d9ef">select</span>{}
+}</code></pre></div>
 <h3 id="locks">Locks</h3>
 
 <p>包 <em>sync</em> 实现了两类锁分别是： <em>sync.Mutex</em> 和 <em>sync.RWMutex。</em></p>
 
 <p><strong>给定类型为 <em>sync.Mutex</em> 或者是 <em>sync.RWMutex</em> 的变量 <em>l</em> ,以及满足 <em>n&lt;m</em> 条件的整数。调用 <em>n</em> 次 <em>l.Unlock()</em>  happens before 调用 <em>m</em> 次 <em>l.Lock()</em> （返回）。</strong>以下代码中，根据本规则 <em>1</em> happens before <em>2</em> ，另外，因为 <em>2</em> 和 <em>3</em> 在同一个goroutine中执行， <em>2</em> happens before <em>3</em> ，所以能够打印出 <code>hello, world</code>。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">l</span> <span style="color:#a6e22e">sync</span>.<span style="color:#a6e22e">Mutex</span>
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#66d9ef">string</span>
 
-<pre><code class="language-go">var l sync.Mutex
-var a string
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">f</span>() {
+	<span style="color:#a6e22e">a</span> = <span style="color:#e6db74">&#34;hello, world&#34;</span>
+	<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Unlock</span>()       <span style="color:#75715e">// 1
+</span><span style="color:#75715e"></span>}
 
-func f() {
-	a = &quot;hello, world&quot;
-	l.Unlock()       // 1
-}
-
-func main() {
-	l.Lock()
-	go f()
-	l.Lock()         // 2
-	print(a)         // 3
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Lock</span>()
+	<span style="color:#66d9ef">go</span> <span style="color:#a6e22e">f</span>()
+	<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Lock</span>()         <span style="color:#75715e">// 2
+</span><span style="color:#75715e"></span>	print(<span style="color:#a6e22e">a</span>)         <span style="color:#75715e">// 3
+</span><span style="color:#75715e"></span>}</code></pre></div>
 <p><strong>对于 <em>sync.RWMutex</em> 类型的变量l，存在一个整数 <em>n</em> ， <em>l.RLock</em> 的调用happens after(返回)调用 <em>n</em> 次 <em>l.Unlock</em> ，与这个 <em>l.RLock</em> 想对应的 <em>l.RUnlock</em> happens before 第 <em>n+1</em> 的 <em>l.Lock</em> 。</strong></p>
 
 <h3 id="once">Once</h3>
@@ -293,8 +269,6 @@ func main() {
 
 
 
-
-<script src="/js/prism.js"></script>
 
 
 </body>

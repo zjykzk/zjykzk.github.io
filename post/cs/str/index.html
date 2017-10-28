@@ -13,7 +13,7 @@
 <meta name="generator" content="Hugo 0.30.2" />
 
 
-<link href="/css/prism.css" rel="stylesheet" />
+<link href="/css/syntax.css" rel="stylesheet" />
 
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="canonical" href="http://zjykzk.github.io/post/cs/str/">
@@ -119,11 +119,8 @@ Tags:
 <p>utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。</p>
 
 <p>utf8编码规则：</p>
-
-<pre><code>  1. 一个字节的编码，最高位为0，其他的位表示unicode编号
-  2. n个字节的编码（n&gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">  1. 一个字节的编码，最高位为0，其他的位表示unicode编号
+  2. n个字节的编码（n&gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号</pre></div>
 <p>下表表示了utf8的编码，z表示用于编码的bit</p>
 
 <table>
@@ -179,29 +176,26 @@ Tags:
 <p>分为byte字符串(str)和unicode(unicode)，前者的内容是字节，后者的内容是unicode中的编号。默认的是byte字符串。</p>
 
 <h4 id="重要方法">重要方法</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># &lt;type &#39;str&#39;&gt; to &lt;type &#39;unicode&#39;&gt;</span>
+<span style="color:#75715e"># 如果 s 是&#39;unicode&#39;类型，python会先通过encode函数把s转换成&#39;str&#39;类型</span>
+<span style="color:#75715e"># encode函数的encoding是sys.getdefaultencoding()的值</span>
+s<span style="color:#f92672">.</span>decode(encoding)
 
-<pre><code class="language-python"># &lt;type 'str'&gt; to &lt;type 'unicode'&gt;
-# 如果 s 是'unicode'类型，python会先通过encode函数把s转换成'str'类型
-# encode函数的encoding是sys.getdefaultencoding()的值
-s.decode(encoding)
+<span style="color:#75715e"># &lt;type &#39;unicode&#39;&gt; to &lt;type &#39;str&#39;&gt;</span>
+<span style="color:#75715e"># 如果u是&#39;str&#39;类型，python会通过decode函数把u转换成&#39;unicode&#39;类型</span>
+<span style="color:#75715e"># decode函数的encoding是sys.getdefaultencoding()的值</span>
+u<span style="color:#f92672">.</span>encode(encoding)
 
-# &lt;type 'unicode'&gt; to &lt;type 'str'&gt;
-# 如果u是'str'类型，python会通过decode函数把u转换成'unicode'类型
-# decode函数的encoding是sys.getdefaultencoding()的值
-u.encode(encoding)
+<span style="color:#75715e"># 获取系统默认的编码</span>
+sys<span style="color:#f92672">.</span>getdefaultencoding()
 
-# 获取系统默认的编码
-sys.getdefaultencoding()
+<span style="color:#75715e"># 修改系统的默认编码</span>
+sys<span style="color:#f92672">.</span>setdefaultencoding(encoding)
 
-# 修改系统的默认编码
-sys.setdefaultencoding(encoding)
-
-# 修改代码
-import sys
-reload(sys) # 因为python初始化的时候会把setdefaultencoding方法给删除掉
-sys.setdefaultencoding('utf8')
-</code></pre>
-
+<span style="color:#75715e"># 修改代码</span>
+<span style="color:#f92672">import</span> sys
+reload(sys) <span style="color:#75715e"># 因为python初始化的时候会把setdefaultencoding方法给删除掉</span>
+sys<span style="color:#f92672">.</span>setdefaultencoding(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;utf8&#39;</span>)</code></pre></div>
 <h4 id="codecs">codecs</h4>
 
 <p>指定encoding参数生成file-object-like对象，利用：</p>
@@ -246,8 +240,6 @@ sys.setdefaultencoding('utf8')
 
 
 
-
-<script src="/js/prism.js"></script>
 
 
 </body>
