@@ -1,0 +1,29 @@
+/*! typey | GPLv2 License | https://github.com/jptaranto/typey */
+@media print {
+  .print-none,
+  .pager,
+  aside,
+  nav,
+  footer {
+    display: none;
+  }
+}
+
+@media print {
+  html {
+    font-size: 12pt;
+  }
+  body,
+  .page {
+    background-color: #fff;
+  }
+  [role='main'] {
+    width: 100%;
+  }
+  :link,
+  :visited {
+    text-decoration: underline;
+  }
+}
+
+/*# sourceMappingURL=print.css.map */

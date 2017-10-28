@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="nojs" lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <title>记一次mongo数据库优化经历 – 老K随笔</title>
 <meta name="description" content="优化首要的是profile，profile一切">
 <meta name="created" content="2017-10-24T18:46:11&#43;0800">
-<meta name="author" content="zenk"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="modified" content="2017-10-24T18:46:11&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
 <meta name="HandheldFriendly" content="true">
 <meta name="generator" content="Hugo 0.30.2" />
@@ -14,35 +16,84 @@
 <link href="/css/prism.css" rel="stylesheet" />
 
 <link rel="stylesheet" href="/css/styles.css">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="canonical" href="http://zjykzk.github.io/post/cs/first-optimal/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "记一次mongo数据库优化经历",
+    "datePublished": "2017-10-24T18:46:11+08:00",
+    "dateModified": "2017-10-24T18:46:11+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/first-optimal/",
+    "description": "优化首要的是profile，profile一切",
+    "keywords": ["编程"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
 </head>
 
-<body class="no-sidebars">
-<div class="layout-center">
-<header class="header" role="banner">
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
 <h1 class="header__site-name">
 <a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
 </h1>
-<div class="header__region region region-header"></div>
+<div class="region header__region"></div>
 </header>
 
-<div class="layout-3col layout-swap">
-<main class="layout-3col__full" role="main">
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">Main menu</h2>
+<ul class="navbar">
+<li><a class="" href="/">Home</a></li>
+
+
+
+  <li><a  class="active"href="/categories/cs">Computer</a>
+  </li>
+
+
+<li><a class="" href="/post/about">About</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
 <h1 class="title title-submitted">记一次mongo数据库优化经历</h1>
 <article class="section-post single-view">
 <header>
 <p class="submitted">
 <span class="author">zenk</span> – <time class="modified-date" datetime="2017-10-24T18:46:11&#43;08:00">2017-10-24 18:46:11</time>
 </p>
-
 <div class="tags">
 Tags:
 <ul>
 <li><a href="/tags/%E7%BC%96%E7%A8%8B">编程</a></li>
 </ul>
 </div>
-
 </header>
 <div class="content">
 
@@ -169,6 +220,7 @@ ts&quot; : ISODate(&quot;2017-10-24T07:54:08.773Z&quot;), &quot;client&quot; : &
 
 <p>本次调优最大问题是思维盲区，由于自己对mongodb不熟悉，就没有想到去profile mongodb，把精力放在了优化代码层面的数据库操作，中间还做过把消息放在缓存中虽然达到预期，但是有数据不一致的问题。其实，方法没对，<strong>优化的首要原则是做profile，profile一切。</strong></p>
 
+
 </div>
 </article>
 </main>
@@ -176,31 +228,12 @@ ts&quot; : ISODate(&quot;2017-10-24T07:54:08.773Z&quot;), &quot;client&quot; : &
 
 
 
-
-
-<div class="layout-swap__top layout-3col__full">
-<nav class="main-menu" role="navigation">
-<h2 class="visually-hidden">Main menu</h2>
-<ul class="navbar clearfix">
-<li><a class="" href="/">Home</a></li>
-
-
-
-  <li><a  class="active"href="/categories/cs">Computer</a>
-  </li>
-
-
-<li><a class="" href="/post/about">About</a></li>
-</ul>
-</nav>
-</div>
-
-</div>
-
-<footer class="footer" role="contentinfo">
-
+<footer class="footer layout__footer" role="contentinfo">
 <p><span>© 老K随笔</span></p>
-<p>Powered by <a href="https://gohugo.io/">Hugo</a></p></footer>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
 </div>
 
 
