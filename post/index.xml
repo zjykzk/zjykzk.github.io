@@ -120,9 +120,12 @@
 &lt;h3 id=&#34;mongodb&#34;&gt;mongodb&lt;/h3&gt;
 
 &lt;p&gt;通过命令 &lt;code&gt;mongostat&lt;/code&gt; 查看mongodb的运行状态，发现随着消费线程并发的提高锁的百分比越来越高最后超过的90%。查看mongodb的版本是2.4.9，它用的数据库锁。换个mongodb版本，避免锁的开销，通过了解公司线上使用的版本3.0.15，并使用wireTiger存储引擎。果断按照这个环境进行benchmark，结果仍然不尽任意。查看&lt;strong&gt;profiler&lt;/strong&gt;，一个类似mysql的慢查询的命令。通过以下命令加上专家的讲解，从&lt;strong&gt;信息 nscannedObjects : 71040&lt;/strong&gt;，发现扫描对象比较多，从代码确认是缺少了一个索引。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&amp;gt; db.setProfilingLevel(2);
-{&amp;#34;was&amp;#34; : 0 , &amp;#34;slowms&amp;#34; : 100, &amp;#34;ok&amp;#34; : 1}       // &amp;#34;was&amp;#34; 表示旧的设置
-&amp;gt; db.system.profile.find().sort({millis:-1}) // 列出耗时的操作，按照操作耗时排序，这条语句会列出扫描的对象数量，锁等关键信息&lt;/pre&gt;&lt;/div&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;gt; db.setProfilingLevel(2);
+{&amp;quot;was&amp;quot; : 0 , &amp;quot;slowms&amp;quot; : 100, &amp;quot;ok&amp;quot; : 1}       // &amp;quot;was&amp;quot; 表示旧的设置
+&amp;gt; db.system.profile.find().sort({millis:-1}) // 列出耗时的操作，按照操作耗时排序，这条语句会列出扫描的对象数量，锁等关键信息
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;在程序里面加上索引，再次benchmark达到预期。&lt;/p&gt;
 
 &lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
@@ -142,37 +145,43 @@
 &lt;h1 id=&#34;类型&#34;&gt;类型&lt;/h1&gt;
 
 &lt;p&gt;golang中的map是一个 &lt;strong&gt;指针&lt;/strong&gt;。当执行语句 &lt;code&gt;make(map[string]string)&lt;/code&gt; 的时候，其实是调用了 &lt;code&gt;makemap&lt;/code&gt; 函数：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;// file: runtime/hashmap.go:L222
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;makemap&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;t&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;maptype&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;hint64&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;h&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;hmap&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;bucket&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;unsafe&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Pointer&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;hmap&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// file: runtime/hashmap.go:L222
+func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;显然，&lt;code&gt;makemap&lt;/code&gt; 返回的是指针。&lt;/p&gt;
 
 &lt;h1 id=&#34;数据结构&#34;&gt;数据结构&lt;/h1&gt;
 
 &lt;h2 id=&#34;hashmap&#34;&gt;hashmap&lt;/h2&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;// hash map
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;type&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;hmap&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;struct&lt;/span&gt; {
-    &lt;span style=&#34;color:#75715e&#34;&gt;// 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;count&lt;/span&gt;     &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt;
 
-    &lt;span style=&#34;color:#75715e&#34;&gt;// map标记:
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 1. key和value是否包指针
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 2. 是否正在扩容
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 3. 是否是同样大小的扩容
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 4. 是否正在 `range`方式访问当前的buckets
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 5. 是否有 `range`方式访问旧的bucket
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;flags&lt;/span&gt;     &lt;span style=&#34;color:#66d9ef&#34;&gt;uint8&lt;/span&gt;
-    &lt;span style=&#34;color:#a6e22e&#34;&gt;B&lt;/span&gt;         &lt;span style=&#34;color:#66d9ef&#34;&gt;uint8&lt;/span&gt;  &lt;span style=&#34;color:#75715e&#34;&gt;// log_2(B) == bucket数量
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;noverflow&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;uint16&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;// overflow bucket的数量，是个近似值
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;hash0&lt;/span&gt;     &lt;span style=&#34;color:#66d9ef&#34;&gt;uint32&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;// hash种子
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
-    &lt;span style=&#34;color:#a6e22e&#34;&gt;buckets&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;unsafe&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Pointer&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;// bucket slice指针，如果count == 0，这里的值为 nil
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;oldbuckets&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;unsafe&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Pointer&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;// bucket slice指针，仅当在扩容的时候不为nil
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;nevacuate&lt;/span&gt;  &lt;span style=&#34;color:#66d9ef&#34;&gt;uintptr&lt;/span&gt;        &lt;span style=&#34;color:#75715e&#34;&gt;// 扩容时已经移到新的map中的bucket数量
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
-    &lt;span style=&#34;color:#75715e&#34;&gt;// 当key和value的类型不包含指针的时候，key和value就会做inline处理(怎么处理的)
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 保证overflow的bucket活着，不被gc回收
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;overflow&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;[&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;]&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;[]&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;bmap&lt;/span&gt;
-}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// hash map
+type hmap struct {
+    // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用
+    count     int
+
+    // map标记:
+    // 1. key和value是否包指针
+    // 2. 是否正在扩容
+    // 3. 是否是同样大小的扩容
+    // 4. 是否正在 `range`方式访问当前的buckets
+    // 5. 是否有 `range`方式访问旧的bucket
+    flags     uint8
+    B         uint8  // log_2(B) == bucket数量
+    noverflow uint16 // overflow bucket的数量，是个近似值
+    hash0     uint32 // hash种子
+
+    buckets    unsafe.Pointer // bucket slice指针，如果count == 0，这里的值为 nil
+    oldbuckets unsafe.Pointer // bucket slice指针，仅当在扩容的时候不为nil
+    nevacuate  uintptr        // 扩容时已经移到新的map中的bucket数量
+
+    // 当key和value的类型不包含指针的时候，key和value就会做inline处理(怎么处理的)
+    // 保证overflow的bucket活着，不被gc回收
+    overflow *[2]*[]*bmap
+}
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;h2 id=&#34;bucket&#34;&gt;bucket&lt;/h2&gt;
 
 &lt;p&gt;每个bucket固定包含8个key和value。实现上面是一个固定的大小连续内存块，分成四部分：&lt;/p&gt;
@@ -186,14 +195,17 @@
 &lt;/ol&gt;
 
 &lt;p&gt;数据结构定义如下：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;// bucket
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;type&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;bmap&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;struct&lt;/span&gt; {
-        &lt;span style=&#34;color:#75715e&#34;&gt;// 每个条目的状态，tophash[0]表示当前bucket中的条目是否已经完全移到新的bucket中去了
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;tophash&lt;/span&gt; [&lt;span style=&#34;color:#a6e22e&#34;&gt;bucketCnt&lt;/span&gt;]&lt;span style=&#34;color:#66d9ef&#34;&gt;uint8&lt;/span&gt;
-        &lt;span style=&#34;color:#75715e&#34;&gt;// keys
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#75715e&#34;&gt;// values
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#75715e&#34;&gt;// Followed by an overflow pointer.
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// bucket
+type bmap struct {
+        // 每个条目的状态，tophash[0]表示当前bucket中的条目是否已经完全移到新的bucket中去了
+        tophash [bucketCnt]uint8
+        // keys
+        // values
+        // Followed by an overflow pointer.
+}
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;h3 id=&#34;条目状态&#34;&gt;条目状态&lt;/h3&gt;
 
 &lt;p&gt;. &lt;code&gt;0&lt;/code&gt; 空，可以被使用&lt;/p&gt;
@@ -211,9 +223,10 @@
 &lt;p&gt;bucket的第一个条目&lt;code&gt;tophash[0]&lt;/code&gt; 用来标识bucket中的条目是否已经全部被移到了新的bucket中去了， &lt;code&gt;1-3&lt;/code&gt; 表示已经移动完。&lt;/p&gt;
 
 &lt;h3 id=&#34;内存布局&#34;&gt;内存布局&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;   ^   +-----------------+ -.
+
+&lt;pre&gt;&lt;code&gt;   ^   +-----------------+ -.
    |   |       bucket0   |  |------&amp;gt; +------------+
-   |   +-----------------+ -&amp;#39;        | tophash 0  |
+   |   +-----------------+ -&#39;        | tophash 0  |
    |   |       bucket1   |           +------------+
    |   +-----------------+           | tophash 1  |
 2^h.B  |      .......    |           +------------+
@@ -244,7 +257,9 @@
                                      |  value 7   |
                                      +------------+ -.
                                      |overflow_ptr|  |-----&amp;gt; new bucket address
-                                     +------------+ -&amp;#39;&lt;/pre&gt;&lt;/div&gt;
+                                     +------------+ -&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;选择这样的布局的好处：由于对齐的原因，&lt;em&gt;key0/value0/key1/value1&amp;hellip;&lt;/em&gt; 这样的形式可能需要更多的补齐空间，比如 &lt;code&gt;map[int64]int8&lt;/code&gt; ，1字节的value后面需要补齐7个字节才能保证下一个key是 &lt;code&gt;int64&lt;/code&gt; 对齐的。&lt;/p&gt;
 
 &lt;h2 id=&#34;装载因子&#34;&gt;装载因子&lt;/h2&gt;
@@ -340,10 +355,13 @@
 &lt;p&gt;2个十进制数字的非正式算法：两个数字中相同位置的数相加，如果结果超过10产生进位，该进位在下一位数相加时加上。直到两个数字的所有位数都加完为止。&lt;/p&gt;
 
 &lt;p&gt;考虑十进制的2位数加法，例如：16 + 26。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;    1 6
+
+&lt;pre&gt;&lt;code&gt;    1 6
   + 2 6
  -------
-    4 2&lt;/pre&gt;&lt;/div&gt;
+    4 2
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;上例中的加法过程是：&lt;/p&gt;
 
 &lt;ol&gt;
@@ -363,10 +381,13 @@
 &lt;/ol&gt;
 
 &lt;p&gt;考虑十进制的2位数减法，例如：16 - 25。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;    1 6
+
+&lt;pre&gt;&lt;code&gt;    1 6
   + 2 5
  -------
-    - 9&lt;/pre&gt;&lt;/div&gt;
+    - 9
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;上例中的加法过程是：&lt;/p&gt;
 
 &lt;ol&gt;
@@ -386,14 +407,17 @@
 &lt;p&gt;注意到&lt;code&gt;16-25=16+(-25)&lt;/code&gt;，如果&lt;code&gt;-25&lt;/code&gt;能够表示成一个正数，那么减法就变成了加法。&lt;/p&gt;
 
 &lt;p&gt;2位10进制的整数范围0-99，取一半用来做正数和零，一半做负数，分布如下：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;0 - 0
+
+&lt;pre&gt;&lt;code&gt;0 - 0
 1 - 1
 ...
 49 - 49
 50 - -50
 51 - -49
 ...
-99 - -1&lt;/pre&gt;&lt;/div&gt;
+99 - -1
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;按照这个分布，&lt;code&gt;-25&lt;/code&gt;对应着&lt;code&gt;75&lt;/code&gt;，从而得到&lt;code&gt;16-25=16+75=91&lt;/code&gt;，再根据上面的正负数的分布&lt;code&gt;91&lt;/code&gt;就是&lt;code&gt;-9&lt;/code&gt;，完全与&lt;code&gt;16-25=-9&lt;/code&gt;吻合。&lt;/p&gt;
 
 &lt;p&gt;另外，如果两个数和超过100，只需要减去100就是对应的结果。&lt;/p&gt;
@@ -403,21 +427,27 @@
 &lt;h3 id=&#34;二进制版本&#34;&gt;二进制版本&lt;/h3&gt;
 
 &lt;p&gt;一个6位数的二进制版本，正负数编码：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;000000 - 000000
+
+&lt;pre&gt;&lt;code&gt;000000 - 000000
 000001 - 000001
 ...
 011111 - 011111
 100000 - -100000
 ...
-111111 - -000001&lt;/pre&gt;&lt;/div&gt;
+111111 - -000001
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;&lt;code&gt;16&lt;/code&gt;的二进制&lt;code&gt;010000&lt;/code&gt;，&lt;code&gt;-25&lt;/code&gt;的二进制&lt;code&gt;100110&lt;/code&gt;，&lt;code&gt;16-15=&amp;gt;010000+100110=110110=&amp;gt;-9&lt;/code&gt;。注意到&lt;code&gt;25&lt;/code&gt;的二进制是&lt;code&gt;011001&lt;/code&gt;，而&lt;code&gt;-25&lt;/code&gt;的二进制&lt;code&gt;100110=1000000-011011=111111-011001+000001&lt;/code&gt;，恰好是对&lt;code&gt;011001&lt;/code&gt;取反加1。&lt;/p&gt;
 
 &lt;p&gt;同时，二进制转化成十进制：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;111111 = -(1000000 - 111111)
+
+&lt;pre&gt;&lt;code&gt;111111 = -(1000000 - 111111)
        = -(2^6 - 2^5 - 2^4 - 2^3 - 2^2 - 2^1 - 2^0)
        = -(2^5 - 2^4 - 2^3 - 2^2 - 2^1 - 2^0)
        = -2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^0
-011111 = 2^4 + 2^3 + 2^2 + 2^1 + 2^0&lt;/pre&gt;&lt;/div&gt;
+011111 = 2^4 + 2^3 + 2^2 + 2^1 + 2^0
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;最高位的转化取负数，其他会取正数，然后求和正好是十进制的数。&lt;/p&gt;
 
 &lt;p&gt;这个结果对计算机来说非常有价值，因为计算机组件有一些逻辑门构成，而逻辑门只能处理真假两个值，这正好可以用01来表示，取反，加1都能很方便的用逻辑门来实现，达到了加法和减法统一，简化逻辑电路的设计。&lt;/p&gt;
@@ -437,15 +467,21 @@
 &lt;h2 id=&#34;happens-before&#34;&gt;Happens Before&lt;/h2&gt;
 
 &lt;p&gt;编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; = &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;;
-&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;b&lt;/span&gt; = &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;;
-print(&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;);
-print(&lt;span style=&#34;color:#a6e22e&#34;&gt;b&lt;/span&gt;);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;int a = 0;
+int b = 1;
+print(a);
+print(b);
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; = &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;;
-print(&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;);
-&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;b&lt;/span&gt; = &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;;
-print(&lt;span style=&#34;color:#a6e22e&#34;&gt;b&lt;/span&gt;);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;int a = 0;
+print(a);
+int b = 1;
+print(b);
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;happens before&lt;/strong&gt;定义了内存操作的顺序，它是一种偏序。&lt;em&gt;e1&lt;/em&gt; happens before &lt;em&gt;e2&lt;/em&gt;, &lt;em&gt;e2&lt;/em&gt; happens after &lt;em&gt;e1&lt;/em&gt; 。如果 &lt;em&gt;e1&lt;/em&gt; 既不happens before &lt;em&gt;e2&lt;/em&gt; 也不happens after &lt;em&gt;e2&lt;/em&gt; ，那么 &lt;em&gt;e1&lt;/em&gt; 和 &lt;em&gt;e2&lt;/em&gt; 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。&lt;/p&gt;
@@ -487,91 +523,109 @@ print(&lt;span style=&#34;color:#a6e22e&#34;&gt;b&lt;/span&gt;);&lt;/code&gt;&lt
 &lt;h3 id=&#34;goroutine-创建&#34;&gt;Goroutine 创建&lt;/h3&gt;
 
 &lt;p&gt;&lt;em&gt;go&lt;/em&gt; 语句happens before新创建的goroutine的运行。以下代码中，&lt;strong&gt;&lt;em&gt;1&lt;/em&gt;&lt;/strong&gt; happens before &lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt;，&lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt; happens before 函数&lt;strong&gt;&lt;em&gt;f&lt;/em&gt;&lt;/strong&gt;的执行，在将来的某个时刻所以打印 &lt;code&gt;hello, world&lt;/code&gt;（可能是在hello函数返回之后）。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt;
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;f&lt;/span&gt;() {
-	print(&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;)
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
+
+func f() {
+	print(a)
 }
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;hello&lt;/span&gt;() {
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; = &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello, world&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;// 1
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;go&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;f&lt;/span&gt;()             &lt;span style=&#34;color:#75715e&#34;&gt;// 2
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+func hello() {
+	a = &amp;quot;hello, world&amp;quot; // 1
+	go f()             // 2
+}
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;h3 id=&#34;goroutine-销毁&#34;&gt;Goroutine 销毁&lt;/h3&gt;
 
 &lt;p&gt;goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证&lt;strong&gt;&lt;em&gt;print(a)&lt;/em&gt;&lt;/strong&gt;的结果就是 &lt;code&gt;hello, world&lt;/code&gt;。事实上，编译器完全有可能把 &lt;em&gt;go&lt;/em&gt; 语句完全的删除掉。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt;
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;hello&lt;/span&gt;() {
-	&lt;span style=&#34;color:#66d9ef&#34;&gt;go&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt;() { &lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; = &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt; }()
-	print(&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;)
-}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
+
+func hello() {
+	go func() { a = &amp;quot;hello&amp;quot; }()
+	print(a)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;h3 id=&#34;channel通信&#34;&gt;Channel通信&lt;/h3&gt;
 
 &lt;p&gt;channel在golang里面是同步的一个重要手段。channel上面的每个发送操作，都唯一对应着一个channel上面的接受操作，显然发送／接受操作在不同的goroutine下面才需要讨论。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。&lt;/strong&gt;以下代码中，按照本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt; = make(&lt;span style=&#34;color:#66d9ef&#34;&gt;chan&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;)
-&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt;
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;f&lt;/span&gt;() {
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; = &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello, world&amp;#34;&lt;/span&gt;
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;       &lt;span style=&#34;color:#75715e&#34;&gt;// 1
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;}
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var c = make(chan int, 10)
+var a string
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
-	&lt;span style=&#34;color:#66d9ef&#34;&gt;go&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;f&lt;/span&gt;()
-	&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;          &lt;span style=&#34;color:#75715e&#34;&gt;// 2
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;	print(&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;)     &lt;span style=&#34;color:#75715e&#34;&gt;// 3
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+func f() {
+	a = &amp;quot;hello, world&amp;quot;
+	c &amp;lt;- 0       // 1
+}
+
+func main() {
+	go f()
+	&amp;lt;-c          // 2
+	print(a)     // 3
+}
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;&lt;strong&gt;channel的关闭操作happens before因为关闭channel读到的0值。&lt;/strong&gt;上面例子中，用 &lt;em&gt;close( c)&lt;/em&gt; 代替 &lt;em&gt;ch &amp;lt;- 0&lt;/em&gt; 同样能够保证 &lt;em&gt;1&lt;/em&gt;  happens before &lt;em&gt;2&lt;/em&gt;  。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; 。另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt; = make(&lt;span style=&#34;color:#66d9ef&#34;&gt;chan&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt;)
-&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt;
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;f&lt;/span&gt;() {
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; = &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello, world&amp;#34;&lt;/span&gt;
-	&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;	                 &lt;span style=&#34;color:#75715e&#34;&gt;// 1
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;}
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var c = make(chan int)
+var a string
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
-	&lt;span style=&#34;color:#66d9ef&#34;&gt;go&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;f&lt;/span&gt;()
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;               &lt;span style=&#34;color:#75715e&#34;&gt;// 2
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;	print(&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;)             &lt;span style=&#34;color:#75715e&#34;&gt;// 3
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+func f() {
+	a = &amp;quot;hello, world&amp;quot;
+	&amp;lt;-c	                 // 1
+}
+
+func main() {
+	go f()
+	c &amp;lt;- 0               // 2
+	print(a)             // 3
+}
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;&lt;strong&gt;如果一个channel有 &lt;em&gt;C&lt;/em&gt; 容量的缓冲，第 &lt;em&gt;k&lt;/em&gt; 个接受操作happens before第 &lt;em&gt;k+C&lt;/em&gt; 个发送操作。&lt;/strong&gt;根据这个规则可以用带缓冲的channel来模拟信号量。以下程序就保证了，同时最多只有3个goroutine同时执行 &lt;em&gt;w&lt;/em&gt; 函数。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;limit&lt;/span&gt; = make(&lt;span style=&#34;color:#66d9ef&#34;&gt;chan&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;)
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
-	&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;_&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;w&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;range&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;work&lt;/span&gt; {
-		&lt;span style=&#34;color:#66d9ef&#34;&gt;go&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;w&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt;()) {
-			&lt;span style=&#34;color:#a6e22e&#34;&gt;limit&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
-			&lt;span style=&#34;color:#a6e22e&#34;&gt;w&lt;/span&gt;()
-			&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;limit&lt;/span&gt;
-		}(&lt;span style=&#34;color:#a6e22e&#34;&gt;w&lt;/span&gt;)
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var limit = make(chan int, 3)
+
+func main() {
+	for _, w := range work {
+		go func(w func()) {
+			limit &amp;lt;- 1
+			w()
+			&amp;lt;-limit
+		}(w)
 	}
-	&lt;span style=&#34;color:#66d9ef&#34;&gt;select&lt;/span&gt;{}
-}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+	select{}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;h3 id=&#34;locks&#34;&gt;Locks&lt;/h3&gt;
 
 &lt;p&gt;包 &lt;em&gt;sync&lt;/em&gt; 实现了两类锁分别是： &lt;em&gt;sync.Mutex&lt;/em&gt; 和 &lt;em&gt;sync.RWMutex。&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;给定类型为 &lt;em&gt;sync.Mutex&lt;/em&gt; 或者是 &lt;em&gt;sync.RWMutex&lt;/em&gt; 的变量 &lt;em&gt;l&lt;/em&gt; ,以及满足 &lt;em&gt;n&amp;lt;m&lt;/em&gt; 条件的整数。调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock()&lt;/em&gt;  happens before 调用 &lt;em&gt;m&lt;/em&gt; 次 &lt;em&gt;l.Lock()&lt;/em&gt; （返回）。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;l&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sync&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Mutex&lt;/span&gt;
-&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt;
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;f&lt;/span&gt;() {
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt; = &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello, world&amp;#34;&lt;/span&gt;
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;l&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Unlock&lt;/span&gt;()       &lt;span style=&#34;color:#75715e&#34;&gt;// 1
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;}
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var l sync.Mutex
+var a string
 
-&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;l&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Lock&lt;/span&gt;()
-	&lt;span style=&#34;color:#66d9ef&#34;&gt;go&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;f&lt;/span&gt;()
-	&lt;span style=&#34;color:#a6e22e&#34;&gt;l&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Lock&lt;/span&gt;()         &lt;span style=&#34;color:#75715e&#34;&gt;// 2
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;	print(&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;)         &lt;span style=&#34;color:#75715e&#34;&gt;// 3
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+func f() {
+	a = &amp;quot;hello, world&amp;quot;
+	l.Unlock()       // 1
+}
+
+func main() {
+	l.Lock()
+	go f()
+	l.Lock()         // 2
+	print(a)         // 3
+}
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;&lt;strong&gt;对于 &lt;em&gt;sync.RWMutex&lt;/em&gt; 类型的变量l，存在一个整数 &lt;em&gt;n&lt;/em&gt; ， &lt;em&gt;l.RLock&lt;/em&gt; 的调用happens after(返回)调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock&lt;/em&gt; ，与这个 &lt;em&gt;l.RLock&lt;/em&gt; 想对应的 &lt;em&gt;l.RUnlock&lt;/em&gt; happens before 第 &lt;em&gt;n+1&lt;/em&gt; 的 &lt;em&gt;l.Lock&lt;/em&gt; 。&lt;/strong&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;once&#34;&gt;Once&lt;/h3&gt;
@@ -615,8 +669,11 @@ print(&lt;span style=&#34;color:#a6e22e&#34;&gt;b&lt;/span&gt;);&lt;/code&gt;&lt
 &lt;p&gt;utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。&lt;/p&gt;
 
 &lt;p&gt;utf8编码规则：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;  1. 一个字节的编码，最高位为0，其他的位表示unicode编号
-  2. n个字节的编码（n&amp;gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号&lt;/pre&gt;&lt;/div&gt;
+
+&lt;pre&gt;&lt;code&gt;  1. 一个字节的编码，最高位为0，其他的位表示unicode编号
+  2. n个字节的编码（n&amp;gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;下表表示了utf8的编码，z表示用于编码的bit&lt;/p&gt;
 
 &lt;table&gt;
@@ -672,26 +729,29 @@ print(&lt;span style=&#34;color:#a6e22e&#34;&gt;b&lt;/span&gt;);&lt;/code&gt;&lt
 &lt;p&gt;分为byte字符串(str)和unicode(unicode)，前者的内容是字节，后者的内容是unicode中的编号。默认的是byte字符串。&lt;/p&gt;
 
 &lt;h4 id=&#34;重要方法&#34;&gt;重要方法&lt;/h4&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# &amp;lt;type &amp;#39;str&amp;#39;&amp;gt; to &amp;lt;type &amp;#39;unicode&amp;#39;&amp;gt;&lt;/span&gt;
-&lt;span style=&#34;color:#75715e&#34;&gt;# 如果 s 是&amp;#39;unicode&amp;#39;类型，python会先通过encode函数把s转换成&amp;#39;str&amp;#39;类型&lt;/span&gt;
-&lt;span style=&#34;color:#75715e&#34;&gt;# encode函数的encoding是sys.getdefaultencoding()的值&lt;/span&gt;
-s&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decode(encoding)
 
-&lt;span style=&#34;color:#75715e&#34;&gt;# &amp;lt;type &amp;#39;unicode&amp;#39;&amp;gt; to &amp;lt;type &amp;#39;str&amp;#39;&amp;gt;&lt;/span&gt;
-&lt;span style=&#34;color:#75715e&#34;&gt;# 如果u是&amp;#39;str&amp;#39;类型，python会通过decode函数把u转换成&amp;#39;unicode&amp;#39;类型&lt;/span&gt;
-&lt;span style=&#34;color:#75715e&#34;&gt;# decode函数的encoding是sys.getdefaultencoding()的值&lt;/span&gt;
-u&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encode(encoding)
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# &amp;lt;type &#39;str&#39;&amp;gt; to &amp;lt;type &#39;unicode&#39;&amp;gt;
+# 如果 s 是&#39;unicode&#39;类型，python会先通过encode函数把s转换成&#39;str&#39;类型
+# encode函数的encoding是sys.getdefaultencoding()的值
+s.decode(encoding)
 
-&lt;span style=&#34;color:#75715e&#34;&gt;# 获取系统默认的编码&lt;/span&gt;
-sys&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getdefaultencoding()
+# &amp;lt;type &#39;unicode&#39;&amp;gt; to &amp;lt;type &#39;str&#39;&amp;gt;
+# 如果u是&#39;str&#39;类型，python会通过decode函数把u转换成&#39;unicode&#39;类型
+# decode函数的encoding是sys.getdefaultencoding()的值
+u.encode(encoding)
 
-&lt;span style=&#34;color:#75715e&#34;&gt;# 修改系统的默认编码&lt;/span&gt;
-sys&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;setdefaultencoding(encoding)
+# 获取系统默认的编码
+sys.getdefaultencoding()
 
-&lt;span style=&#34;color:#75715e&#34;&gt;# 修改代码&lt;/span&gt;
-&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; sys
-reload(sys) &lt;span style=&#34;color:#75715e&#34;&gt;# 因为python初始化的时候会把setdefaultencoding方法给删除掉&lt;/span&gt;
-sys&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;setdefaultencoding(&lt;span style=&#34;color:#e6db74&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;utf8&amp;#39;&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+# 修改系统的默认编码
+sys.setdefaultencoding(encoding)
+
+# 修改代码
+import sys
+reload(sys) # 因为python初始化的时候会把setdefaultencoding方法给删除掉
+sys.setdefaultencoding(&#39;utf8&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;h4 id=&#34;codecs&#34;&gt;codecs&lt;/h4&gt;
 
 &lt;p&gt;指定encoding参数生成file-object-like对象，利用：&lt;/p&gt;
@@ -833,16 +893,22 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 &lt;h2 id=&#34;思路不清晰&#34;&gt;思路不清晰&lt;/h2&gt;
 
 &lt;p&gt;思路没有完全确定情况下写代码。造成不确定的情况有多方面：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;1. 求快，把相似的需求当做一样的需求
+
+&lt;pre&gt;&lt;code&gt;1. 求快，把相似的需求当做一样的需求
 2. 缺少设计，大体明白实现方案，就开始编码
-3. 知识不充分，集中在前端的css、布局&lt;/pre&gt;&lt;/div&gt;
+3. 知识不充分，集中在前端的css、布局
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;&lt;strong&gt;怎么办？&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;快是可以做到，心里不要慌就是。&lt;/em&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;1. 需求分析到位
+
+&lt;pre&gt;&lt;code&gt;1. 需求分析到位
 2. 仔细查看现有的代码
 3. 遗留代码多问老员工
-4. 放下别人对你问代码时的负面情绪&lt;/pre&gt;&lt;/div&gt;
+4. 放下别人对你问代码时的负面情绪
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;h2 id=&#34;破窗原理&#34;&gt;破窗原理&lt;/h2&gt;
 
 &lt;p&gt;在一个代码质量差的项目里面，就很容易被一种“别人也是这样，我也就这样得了”，尤其是在你不熟悉代码的情况下。&lt;strong&gt;短期内，代码是写给自己的，维护的人是自己，长期内是给别人的，对自己好就是对别人好，还有需要执行力。&lt;/strong&gt;&lt;/p&gt;
