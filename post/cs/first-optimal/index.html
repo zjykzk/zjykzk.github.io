@@ -198,20 +198,11 @@ Tags:
 
 <h3 id="mongodb">mongodb</h3>
 
-<p>通过命令 <code>mongostat</code> 查看mongodb的运行状态，发现随着消费线程并发的提高锁的百分比越来越高最后超过的90%。查看mongodb的版本是2.4.9，它用的数据库锁。换个mongodb版本，避免锁的开销，通过了解公司线上使用的版本3.0.15，并使用wireTiger存储引擎。果断按照这个环境进行benchmark，结果仍然不尽任意。查看<strong>profiler</strong>，一个类似mysql的慢查询的命令。通过以下命令加上专家的讲解，其中扫描对象比较多（<strong>从信息&raquo;nscannedObjects&raquo; : 71040看出</strong>） 确认是缺少了一个索引。</p>
+<p>通过命令 <code>mongostat</code> 查看mongodb的运行状态，发现随着消费线程并发的提高锁的百分比越来越高最后超过的90%。查看mongodb的版本是2.4.9，它用的数据库锁。换个mongodb版本，避免锁的开销，通过了解公司线上使用的版本3.0.15，并使用wireTiger存储引擎。果断按照这个环境进行benchmark，结果仍然不尽任意。查看<strong>profiler</strong>，一个类似mysql的慢查询的命令。通过以下命令加上专家的讲解，从<strong>信息 nscannedObjects : 71040</strong>，发现扫描对象比较多，从代码确认是缺少了一个索引。</p>
 
 <pre><code>&gt; db.setProfilingLevel(2);
-{&quot;was&quot; : 0 , &quot;slowms&quot; : 100, &quot;ok&quot; : 1} // &quot;was&quot; is the old setting
-&gt; db.system.profile.find().sort({millis:-1}) // 列出耗时的操作，按照操作耗时排序
-{ &quot;op&quot; : &quot;query&quot;, &quot;ns&quot; : &quot;broker_test.working_message&quot;, &quot;query&quot; : { &quot;$query&quot; : { &quot;state&quot; : 2 }, &quot;$orderby&quot; : { &quot;created_at&quot; : 1 } }, &quot;cursorid&quot; : 24924786875, &quot;ntoreturn&quot; : 256, &quot;ntoskip&quot; : 0, &quot;nscanned&quot; : 0, &quot;nscannedObjects&quot; : 71040, &quot;scanAndOrder&quot; : true, &quot;keyUpdates&quot; : 
-0, &quot;writeConflicts&quot; : 0, &quot;numYield&quot; : 557, &quot;locks&quot; : { &quot;Global&quot; : { &quot;acquireCount&quot; : { &quot;r&quot; : NumberLong(1116) } }, &quot;Database&quot; : { &quot;acquireCount&quot; : { &quot;r&quot; : NumberLong(558) } }, &quot;Collection&quot; : { &quot;acquireCount&quot; : { &quot;r&quot; : NumberLong(558) } } }, &quot;nreturned&quot; : 256, &quot;responseLengt
-h&quot; : 182909, &quot;millis&quot; : 192, &quot;execStats&quot; : { &quot;stage&quot; : &quot;OR&quot;, &quot;nReturned&quot; : 256, &quot;executionTimeMillisEstimate&quot; : 180, &quot;works&quot; : 71299, &quot;advanced&quot; : 256, &quot;needTime&quot; : 71043, &quot;needFetch&quot; : 0, &quot;saveState&quot; : 557, &quot;restoreState&quot; : 557, &quot;isEOF&quot; : 0, &quot;invalidates&quot; : 0, &quot;dupsTested&quot;
- : 256, &quot;dupsDropped&quot; : 0, &quot;locsForgotten&quot; : 0, &quot;matchTested_0&quot; : 0, &quot;matchTested_1&quot; : 0, &quot;inputStages&quot; : [ { &quot;stage&quot; : &quot;SORT&quot;, &quot;nReturned&quot; : 256, &quot;executionTimeMillisEstimate&quot; : 180, &quot;works&quot; : 71299, &quot;advanced&quot; : 256, &quot;needTime&quot; : 71042, &quot;needFetch&quot; : 0, &quot;saveState&quot; : 557,
- &quot;restoreState&quot; : 557, &quot;isEOF&quot; : 1, &quot;invalidates&quot; : 0, &quot;sortPattern&quot; : { &quot;created_at&quot; : 1 }, &quot;memUsage&quot; : 184937, &quot;memLimit&quot; : 33554432, &quot;limitAmount&quot; : 256, &quot;inputStage&quot; : { &quot;stage&quot; : &quot;COLLSCAN&quot;, &quot;filter&quot; : { &quot;state&quot; : { &quot;$eq&quot; : 2 } }, &quot;nReturned&quot; : 70469, &quot;executionTimeMi
-llisEstimate&quot; : 60, &quot;works&quot; : 71042, &quot;advanced&quot; : 70469, &quot;needTime&quot; : 572, &quot;needFetch&quot; : 0, &quot;saveState&quot; : 557, &quot;restoreState&quot; : 557, &quot;isEOF&quot; : 1, &quot;invalidates&quot; : 0, &quot;direction&quot; : &quot;forward&quot;, &quot;docsExamined&quot; : 71040 } }, { &quot;stage&quot; : &quot;SORT&quot;, &quot;nReturned&quot; : 0, &quot;executionTimeMilli
-sEstimate&quot; : 0, &quot;works&quot; : 0, &quot;advanced&quot; : 0, &quot;needTime&quot; : 0, &quot;needFetch&quot; : 0, &quot;saveState&quot; : 557, &quot;restoreState&quot; : 557, &quot;isEOF&quot; : 0, &quot;invalidates&quot; : 0, &quot;sortPattern&quot; : { &quot;created_at&quot; : 1 }, &quot;memUsage&quot; : 0, &quot;memLimit&quot; : 33554432, &quot;inputStage&quot; : { &quot;stage&quot; : &quot;COLLSCAN&quot;, &quot;filter
-&quot; : { &quot;state&quot; : { &quot;$eq&quot; : 2 } }, &quot;nReturned&quot; : 0, &quot;executionTimeMillisEstimate&quot; : 0, &quot;works&quot; : 0, &quot;advanced&quot; : 0, &quot;needTime&quot; : 0, &quot;needFetch&quot; : 0, &quot;saveState&quot; : 557, &quot;restoreState&quot; : 557, &quot;isEOF&quot; : 0, &quot;invalidates&quot; : 0, &quot;direction&quot; : &quot;forward&quot;, &quot;docsExamined&quot; : 0 } } ] }, &quot;
-ts&quot; : ISODate(&quot;2017-10-24T07:54:08.773Z&quot;), &quot;client&quot; : &quot;10.200.20.56&quot;, &quot;allUsers&quot; : [ ], &quot;user&quot; : &quot;&quot; }
+{&quot;was&quot; : 0 , &quot;slowms&quot; : 100, &quot;ok&quot; : 1}       // &quot;was&quot; 表示旧的设置
+&gt; db.system.profile.find().sort({millis:-1}) // 列出耗时的操作，按照操作耗时排序，这条语句会列出扫描的对象数量，锁等关键信息
 </code></pre>
 
 <p>在程序里面加上索引，再次benchmark达到预期。</p>
