@@ -10,7 +10,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
 <meta name="HandheldFriendly" content="true">
-<meta name="generator" content="Hugo 0.30.2" />
+<meta name="generator" content="Hugo 0.31-DEV" />
 
 
 <link href="/css/prism.css" rel="stylesheet" />
@@ -230,6 +230,12 @@ type bmap struct {
 </tr>
 </tbody>
 </table>
+
+<h1 id="hash函数">hash函数</h1>
+
+<p>map中的key对应着一个hash函数，用于定位bucket。在golang的hash函数是固定的，用户无法修改。golang中的预定义基本类型，像 <code>int32/int64/string/interface</code> 等等都有一个hash函数与之对应，代码在runtime/alg.go中。对于struct/数组/slice，如果它每个字段或者元素都是有hash函数，那么该类型就有hash函数，hash值由每个字段的hash值来定义，代码在reflect/type.go函数<code>StructOf</code>中。</p>
+
+<p>注：<code>map</code>是不能作为key的。</p>
 
 <h1 id="扩容">扩容</h1>
 
