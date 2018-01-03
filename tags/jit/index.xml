@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jit on 老K随笔</title>
+    <link>http://zjykzk.github.io/tags/jit/</link>
+    <description>Recent content in Jit on 老K随笔</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
+    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <copyright>(c) 2017 zenk.</copyright>
+    <lastBuildDate>Wed, 03 Jan 2018 15:12:25 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/jit/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>jit的基本原理以及实现</title>
+      <link>http://zjykzk.github.io/post/cs/jit/</link>
+      <pubDate>Wed, 03 Jan 2018 15:12:25 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/jit/</guid>
+      <description>
+
+&lt;h2 id=&#34;基本原理&#34;&gt;基本原理&lt;/h2&gt;
+
+&lt;p&gt;JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：&lt;br /&gt;
+1. 生成可以执行的代码&lt;br /&gt;
+2. 执行代码&lt;/p&gt;
+
+&lt;h3 id=&#34;生成代码&#34;&gt;生成代码&lt;/h3&gt;
+
+&lt;p&gt;生成的代码是平台相关，一般就是一些机器码。&lt;/p&gt;
+
+&lt;h3 id=&#34;执行代码&#34;&gt;执行代码&lt;/h3&gt;
+
+&lt;p&gt;生成的代码如果要被执行，必须要确保代码所在的内存拥有可执行的标志。在linux下面通过&lt;code&gt;mmap&lt;/code&gt;系统调用映射一块可执行的内存，然后把相关的代码复制到这块内存中。最后，把内存首地址转换成函数地址并进行调用。&lt;/p&gt;
+
+&lt;h2 id=&#34;hello-world&#34;&gt;Hello，World&lt;/h2&gt;
+
+&lt;p&gt;一个基于x86_64平台的JIT代码， 通过系统调用&lt;code&gt;write&lt;/code&gt;实现打印&lt;code&gt;hello,world！&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h3 id=&#34;基于x86-64平台的jit代码&#34;&gt;基于x86_64平台的JIT代码&lt;/h3&gt;
+
+&lt;p&gt;linux下面系统调用通过软中断来实现，参数通过寄存器来传递。寄存器的使用情况如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;+----------+--------+--------+--------+--------+--------+--------+
+| Syscall #| Param 1| Param 2| Param 3| Param 4| Param 5| Param 6|
++----------+--------+--------+--------+--------+--------+--------+
+| rax      |  rdi   |  rsi   |   rdx  |   r10  |   r8   |   r9   |
++----------+--------+--------+--------+--------+--------+--------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;系统调用&lt;a href=&#34;http://man7.org/linux/man-pages/man2/write.2.html&#34;&gt;write(int fd, const void *buf, size_t count)&lt;/a&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;参数&lt;code&gt;fd&lt;/code&gt;:文件描述符号&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;参数&lt;code&gt;buf&lt;/code&gt;:输出的内存起始地址&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;参数&lt;code&gt;count&lt;/code&gt;:输出的字节数&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;因此，x86_64平台下调用&lt;code&gt;write&lt;/code&gt;的机器码为&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;0:  48 c7 c0 01 00 00 00    mov    rax,0x1
+7:  48 c7 c7 01 00 00 00    mov    rdi,0x1
+e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc
+15: 48 8d 35 03 00 00 00    lea    rsi,[rip+0x4]        # 0x1f
+1c: 0f 05                   syscall
+1e: c3 cc                   ret
+1f: 48 65 6c 6c 6f 20 57 6f 72 6c 64 21   // Hello World!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中：&lt;br /&gt;
+1. &lt;code&gt;rax&lt;/code&gt;值为1，系统调用&lt;code&gt;write&lt;/code&gt;的编号&lt;br /&gt;
+2. &lt;code&gt;rdi&lt;/code&gt;值为1，参数&lt;code&gt;fd&lt;/code&gt;的值，标准输出&lt;br /&gt;
+3. &lt;code&gt;rsi&lt;/code&gt;值为&lt;code&gt;rip+4&lt;/code&gt;，参数&lt;code&gt;buf&lt;/code&gt;的值，通过相对地址得到&lt;br /&gt;
+4. &lt;code&gt;rdx&lt;/code&gt;值为0xc（12），参数&lt;code&gt;count&lt;/code&gt;的值&lt;/p&gt;
+
+&lt;h3 id=&#34;执行代码-1&#34;&gt;执行代码&lt;/h3&gt;
+
+&lt;p&gt;通过系统调用&lt;a href=&#34;http://man7.org/linux/man-pages/man2/mmap.2.html&#34;&gt;void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)&lt;/a&gt;创建内存映射，确保这块内存可以执行，通过参数&lt;code&gt;prot&lt;/code&gt;指定，其中&lt;code&gt;PROT_EXEC&lt;/code&gt;可执行，&lt;code&gt;PROT_READ&lt;/code&gt;可读，&lt;code&gt;PROD_WRITE&lt;/code&gt;可写。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;unsigned short code[] = {
+    0x48c7, 0xc001, 0x0,          // mov %rax,$0x1
+    0x48, 0xc7c7, 0x100, 0x0,     // mov %rdi,$0x1
+    0x48c7, 0xc20c, 0x0,          // mov 0x12, %rdx
+    0x48, 0x8d35, 0x400, 0x0,     // lea 0x4(%rip), %rsi
+    0xf05,                        // syscall
+    0xc3cc,                       // ret
+    0x4865, 0x6c6c, 0x6f20,       // Hello_(whitespace)
+    0x576f, 0x726c, 0x6421, 0xa,  // World!
+};
+
+#define PROTS PROT_READ|PROT_WRITE|PROT_EXEC
+#define FLAGS MAP_PRIVATE|MAP_ANONYMOUS
+
+void *m = mmap(NULL, sizeof(code), PROTS, FLAGS, -1, 0);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接下来，把机器码复制到刚刚映射的内存中，注意为了显示方便机器码保存在了&lt;code&gt;unsigned short&lt;/code&gt;数组中，加上x86_64平台字节顺序按照小端来存储，需要把机器码字节顺序调换。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;for (int i = 0; i &amp;lt; sizeof(code)/sizeof(code[0]); i++) {
+    *((unsigned short *)m+i) = (unsigned short)(((code[i]&amp;gt;&amp;gt;8) | (code[i]&amp;lt;&amp;lt;8)) &amp;amp; 0xffff);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最后，调用一个没有参数以及没有返回值的函数：&lt;code&gt;void (*)()&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;((void (*)())m)();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;完整代码&#34;&gt;完整代码&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;sys/mman.h&amp;gt;
+#include &amp;lt;sys/types.h&amp;gt;
+#define _GNU_SOURCE
+
+int main(void) {
+  unsigned short code[] = {
+    0x48c7, 0xc001, 0x0,          // mov %rax,$0x1
+    0x48, 0xc7c7, 0x100, 0x0,     // mov %rdi,$0x1
+    0x48c7, 0xc20c, 0x0,          // mov 0x12, %rdx
+    0x48, 0x8d35, 0x400, 0x0,     // lea 0x4(%rip), %rsi
+    0xf05,                        // syscall
+    0xc3cc,                       // ret
+    0x4865, 0x6c6c, 0x6f20,       // Hello_(whitespace)
+    0x576f, 0x726c, 0x6421, 0xa,  // World!
+  };
+
+#define PROTS PROT_READ|PROT_WRITE|PROT_EXEC
+#define FLAGS MAP_PRIVATE|MAP_ANONYMOUS
+
+  void *m = mmap(NULL, sizeof(code), PROTS, FLAGS, -1, 0);
+  if (m == MAP_FAILED) {
+      printf(&amp;quot;mmap error&amp;quot;);
+      return -1;
+  }
+
+  for (int i = 0; i &amp;lt; sizeof(code)/sizeof(code[0]); i++) {
+    *((unsigned short *)m+i) = (unsigned short)(((code[i]&amp;gt;&amp;gt;8) | (code[i]&amp;lt;&amp;lt;8)) &amp;amp; 0xffff);
+  }
+
+  ((void (*)())m)();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://medium.com/kokster/writing-a-jit-compiler-in-golang-964b61295f&#34;&gt;https://medium.com/kokster/writing-a-jit-compiler-in-golang-964b61295f&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

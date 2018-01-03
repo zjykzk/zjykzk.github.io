@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="nojs" lang="zh" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>jit的基本原理以及实现 – 老K随笔</title>
+<meta name="description" content="jit的基本原理以及hello,world实现">
+<meta name="created" content="2018-01-03T15:12:25&#43;0800">
+<meta name="modified" content="2018-01-03T15:12:25&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.32" />
+
+
+<link href="/css/prism.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/jit/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "jit的基本原理以及实现",
+    "datePublished": "2018-01-03T15:12:25+08:00",
+    "dateModified": "2018-01-03T15:12:25+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/jit/",
+    "description": "jit的基本原理以及hello,world实现",
+    "keywords": ["jit"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
+</head>
+
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
+</h1>
+<div class="region header__region"></div>
+</header>
+
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">主菜单</h2>
+<ul class="navbar">
+<li><a class="" href="/">首页</a></li>
+
+
+
+  <li><a  class="active"href="/categories/cs">计算机</a>
+  </li>
+
+
+<li><a class="" href="/post/about">关于</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
+<h1 class="title title-submitted">jit的基本原理以及实现</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-01-03T15:12:25&#43;08:00">2018-01-03 15:12:25</time>
+</p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/jit">jit</a></li>
+</ul>
+</div>
+</header>
+<div class="content">
+
+
+<h2 id="基本原理">基本原理</h2>
+
+<p>JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：<br />
+1. 生成可以执行的代码<br />
+2. 执行代码</p>
+
+<h3 id="生成代码">生成代码</h3>
+
+<p>生成的代码是平台相关，一般就是一些机器码。</p>
+
+<h3 id="执行代码">执行代码</h3>
+
+<p>生成的代码如果要被执行，必须要确保代码所在的内存拥有可执行的标志。在linux下面通过<code>mmap</code>系统调用映射一块可执行的内存，然后把相关的代码复制到这块内存中。最后，把内存首地址转换成函数地址并进行调用。</p>
+
+<h2 id="hello-world">Hello，World</h2>
+
+<p>一个基于x86_64平台的JIT代码， 通过系统调用<code>write</code>实现打印<code>hello,world！</code>。</p>
+
+<h3 id="基于x86-64平台的jit代码">基于x86_64平台的JIT代码</h3>
+
+<p>linux下面系统调用通过软中断来实现，参数通过寄存器来传递。寄存器的使用情况如下：</p>
+
+<pre><code>+----------+--------+--------+--------+--------+--------+--------+
+| Syscall #| Param 1| Param 2| Param 3| Param 4| Param 5| Param 6|
++----------+--------+--------+--------+--------+--------+--------+
+| rax      |  rdi   |  rsi   |   rdx  |   r10  |   r8   |   r9   |
++----------+--------+--------+--------+--------+--------+--------+
+</code></pre>
+
+<p>系统调用<a href="http://man7.org/linux/man-pages/man2/write.2.html">write(int fd, const void *buf, size_t count)</a></p>
+
+<ul>
+<li>参数<code>fd</code>:文件描述符号<br /></li>
+<li>参数<code>buf</code>:输出的内存起始地址<br /></li>
+<li>参数<code>count</code>:输出的字节数<br />
+<br /></li>
+</ul>
+
+<p>因此，x86_64平台下调用<code>write</code>的机器码为</p>
+
+<pre><code>0:  48 c7 c0 01 00 00 00    mov    rax,0x1
+7:  48 c7 c7 01 00 00 00    mov    rdi,0x1
+e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc
+15: 48 8d 35 03 00 00 00    lea    rsi,[rip+0x4]        # 0x1f
+1c: 0f 05                   syscall
+1e: c3 cc                   ret
+1f: 48 65 6c 6c 6f 20 57 6f 72 6c 64 21   // Hello World!
+</code></pre>
+
+<p>其中：<br />
+1. <code>rax</code>值为1，系统调用<code>write</code>的编号<br />
+2. <code>rdi</code>值为1，参数<code>fd</code>的值，标准输出<br />
+3. <code>rsi</code>值为<code>rip+4</code>，参数<code>buf</code>的值，通过相对地址得到<br />
+4. <code>rdx</code>值为0xc（12），参数<code>count</code>的值</p>
+
+<h3 id="执行代码-1">执行代码</h3>
+
+<p>通过系统调用<a href="http://man7.org/linux/man-pages/man2/mmap.2.html">void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)</a>创建内存映射，确保这块内存可以执行，通过参数<code>prot</code>指定，其中<code>PROT_EXEC</code>可执行，<code>PROT_READ</code>可读，<code>PROD_WRITE</code>可写。</p>
+
+<pre><code>unsigned short code[] = {
+    0x48c7, 0xc001, 0x0,          // mov %rax,$0x1
+    0x48, 0xc7c7, 0x100, 0x0,     // mov %rdi,$0x1
+    0x48c7, 0xc20c, 0x0,          // mov 0x12, %rdx
+    0x48, 0x8d35, 0x400, 0x0,     // lea 0x4(%rip), %rsi
+    0xf05,                        // syscall
+    0xc3cc,                       // ret
+    0x4865, 0x6c6c, 0x6f20,       // Hello_(whitespace)
+    0x576f, 0x726c, 0x6421, 0xa,  // World!
+};
+
+#define PROTS PROT_READ|PROT_WRITE|PROT_EXEC
+#define FLAGS MAP_PRIVATE|MAP_ANONYMOUS
+
+void *m = mmap(NULL, sizeof(code), PROTS, FLAGS, -1, 0);
+</code></pre>
+
+<p>接下来，把机器码复制到刚刚映射的内存中，注意为了显示方便机器码保存在了<code>unsigned short</code>数组中，加上x86_64平台字节顺序按照小端来存储，需要把机器码字节顺序调换。</p>
+
+<pre><code>for (int i = 0; i &lt; sizeof(code)/sizeof(code[0]); i++) {
+    *((unsigned short *)m+i) = (unsigned short)(((code[i]&gt;&gt;8) | (code[i]&lt;&lt;8)) &amp; 0xffff);
+}
+</code></pre>
+
+<p>最后，调用一个没有参数以及没有返回值的函数：<code>void (*)()</code></p>
+
+<pre><code>((void (*)())m)();
+</code></pre>
+
+<h3 id="完整代码">完整代码</h3>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &lt;sys/types.h&gt;
+#define _GNU_SOURCE
+
+int main(void) {
+  unsigned short code[] = {
+    0x48c7, 0xc001, 0x0,          // mov %rax,$0x1
+    0x48, 0xc7c7, 0x100, 0x0,     // mov %rdi,$0x1
+    0x48c7, 0xc20c, 0x0,          // mov 0x12, %rdx
+    0x48, 0x8d35, 0x400, 0x0,     // lea 0x4(%rip), %rsi
+    0xf05,                        // syscall
+    0xc3cc,                       // ret
+    0x4865, 0x6c6c, 0x6f20,       // Hello_(whitespace)
+    0x576f, 0x726c, 0x6421, 0xa,  // World!
+  };
+
+#define PROTS PROT_READ|PROT_WRITE|PROT_EXEC
+#define FLAGS MAP_PRIVATE|MAP_ANONYMOUS
+
+  void *m = mmap(NULL, sizeof(code), PROTS, FLAGS, -1, 0);
+  if (m == MAP_FAILED) {
+      printf(&quot;mmap error&quot;);
+      return -1;
+  }
+
+  for (int i = 0; i &lt; sizeof(code)/sizeof(code[0]); i++) {
+    *((unsigned short *)m+i) = (unsigned short)(((code[i]&gt;&gt;8) | (code[i]&lt;&lt;8)) &amp; 0xffff);
+  }
+
+  ((void (*)())m)();
+}
+</code></pre>
+
+<h2 id="参考">参考</h2>
+
+<p><a href="https://medium.com/kokster/writing-a-jit-compiler-in-golang-964b61295f">https://medium.com/kokster/writing-a-jit-compiler-in-golang-964b61295f</a></p>
+
+
+</div>
+</article>
+</main>
+
+
+
+
+<footer class="footer layout__footer" role="contentinfo">
+<p><span>© 老K随笔</span></p>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
+</div>
+
+
+
+
+<script src="/js/prism.js"></script>
+
+
+</body>
+</html>
