@@ -2,10 +2,10 @@
 <html class="nojs" lang="zh" dir="ltr">
 <head>
 <meta charset="utf-8">
-<title>About – 老K随笔</title>
-<meta name="description" content="还在努力学习思考。。。">
-<meta name="created" content="2016-02-02T21:33:21&#43;0800">
-<meta name="modified" content="2016-02-02T21:33:21&#43;0800">
+<title>vim常用操作 – 老K随笔</title>
+<meta name="description" content="vim常用操作">
+<meta name="created" content="2018-01-10T18:16:35&#43;0800">
+<meta name="modified" content="2018-01-10T18:16:35&#43;0800">
 <meta name="author" content="zenk">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
@@ -16,7 +16,7 @@
 <link href="/css/prism.css" rel="stylesheet" />
 
 <link rel="stylesheet" href="/css/styles.css">
-<link rel="canonical" href="http://zjykzk.github.io/post/about/">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/vim-tips/">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" as="style" href="/css/styles.css">
 <link rel="stylesheet" href="/css/styles.css">
@@ -25,11 +25,12 @@
   {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": "About",
-    "datePublished": "2016-02-02T21:33:21+08:00",
-    "dateModified": "2016-02-02T21:33:21+08:00",
-    "url" : "http://zjykzk.github.io/post/about/",
-    "description": "还在努力学习思考。。。",
+    "headline": "vim常用操作",
+    "datePublished": "2018-01-10T18:16:35+08:00",
+    "dateModified": "2018-01-10T18:16:35+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/vim-tips/",
+    "description": "vim常用操作",
+    "keywords": ["vim"],
     "author": {
       "@type": "Person",
       "name": "zenk"
@@ -74,7 +75,7 @@
   <li><a  class=""href="/categories/buddhism">佛法</a>
   </li>
 
-  <li><a  class=""href="/categories/cs">计算机</a>
+  <li><a  class="active"href="/categories/cs">计算机</a>
   </li>
 
 
@@ -84,15 +85,81 @@
 
 
 <main class="main layout__main" role="main">
-<h1 class="title title-submitted">About</h1>
+<h1 class="title title-submitted">vim常用操作</h1>
 <article class="section-post single-view">
 <header>
 <p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2016-02-02T21:33:21&#43;08:00">2016-02-02 21:33:21</time>
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-01-10T18:16:35&#43;08:00">2018-01-10 18:16:35</time>
 </p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/vim">vim</a></li>
+</ul>
+</div>
 </header>
 <div class="content">
-<p>还在努力学习思考。。。</p>
+<ol>
+<li>在命令模式使用函数<br />
+<br /></li>
+</ol>
+
+<pre><code>:%s/ab(.*)c/\=submatch(1) . 'test'/gc
+</code></pre>
+
+<ol>
+<li>窗口间切换<br />
+<br /></li>
+</ol>
+
+<pre><code>跳转至某个窗口：窗口number + c-w + w：
+跳至当前位置的左边某个窗口：c-w &lt;number&gt;h
+跳至当前位置的右边某个窗口：c-w &lt;number&gt;l
+跳至当前位置的上边某个窗口：c-w &lt;number&gt;j
+跳至当前位置的下边某个窗口：c-w &lt;number&gt;k
+</code></pre>
+
+<ol>
+<li>全文缩进<br />
+<br /></li>
+</ol>
+
+<pre><code>gg=G
+</code></pre>
+
+<ol>
+<li>把数字替换成原来的数字减一<br />
+<br /></li>
+</ol>
+
+<pre><code>:%s/(\d+)/\=submatch(1)-1/gc
+</code></pre>
+
+<ol>
+<li>移动屏幕<br />
+<br /></li>
+</ol>
+
+<pre><code>H // 把当前行的位置移到最上面
+M // 把当前行的位置移到屏幕中间
+L // 把当前的位置移到屏幕底部
+</code></pre>
+
+<ol>
+<li>全局操作<code>g</code><br />
+<br /></li>
+</ol>
+
+<pre><code>:{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果
+</code></pre>
+
+<ol>
+<li>移动窗口<br />
+<br /></li>
+</ol>
+
+<pre><code>CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签
+</code></pre>
 
 
 </div>

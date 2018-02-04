@@ -8,8 +8,92 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 03 Jan 2018 15:12:25 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 04 Feb 2018 17:13:52 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>打坐感悟</title>
+      <link>http://zjykzk.github.io/post/buddhism/dazuo/</link>
+      <pubDate>Sun, 04 Feb 2018 17:13:52 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/buddhism/dazuo/</guid>
+      <description>&lt;p&gt;自从老师教打坐已经7年了。在腿疼这一点上一直无法完全克服，经常被想去除腿疼的念头带走，然后起坐。今天趁儿子午睡入座，结果50分钟起坐了，原因照旧。但是，打坐腿疼时并没有忘记观照：腿疼的境，以及想起坐的念头无非都是自己的心念而已，如何对待依然由“自己”做主。&lt;/p&gt;
+
+&lt;p&gt;起坐以后，接着打坐时的思路继续思维，在境来时不是恰好我练习的关照的最好时刻么，趁儿子未醒，接着下座。这次，入座腿疼的境以及起坐的念头如期而至，有了上次的思维，我把心专注在大明咒上，尽量保持不让腿疼的境和起坐的念头所带走，一直到心中有把握任他们起落而不被他们带走，起坐，心中法喜充满。至此，腿疼的问题可以告一段落。&lt;/p&gt;
+
+&lt;p&gt;在坐中居然还冒出一句：心念出现，心不随念转，它就上伤到你；心念本伤不到你，心也就不会随境所转。当然，这是对负面的念头而言，其实正面的念头何尝不是如此。感恩老师教诲！&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>vim常用操作</title>
+      <link>http://zjykzk.github.io/post/cs/vim-tips/</link>
+      <pubDate>Wed, 10 Jan 2018 18:16:35 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/vim-tips/</guid>
+      <description>&lt;ol&gt;
+&lt;li&gt;在命令模式使用函数&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;:%s/ab(.*)c/\=submatch(1) . &#39;test&#39;/gc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;窗口间切换&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;跳转至某个窗口：窗口number + c-w + w：
+跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h
+跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l
+跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j
+跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;全文缩进&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;gg=G
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;把数字替换成原来的数字减一&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;:%s/(\d+)/\=submatch(1)-1/gc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;移动屏幕&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;H // 把当前行的位置移到最上面
+M // 把当前行的位置移到屏幕中间
+L // 把当前的位置移到屏幕底部
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;全局操作&lt;code&gt;g&lt;/code&gt;&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;:{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;移动窗口&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>jit的基本原理以及实现</title>

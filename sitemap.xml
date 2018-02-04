@@ -3,6 +3,16 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://zjykzk.github.io/post/buddhism/dazuo/</loc>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/post/cs/vim-tips/</loc>
+    <lastmod>2018-01-10T18:16:35+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/post/cs/jit/</loc>
     <lastmod>2018-01-03T15:12:25+08:00</lastmod>
   </url>
@@ -58,13 +68,20 @@
   </url>
   
   <url>
+    <loc>http://zjykzk.github.io/categories/buddhism/</loc>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/categories/</loc>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://zjykzk.github.io/categories/cs/</loc>
-    <lastmod>2018-01-03T15:12:25+08:00</lastmod>
+    <lastmod>2018-01-10T18:16:35+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -82,13 +99,25 @@
   
   <url>
     <loc>http://zjykzk.github.io/post/</loc>
-    <lastmod>2018-01-03T15:12:25+08:00</lastmod>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://zjykzk.github.io/tags/</loc>
     <lastmod>2017-06-15T19:13:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/vim/</loc>
+    <lastmod>2018-01-10T18:16:35+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/zazen/</loc>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -100,7 +129,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/</loc>
-    <lastmod>2018-01-03T15:12:25+08:00</lastmod>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
     <priority>0</priority>
   </url>
   
