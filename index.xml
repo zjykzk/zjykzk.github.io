@@ -8,8 +8,75 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Sun, 04 Feb 2018 17:13:52 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 27 Feb 2018 19:51:16 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>golang中的tls</title>
+      <link>http://zjykzk.github.io/post/cs/golang/tls/</link>
+      <pubDate>Tue, 27 Feb 2018 19:51:16 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/golang/tls/</guid>
+      <description>&lt;p&gt;在golang中，为了性能的目的，当前执行的&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332&#34;&gt;&lt;code&gt;g&lt;/code&gt;&lt;/a&gt;是保存在当前线程的TLS中的，而TLS的地址在结构体&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412&#34;&gt;&lt;code&gt;m&lt;/code&gt;&lt;/a&gt;里面。问题是怎么放进去的呢？&lt;/p&gt;
+
+&lt;p&gt;可以从程序的启动入手，顺藤摸瓜。&lt;/p&gt;
+
+&lt;p&gt;编写一个打印&lt;code&gt;hello,world&lt;/code&gt;的程序&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// hello.go
+
+package main
+
+func main() {
+        print(&amp;quot;hello, world&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;编译生成可执行文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;go build -o hello hello.go
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;用gdb进行调试，找到程序的入口 &lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L7&#34;&gt;&lt;code&gt;_rt0_amd64_linux&lt;/code&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;gdb hello
+(gdb) info files
+...
+Entry point: 0x448f20
+...
+(gdb) list *0x448f20
+0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8)
+3       // license that can be found in the LICENSE file.
+4
+5       #include &amp;quot;textflag.h&amp;quot;
+6
+7       TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8
+8               LEAQ    8(SP), SI // argv
+9               MOVQ    0(SP), DI // argc
+10              MOVQ    $main(SB), AX
+11              JMP     AX
+12
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;发现&lt;code&gt;_rt0_amd64_linux&lt;/code&gt;调用了&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L72&#34;&gt;&lt;code&gt;main&lt;/code&gt;&lt;/a&gt;函数，后者调用了&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/asm_amd64.s#L10&#34;&gt;&lt;code&gt;runtime.rt0_go&lt;/code&gt;&lt;/a&gt;。而在函数&lt;code&gt;runtime.rt0_go&lt;/code&gt;中&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;127 	LEAQ	runtime·m0+m_tls(SB), DI
+128 	CALL	runtime·settls(SB)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;把&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/proc.go#L79&#34;&gt;&lt;code&gt;m0.tls&lt;/code&gt;&lt;/a&gt;的地址放到寄存器&lt;code&gt;DI&lt;/code&gt;，并调用了函数&lt;code&gt;runtime.settls&lt;/code&gt;，查看&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/sys_linux_amd64.s#L496&#34;&gt;&lt;code&gt;runtime.settls&lt;/code&gt;&lt;/a&gt;核心代码&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;503 	ADDQ	$8, DI	// ELF wants to use -8(FS)
+504 #endif
+505 	MOVQ	DI, SI
+506 	MOVQ	$0x1002, DI	// ARCH_SET_FS
+507 	MOVQ	$158, AX	// arch_prctl
+508 	SYSCALL
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看到，这里调用了系统调用&lt;a href=&#34;http://man7.org/linux/man-pages/man2/arch_prctl.2.html&#34;&gt;&lt;code&gt;arch_prctl&lt;/code&gt;&lt;/a&gt;，在linux下把&lt;code&gt;m0.tls+8&lt;/code&gt;的地址保存到&lt;code&gt;fs&lt;/code&gt;寄存器。到此，完成TLS的设置。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>打坐感悟</title>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="nojs" lang="zh" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>golang中的tls – 老K随笔</title>
+<meta name="description" content="golang中tls的使用。">
+<meta name="created" content="2018-02-27T19:51:16&#43;0800">
+<meta name="modified" content="2018-02-27T19:51:16&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.37.1" />
+
+
+<link href="/css/prism.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/golang/tls/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "golang中的tls",
+    "datePublished": "2018-02-27T19:51:16+08:00",
+    "dateModified": "2018-02-27T19:51:16+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/golang/tls/",
+    "description": "golang中tls的使用。",
+    "keywords": ["golang"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
+</head>
+
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
+</h1>
+<div class="region header__region"></div>
+</header>
+
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">主菜单</h2>
+<ul class="navbar">
+<li><a class="" href="/">首页</a></li>
+
+
+
+  <li><a  class=""href="/categories/buddhism">佛法</a>
+  </li>
+
+  <li><a  class="active"href="/categories/cs">计算机</a>
+  </li>
+
+
+<li><a class="" href="/post/about">关于</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
+<h1 class="title title-submitted">golang中的tls</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-02-27T19:51:16&#43;08:00">2018-02-27 19:51:16</time>
+</p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/golang">golang</a></li>
+</ul>
+</div>
+</header>
+<div class="content">
+<p>在golang中，为了性能的目的，当前执行的<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332"><code>g</code></a>是保存在当前线程的TLS中的，而TLS的地址在结构体<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412"><code>m</code></a>里面。问题是怎么放进去的呢？</p>
+
+<p>可以从程序的启动入手，顺藤摸瓜。</p>
+
+<p>编写一个打印<code>hello,world</code>的程序</p>
+
+<pre><code>// hello.go
+
+package main
+
+func main() {
+        print(&quot;hello, world&quot;)
+}
+</code></pre>
+
+<p>编译生成可执行文件</p>
+
+<pre><code>go build -o hello hello.go
+</code></pre>
+
+<p>用gdb进行调试，找到程序的入口 <a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L7"><code>_rt0_amd64_linux</code></a></p>
+
+<pre><code>gdb hello
+(gdb) info files
+...
+Entry point: 0x448f20
+...
+(gdb) list *0x448f20
+0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8)
+3       // license that can be found in the LICENSE file.
+4
+5       #include &quot;textflag.h&quot;
+6
+7       TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8
+8               LEAQ    8(SP), SI // argv
+9               MOVQ    0(SP), DI // argc
+10              MOVQ    $main(SB), AX
+11              JMP     AX
+12
+</code></pre>
+
+<p>发现<code>_rt0_amd64_linux</code>调用了<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L72"><code>main</code></a>函数，后者调用了<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/asm_amd64.s#L10"><code>runtime.rt0_go</code></a>。而在函数<code>runtime.rt0_go</code>中</p>
+
+<pre><code>127 	LEAQ	runtime·m0+m_tls(SB), DI
+128 	CALL	runtime·settls(SB)
+</code></pre>
+
+<p>把<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/proc.go#L79"><code>m0.tls</code></a>的地址放到寄存器<code>DI</code>，并调用了函数<code>runtime.settls</code>，查看<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/sys_linux_amd64.s#L496"><code>runtime.settls</code></a>核心代码</p>
+
+<pre><code>503 	ADDQ	$8, DI	// ELF wants to use -8(FS)
+504 #endif
+505 	MOVQ	DI, SI
+506 	MOVQ	$0x1002, DI	// ARCH_SET_FS
+507 	MOVQ	$158, AX	// arch_prctl
+508 	SYSCALL
+</code></pre>
+
+<p>可以看到，这里调用了系统调用<a href="http://man7.org/linux/man-pages/man2/arch_prctl.2.html"><code>arch_prctl</code></a>，在linux下把<code>m0.tls+8</code>的地址保存到<code>fs</code>寄存器。到此，完成TLS的设置。</p>
+
+
+</div>
+</article>
+</main>
+
+
+
+
+<footer class="footer layout__footer" role="contentinfo">
+<p><span>© 老K随笔</span></p>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
+</div>
+
+
+
+
+<script src="/js/prism.js"></script>
+
+
+</body>
+</html>
