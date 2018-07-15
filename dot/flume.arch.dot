@@ -1,0 +1,4 @@
+digraph arch { rankdir=LR; agent -> {collector1; collector2;
+    collector3;} collector1 -> {hdfs; Elasticsearch} collector2 ->
+    {hdfs; Elasticsearch} collector3 -> {hdfs; Elasticsearch}
+    hdfs[shape=egg]; Elasticsearch[shape=egg]; }

@@ -30,6 +30,24 @@
     </item>
     
     <item>
+      <title>Mq</title>
+      <link>http://zjykzk.github.io/tags/mq/</link>
+      <pubDate>Fri, 08 Dec 2017 17:59:56 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/tags/mq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Rocketmq</title>
+      <link>http://zjykzk.github.io/tags/rocketmq/</link>
+      <pubDate>Fri, 08 Dec 2017 17:59:56 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/tags/rocketmq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Vim</title>
       <link>http://zjykzk.github.io/tags/vim/</link>
       <pubDate>Wed, 10 Jan 2018 18:16:35 +0800</pubDate>
@@ -48,11 +66,38 @@
     </item>
     
     <item>
+      <title>分布式</title>
+      <link>http://zjykzk.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</link>
+      <pubDate>Sat, 28 Apr 2018 13:58:46 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>算法</title>
+      <link>http://zjykzk.github.io/tags/%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Sat, 28 Apr 2018 13:58:46 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/tags/%E7%AE%97%E6%B3%95/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>编程</title>
       <link>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</link>
-      <pubDate>Tue, 24 Oct 2017 18:46:11 +0800</pubDate>
+      <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>设计</title>
+      <link>http://zjykzk.github.io/tags/%E8%AE%BE%E8%AE%A1/</link>
+      <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/tags/%E8%AE%BE%E8%AE%A1/</guid>
       <description></description>
     </item>
     

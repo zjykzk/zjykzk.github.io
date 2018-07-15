@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>算法 on 老K随笔</title>
+    <link>http://zjykzk.github.io/tags/%E7%AE%97%E6%B3%95/</link>
+    <description>Recent content in 算法 on 老K随笔</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
+    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <copyright>(c) 2017 zenk.</copyright>
+    <lastBuildDate>Sat, 28 Apr 2018 13:58:46 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/%E7%AE%97%E6%B3%95/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>分布式中常用算法</title>
+      <link>http://zjykzk.github.io/post/cs/dist/alogs/</link>
+      <pubDate>Sat, 28 Apr 2018 13:58:46 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/dist/alogs/</guid>
+      <description>
+
+&lt;h2 id=&#34;一致性hash&#34;&gt;一致性hash&lt;/h2&gt;
+
+&lt;h3 id=&#34;目标&#34;&gt;目标&lt;/h3&gt;
+
+&lt;p&gt;缓存的机器扩容、缩容时，尽量保持数据的命中率。常规的hash算法，&lt;code&gt;hash(key)mod N&lt;/code&gt; （N表示缓存结点），当N变化时同一个key查询的缓存结点都会变化，导致缓存没有命中，造成很大的数据库压力。&lt;/p&gt;
+
+&lt;h3 id=&#34;原理&#34;&gt;原理&lt;/h3&gt;
+
+&lt;p&gt;hash函数值大小32位，因此输出的范围是&lt;code&gt;0~2^32-1&lt;/code&gt;。把这个范围形成一个环，同时对数据进行hash计算以外，对缓存的机器也做hash计算。这些计算出来的值在这个环上都有对应的一个点。&lt;/p&gt;
+
+&lt;p&gt;假设数据的hash值分别为&lt;code&gt;K1&lt;/code&gt;,&lt;code&gt;K2&lt;/code&gt;,&lt;code&gt;K3&lt;/code&gt;,&lt;code&gt;K4&lt;/code&gt;,&lt;code&gt;K5&lt;/code&gt;,&lt;code&gt;K6&lt;/code&gt;，以及缓存结点的hash值&lt;code&gt;H1&lt;/code&gt;,&lt;code&gt;H2&lt;/code&gt;,&lt;code&gt;H3&lt;/code&gt;,大小关系为&lt;code&gt;H1&amp;lt;K3&amp;lt;K4&amp;lt;K5&amp;lt;H2&amp;lt;K6&amp;lt;H3&amp;lt;K1&amp;lt;K2&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;每个数据所在的缓存结点是在这个环上顺时针方向遇到的第一个缓存结点既是。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/dist/ch1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;因此&lt;code&gt;K1&lt;/code&gt;,&lt;code&gt;K2&lt;/code&gt;落在&lt;code&gt;H1&lt;/code&gt;,&lt;code&gt;K3&lt;/code&gt;,&lt;code&gt;K4&lt;/code&gt;,&lt;code&gt;K5&lt;/code&gt;落在&lt;code&gt;H2&lt;/code&gt;,&lt;code&gt;K6&lt;/code&gt;落在&lt;code&gt;H3&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;添加一个新的缓存结点&lt;code&gt;H4&lt;/code&gt;，它的hash值落在&lt;code&gt;K4&lt;/code&gt;和&lt;code&gt;K5&lt;/code&gt;之间。按照规则，&lt;code&gt;K3&lt;/code&gt;,&lt;code&gt;K4&lt;/code&gt;将落在&lt;code&gt;H4&lt;/code&gt;，也就是说&lt;code&gt;K3&lt;/code&gt;,&lt;code&gt;K4&lt;/code&gt;将会失效而其他的数据不会影响。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/dist/ch2.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;减少缓存结点&lt;code&gt;H3&lt;/code&gt;，&lt;code&gt;K6&lt;/code&gt;会受到影响，它将落在缓存结点&lt;code&gt;H1&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/dist/ch3.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在次基础上可以抽象出一层缓存的虚拟缓存结点，这样的好处是可以事先确定缓存结点数量，让数据均匀的分布在每个虚拟缓存结点上面。每个物理缓存结点对应一个或者多个缓存结点。如下图中，有个4个虚拟缓存结点&lt;code&gt;VH1/VH2/VH3/VH4&lt;/code&gt;，两个物理缓存结点&lt;code&gt;H1/H2&lt;/code&gt;，分别对应&lt;code&gt;VH1/VH2和VH3/VH4&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/dist/ch4.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

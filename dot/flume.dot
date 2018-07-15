@@ -1,0 +1,40 @@
+digraph flume {
+    rankdir=LR;
+    source -> src_interceptor;
+    src_interceptor -> ch_selector;
+    ch_selector -> {ch_mem; ch_file;}
+    ch_mem -> sink_processor;
+    ch_file -> sink_jdbc;
+    sink_processor -> {sink_hdfs; sink_jms;}
+    sink_hdfs -> hdfs_event_serializer -> hdfs;
+    sink_jms -> jms_event_serializer -> jms;
+    sink_jdbc -> table_event_serializer -> mysql;
+
+    subgraph cluster_src {
+        source; src_interceptor; label="source";
+    }
+
+    subgraph cluster_ch {
+        ch_selector; ch_mem; ch_file; label="channel";
+    }
+
+    subgraph cluster_sink {
+        hdfs_event_serializer; jms_event_serializer; table_event_serializer;
+        sink_jms; sink_hdfs; sink_jdbc; sink_processor; label="sink";
+    }
+
+    src_interceptor [shape=doublecircle, label="interceptor"];
+    sink_processor [shape=diamond,style="rounded", label=<sink<br/>processor>];
+    ch_selector [shape=cds, label=<channel<br/>selector>];
+    ch_mem [label=<memory<br/>channel>];
+    ch_file [label=<file<br/>channel>];
+    sink_hdfs [label=<hdfs<br/>sink>];
+    sink_jms [label=<jms<br/>sink>];
+    sink_jdbc [label=<jdbc<br/>sink>];
+    hdfs [shape=plaintext];
+    jms [shape=plaintext];
+    mysql [shape=plaintext];
+    hdfs_event_serializer [label=<hdfs<br/>serializer>,style="rounded", shape=diamond];
+    jms_event_serializer [label=<jms<br/>serializer>, style="rounded", shape=diamond];
+    table_event_serializer [label=<db<br/>serializer>, style="rounded", shape=diamond];
+}

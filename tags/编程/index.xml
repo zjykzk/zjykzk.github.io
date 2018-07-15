@@ -8,8 +8,51 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 24 Oct 2017 18:46:11 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 15 Jul 2018 15:11:11 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>接口在哪里定义？</title>
+      <link>http://zjykzk.github.io/post/cs/design/interface-owner/</link>
+      <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/design/interface-owner/</guid>
+      <description>&lt;p&gt;接口放在哪里决定了源代码依赖问题。因此，依赖是接口定义唯一考量，其他问题都可以归结为依赖问题，而定义的包永远是被依赖包。&lt;/p&gt;
+
+&lt;p&gt;接口定义的位置有三种情况：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;使用者&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;实现者&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;单独一个第三方位置&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;放在使用者这边&lt;/strong&gt;，那么实现者依赖使用者的接口定义。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;好处&lt;/strong&gt;：可以并行开发，尤其是类似golang这样的语言，实现一接口不需要引用具体的接口定义，即使在必须引用的开发语言里面也只需要实现相关的接口，集成的时候加上是很简单的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;坏处&lt;/strong&gt;：在实现者依赖接口定义源代码的情况下，实现者代码要提出来重用，必须要得要包含使用者的接口定义&lt;/p&gt;
+
+&lt;p&gt;这样的方式比较适合多个使用者，单个实现者的情况。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;放在实现者这边&lt;/strong&gt;，那么使用者依赖实现者的接口定义。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;好处&lt;/strong&gt;：实现者是一个独立的包，可以很方便的重用。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;坏处&lt;/strong&gt;：使用者开发的时候需要引用实现者的接口定义，增加并行开发的难度，这里可以自己mock接口，集成的时候改成实现者的接口即可。&lt;/p&gt;
+
+&lt;p&gt;这样的方式适合单个使用者，多个实现者情况。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;单独放在第三方位置&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;好处&lt;/strong&gt;：定义完接口以后，使用者和实现者都可以并行开发，同时实现者包的重用和使用者解耦。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;坏处&lt;/strong&gt;：包的管理变得复杂，包含接口的包会变得很薄&lt;/p&gt;
+
+&lt;p&gt;这样的方式适合多个使用者，多个实现者情况。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>记一次mongo数据库优化经历</title>
