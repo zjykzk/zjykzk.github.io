@@ -10,7 +10,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
 <meta name="HandheldFriendly" content="true">
-<meta name="generator" content="Hugo 0.39-DEV" />
+<meta name="generator" content="Hugo 0.41-DEV" />
 
 
 <link href="/css/prism.css" rel="stylesheet" />
@@ -142,7 +142,7 @@ Tags:
 
 <h4 id="主从同步">主从同步</h4>
 
-<p>每条消息要等从broker同步完才算完成。</p>
+<p>每条消息要等一个从broker同步完才算完成。</p>
 
 <p>在主从同步的场景下，会有一个定期检查消息是否已经被从broker同步的辅助线程：<code>GroupTransferService</code>。写消息的时候会生成一个<code>GroupCommitRequest</code>提交给<code>GroupTransferService</code>，并等待被唤醒或者超时。当<code>GroupTransferService</code>发现从broker已经同步的最后一个消息的索引大于本次消息的索引时就会唤醒<code>GroupCommitRequest</code>。</p>
 
@@ -372,7 +372,7 @@ Tags:
 
 <h2 id="ha">HA</h2>
 
-<p>RocketMQ的HA是最朴素的主从同步，主broker挂了从broker可以读数据，但是不能写，也不会自动主从切换。</p>
+<p>RocketMQ的HA是最朴素的一主多从同步，主broker挂了从broker可以读数据，但是不能写，也不会自动主从切换。</p>
 
 <p><img src="/imgs/rocketmq/ha.png" alt="ha" /></p>
 

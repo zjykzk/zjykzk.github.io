@@ -59,7 +59,7 @@
 
 &lt;h4 id=&#34;主从同步&#34;&gt;主从同步&lt;/h4&gt;
 
-&lt;p&gt;每条消息要等从broker同步完才算完成。&lt;/p&gt;
+&lt;p&gt;每条消息要等一个从broker同步完才算完成。&lt;/p&gt;
 
 &lt;p&gt;在主从同步的场景下，会有一个定期检查消息是否已经被从broker同步的辅助线程：&lt;code&gt;GroupTransferService&lt;/code&gt;。写消息的时候会生成一个&lt;code&gt;GroupCommitRequest&lt;/code&gt;提交给&lt;code&gt;GroupTransferService&lt;/code&gt;，并等待被唤醒或者超时。当&lt;code&gt;GroupTransferService&lt;/code&gt;发现从broker已经同步的最后一个消息的索引大于本次消息的索引时就会唤醒&lt;code&gt;GroupCommitRequest&lt;/code&gt;。&lt;/p&gt;
 
@@ -289,7 +289,7 @@
 
 &lt;h2 id=&#34;ha&#34;&gt;HA&lt;/h2&gt;
 
-&lt;p&gt;RocketMQ的HA是最朴素的主从同步，主broker挂了从broker可以读数据，但是不能写，也不会自动主从切换。&lt;/p&gt;
+&lt;p&gt;RocketMQ的HA是最朴素的一主多从同步，主broker挂了从broker可以读数据，但是不能写，也不会自动主从切换。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/rocketmq/ha.png&#34; alt=&#34;ha&#34; /&gt;&lt;/p&gt;
 

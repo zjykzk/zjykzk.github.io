@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://zjykzk.github.io/post/cs/mongodb/</loc>
+    <lastmod>2018-07-20T16:18:23+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/post/cs/design/interface-owner/</loc>
     <lastmod>2018-07-15T15:11:11+08:00</lastmod>
   </url>
@@ -101,7 +106,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/categories/cs/</loc>
-    <lastmod>2018-07-15T15:11:11+08:00</lastmod>
+    <lastmod>2018-07-20T16:18:23+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -118,6 +123,12 @@
   </url>
   
   <url>
+    <loc>http://zjykzk.github.io/tags/mongodb/</loc>
+    <lastmod>2018-07-20T16:18:23+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/tags/mq/</loc>
     <lastmod>2017-12-08T17:59:56+08:00</lastmod>
     <priority>0</priority>
@@ -125,7 +136,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/post/</loc>
-    <lastmod>2018-07-15T15:11:11+08:00</lastmod>
+    <lastmod>2018-07-20T16:18:23+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -173,7 +184,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/</loc>
-    <lastmod>2018-07-15T15:11:11+08:00</lastmod>
+    <lastmod>2018-07-20T16:18:23+08:00</lastmod>
     <priority>0</priority>
   </url>
   
