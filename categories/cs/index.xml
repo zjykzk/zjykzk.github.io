@@ -406,66 +406,47 @@ Entry point: 0x448f20
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/vim-tips/</guid>
       <description>&lt;ol&gt;
-&lt;li&gt;在命令模式使用函数&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;li&gt;&lt;p&gt;在命令模式使用函数&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;:%s/ab(.*)c/\=submatch(1) . &#39;test&#39;/gc
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 
-&lt;ol&gt;
-&lt;li&gt;窗口间切换&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;li&gt;&lt;p&gt;窗口间切换&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;跳转至某个窗口：窗口number + c-w + w：
 跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h
 跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l
 跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j
 跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 
-&lt;ol&gt;
-&lt;li&gt;全文缩进&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;li&gt;&lt;p&gt;全文缩进&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;gg=G
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 
-&lt;ol&gt;
-&lt;li&gt;把数字替换成原来的数字减一&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;li&gt;&lt;p&gt;把数字替换成原来的数字减一&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;:%s/(\d+)/\=submatch(1)-1/gc
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 
-&lt;ol&gt;
-&lt;li&gt;移动屏幕&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;li&gt;&lt;p&gt;移动屏幕&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;H // 把当前行的位置移到最上面
 M // 把当前行的位置移到屏幕中间
 L // 把当前的位置移到屏幕底部
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 
-&lt;ol&gt;
-&lt;li&gt;全局操作&lt;code&gt;g&lt;/code&gt;&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;li&gt;&lt;p&gt;全局操作&lt;code&gt;g&lt;/code&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;:{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 
-&lt;ol&gt;
-&lt;li&gt;移动窗口&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;li&gt;&lt;p&gt;移动窗口&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ol&gt;
 </description>
     </item>
     

@@ -100,66 +100,47 @@ Tags:
 </header>
 <div class="content">
 <ol>
-<li>在命令模式使用函数<br />
-<br /></li>
-</ol>
+<li><p>在命令模式使用函数</p>
 
 <pre><code>:%s/ab(.*)c/\=submatch(1) . 'test'/gc
-</code></pre>
+</code></pre></li>
 
-<ol>
-<li>窗口间切换<br />
-<br /></li>
-</ol>
+<li><p>窗口间切换</p>
 
 <pre><code>跳转至某个窗口：窗口number + c-w + w：
 跳至当前位置的左边某个窗口：c-w &lt;number&gt;h
 跳至当前位置的右边某个窗口：c-w &lt;number&gt;l
 跳至当前位置的上边某个窗口：c-w &lt;number&gt;j
 跳至当前位置的下边某个窗口：c-w &lt;number&gt;k
-</code></pre>
+</code></pre></li>
 
-<ol>
-<li>全文缩进<br />
-<br /></li>
-</ol>
+<li><p>全文缩进</p>
 
 <pre><code>gg=G
-</code></pre>
+</code></pre></li>
 
-<ol>
-<li>把数字替换成原来的数字减一<br />
-<br /></li>
-</ol>
+<li><p>把数字替换成原来的数字减一</p>
 
 <pre><code>:%s/(\d+)/\=submatch(1)-1/gc
-</code></pre>
+</code></pre></li>
 
-<ol>
-<li>移动屏幕<br />
-<br /></li>
-</ol>
+<li><p>移动屏幕</p>
 
 <pre><code>H // 把当前行的位置移到最上面
 M // 把当前行的位置移到屏幕中间
 L // 把当前的位置移到屏幕底部
-</code></pre>
+</code></pre></li>
 
-<ol>
-<li>全局操作<code>g</code><br />
-<br /></li>
-</ol>
+<li><p>全局操作<code>g</code></p>
 
 <pre><code>:{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果
-</code></pre>
+</code></pre></li>
 
-<ol>
-<li>移动窗口<br />
-<br /></li>
-</ol>
+<li><p>移动窗口</p>
 
 <pre><code>CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签
-</code></pre>
+</code></pre></li>
+</ol>
 
 
 </div>
