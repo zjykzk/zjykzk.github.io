@@ -8,15 +8,167 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Sat, 28 Apr 2018 13:58:46 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 22 Aug 2018 11:08:28 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>分布式中常用算法</title>
-      <link>http://zjykzk.github.io/post/cs/dist/alogs/</link>
+      <title>分布式ID生成算法</title>
+      <link>http://zjykzk.github.io/post/cs/dist/uuid/</link>
+      <pubDate>Wed, 22 Aug 2018 11:08:28 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/dist/uuid/</guid>
+      <description>
+
+&lt;p&gt;分布式Unique ID在分布式系统使用很广泛，常用的用途有：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;请求的ID，用于跟踪请求链路。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;消息队列中的unique id。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;业务对象的id。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;总结下生成分布式ID常用算法。&lt;/p&gt;
+
+&lt;h2 id=&#34;数据库自增id&#34;&gt;数据库自增id&lt;/h2&gt;
+
+&lt;p&gt;通过MySQL中的&lt;code&gt;auto_increment&lt;/code&gt;特性来实现数据库唯一的ID。问题是扩展性差，性能受限于一台机器。可以做的优化是使用多个数据库实例，设置相同的步长和不同的起始值，避免重复产生ID。通过一个这种方式可以利用多台机器的资源。同时，还有一个优化是获取ID的时候可以批量获取ID，这样可以减少DB的操作，减少响应时间。&lt;/p&gt;
+
+&lt;p&gt;基于Redis，Postgres，Oracle也有类似的方案。&lt;/p&gt;
+
+&lt;h2 id=&#34;uuid-http-www-ietf-org-rfc-rfc4122-txt&#34;&gt;&lt;a href=&#34;http://www.ietf.org/rfc/rfc4122.txt&#34;&gt;UUID&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;UUID由&lt;code&gt;[0-9a-f-]&lt;/code&gt;字符组成，总共16个字节，转换成16进制的格式为：&lt;code&gt;XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;数据由5个部分组成：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;时间戳，占60位。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;时钟序列，占13位。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;结点编号，占48位。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;版本号，版本不同以上1-3个字段的数据来源也不一样，占4位。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;UUID类型，用于解析UUID数据中的意义，占3位。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;每个数据的位置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                          time_low                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |       time_mid                |         time_hi_and_version   |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |clk_seq_hi_res |  clk_seq_low  |         node (0-1)            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                         node (2-5)                            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;time_hi_and_version&lt;/code&gt;的第4-7位是版本号，&lt;code&gt;clk_seq_hi_res&lt;/code&gt;的第5-7位是UUID类型编号。&lt;/p&gt;
+
+&lt;p&gt;UUID类型常用的有是&lt;strong&gt;IETF&lt;/strong&gt;和微软兼容的类型，UUID类型编号分别是&lt;code&gt;10x&lt;/code&gt;和&lt;code&gt;110&lt;/code&gt;，x是任意值。以下讨论的是IETF。&lt;/p&gt;
+
+&lt;p&gt;UUID总共有5个版本，每个版本数据源和算法各有差异。&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;版本&lt;/th&gt;
+&lt;th&gt;时间戳&lt;/th&gt;
+&lt;th&gt;时钟序列&lt;/th&gt;
+&lt;th&gt;结点编号&lt;/th&gt;
+&lt;th&gt;版本号&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;自1582年10月15号，100纳秒数&lt;/td&gt;
+&lt;td&gt;随机数。&lt;br /&gt;如果时间戳回退，这个值需要在上一个序列上面递增&lt;/td&gt;
+&lt;td&gt;mac地址&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;自1582年10月15号，100纳秒数，同时会把低4个字节替换成GID或者UID（根据domain值）&lt;/td&gt;
+&lt;td&gt;随机数。但是最低位会被替换成domain&lt;/td&gt;
+&lt;td&gt;mac地址&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;给定命名空间和字符串通过MD5计算散列值&lt;/td&gt;
+&lt;td&gt;散列值&lt;/td&gt;
+&lt;td&gt;散列值&lt;/td&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;随机数&lt;/td&gt;
+&lt;td&gt;随机数&lt;/td&gt;
+&lt;td&gt;随机数&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;给定命名空间和字符串通过SHA-1计算散列值&lt;/td&gt;
+&lt;td&gt;散列值&lt;/td&gt;
+&lt;td&gt;散列值&lt;/td&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;最常用的还是版本1和4。显然，两个版本都无法保证绝对唯一。版本1在100纳秒里面就会重复，而版本4就是概率问题了。&lt;/p&gt;
+
+&lt;h2 id=&#34;mongodb的objectid&#34;&gt;mongodb的ObjectID&lt;/h2&gt;
+
+&lt;p&gt;ObjectID是UUID版本1的变种。总共12个字节。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;4个字节时间戳，unix时间，秒。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;3个字节机器标识。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;2个字节进程id。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;3个字节计数，起始值是一个随机数，过秒不归零。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;每秒能支持2^24-1个不同的id，千万级别。&lt;/p&gt;
+
+&lt;h2 id=&#34;twitter-snowflake派号器&#34;&gt;twitter snowflake派号器&lt;/h2&gt;
+
+&lt;p&gt;snowflake占8个字节。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;1个bit保留。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;41个bit的时间戳，unix时间，毫秒。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;10个bit机器标识，5 bit是data center标识，5 bit是work标识。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;12个bit的序号，过毫秒归零，保证id的递增。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;没毫秒支持2^12=4096个不同的id。&lt;/p&gt;
+
+&lt;h2 id=&#34;uid要求&#34;&gt;UID要求&lt;/h2&gt;
+
+&lt;p&gt;文章&lt;a href=&#34;http://ericliang.info/what-kind-of-id-generator-we-need-in-business-systems/&#34;&gt;《业务系统需要什么样的ID生成器》&lt;/a&gt;的提法很好： 唯一性，时间相关，粗略有序，可反解，可制造。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>一致性hash算法</title>
+      <link>http://zjykzk.github.io/post/cs/dist/cons-hash/</link>
       <pubDate>Sat, 28 Apr 2018 13:58:46 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/alogs/</guid>
+      <guid>http://zjykzk.github.io/post/cs/dist/cons-hash/</guid>
       <description>
 
 &lt;h2 id=&#34;一致性hash&#34;&gt;一致性hash&lt;/h2&gt;

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html class="nojs" lang="zh" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>一致性hash算法 – 老K随笔</title>
+<meta name="description" content="一致性hash算法介绍。">
+<meta name="created" content="2018-04-28T13:58:46&#43;0800">
+<meta name="modified" content="2018-04-28T13:58:46&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.41-DEV" />
+
+
+<link href="/css/prism.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/dist/cons-hash/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "一致性hash算法",
+    "datePublished": "2018-04-28T13:58:46+08:00",
+    "dateModified": "2018-04-28T13:58:46+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/dist/cons-hash/",
+    "description": "一致性hash算法介绍。",
+    "keywords": ["分布式","算法"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
+</head>
+
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
+</h1>
+<div class="region header__region"></div>
+</header>
+
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">主菜单</h2>
+<ul class="navbar">
+<li><a class="" href="/">首页</a></li>
+
+
+
+  <li><a  class=""href="/categories/buddhism">佛法</a>
+  </li>
+
+  <li><a  class="active"href="/categories/cs">计算机</a>
+  </li>
+
+
+<li><a class="" href="/post/about">关于</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
+<h1 class="title title-submitted">一致性hash算法</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-04-28T13:58:46&#43;08:00">2018-04-28 13:58:46</time>
+</p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F">分布式</a></li>
+<li><a href="/tags/%E7%AE%97%E6%B3%95">算法</a></li>
+</ul>
+</div>
+</header>
+<div class="content">
+
+
+<h2 id="一致性hash">一致性hash</h2>
+
+<h3 id="目标">目标</h3>
+
+<p>缓存的机器扩容、缩容时，尽量保持数据的命中率。常规的hash算法，<code>hash(key)mod N</code> （N表示缓存结点），当N变化时同一个key查询的缓存结点都会变化，导致缓存没有命中，造成很大的数据库压力。</p>
+
+<h3 id="原理">原理</h3>
+
+<p>hash函数值大小32位，因此输出的范围是<code>0~2^32-1</code>。把这个范围形成一个环，同时对数据进行hash计算以外，对缓存的机器也做hash计算。这些计算出来的值在这个环上都有对应的一个点。</p>
+
+<p>假设数据的hash值分别为<code>K1</code>,<code>K2</code>,<code>K3</code>,<code>K4</code>,<code>K5</code>,<code>K6</code>，以及缓存结点的hash值<code>H1</code>,<code>H2</code>,<code>H3</code>,大小关系为<code>H1&lt;K3&lt;K4&lt;K5&lt;H2&lt;K6&lt;H3&lt;K1&lt;K2</code>。</p>
+
+<p>每个数据所在的缓存结点是在这个环上顺时针方向遇到的第一个缓存结点既是。</p>
+
+<p><img src="/imgs/dist/ch1.png" alt="" /></p>
+
+<p>因此<code>K1</code>,<code>K2</code>落在<code>H1</code>,<code>K3</code>,<code>K4</code>,<code>K5</code>落在<code>H2</code>,<code>K6</code>落在<code>H3</code>。</p>
+
+<p>添加一个新的缓存结点<code>H4</code>，它的hash值落在<code>K4</code>和<code>K5</code>之间。按照规则，<code>K3</code>,<code>K4</code>将落在<code>H4</code>，也就是说<code>K3</code>,<code>K4</code>将会失效而其他的数据不会影响。</p>
+
+<p><img src="/imgs/dist/ch2.png" alt="" /></p>
+
+<p>减少缓存结点<code>H3</code>，<code>K6</code>会受到影响，它将落在缓存结点<code>H1</code>。</p>
+
+<p><img src="/imgs/dist/ch3.png" alt="" /></p>
+
+<p>在次基础上可以抽象出一层缓存的虚拟缓存结点，这样的好处是可以事先确定缓存结点数量，让数据均匀的分布在每个虚拟缓存结点上面。每个物理缓存结点对应一个或者多个缓存结点。如下图中，有个4个虚拟缓存结点<code>VH1/VH2/VH3/VH4</code>，两个物理缓存结点<code>H1/H2</code>，分别对应<code>VH1/VH2和VH3/VH4</code>。</p>
+
+<p><img src="/imgs/dist/ch4.png" alt="" /></p>
+
+
+</div>
+</article>
+</main>
+
+
+
+
+<footer class="footer layout__footer" role="contentinfo">
+<p><span>© 老K随笔</span></p>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
+</div>
+
+
+
+
+<script src="/js/prism.js"></script>
+
+
+</body>
+</html>

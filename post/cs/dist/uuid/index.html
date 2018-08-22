@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html class="nojs" lang="zh" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>分布式ID生成算法 – 老K随笔</title>
+<meta name="description" content="介绍生成分布式ID的常用算法。">
+<meta name="created" content="2018-08-22T11:08:28&#43;0800">
+<meta name="modified" content="2018-08-22T11:08:28&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.41-DEV" />
+
+
+<link href="/css/prism.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/dist/uuid/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "分布式ID生成算法",
+    "datePublished": "2018-08-22T11:08:28+08:00",
+    "dateModified": "2018-08-22T11:08:28+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/dist/uuid/",
+    "description": "介绍生成分布式ID的常用算法。",
+    "keywords": ["分布式","算法"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
+</head>
+
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
+</h1>
+<div class="region header__region"></div>
+</header>
+
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">主菜单</h2>
+<ul class="navbar">
+<li><a class="" href="/">首页</a></li>
+
+
+
+  <li><a  class=""href="/categories/buddhism">佛法</a>
+  </li>
+
+  <li><a  class="active"href="/categories/cs">计算机</a>
+  </li>
+
+
+<li><a class="" href="/post/about">关于</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
+<h1 class="title title-submitted">分布式ID生成算法</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-08-22T11:08:28&#43;08:00">2018-08-22 11:08:28</time>
+</p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F">分布式</a></li>
+<li><a href="/tags/%E7%AE%97%E6%B3%95">算法</a></li>
+</ul>
+</div>
+</header>
+<div class="content">
+
+
+<p>分布式Unique ID在分布式系统使用很广泛，常用的用途有：</p>
+
+<ol>
+<li>请求的ID，用于跟踪请求链路。<br /></li>
+<li>消息队列中的unique id。<br /></li>
+<li>业务对象的id。<br />
+<br /></li>
+</ol>
+
+<p>总结下生成分布式ID常用算法。</p>
+
+<h2 id="数据库自增id">数据库自增id</h2>
+
+<p>通过MySQL中的<code>auto_increment</code>特性来实现数据库唯一的ID。问题是扩展性差，性能受限于一台机器。可以做的优化是使用多个数据库实例，设置相同的步长和不同的起始值，避免重复产生ID。通过一个这种方式可以利用多台机器的资源。同时，还有一个优化是获取ID的时候可以批量获取ID，这样可以减少DB的操作，减少响应时间。</p>
+
+<p>基于Redis，Postgres，Oracle也有类似的方案。</p>
+
+<h2 id="uuid-http-www-ietf-org-rfc-rfc4122-txt"><a href="http://www.ietf.org/rfc/rfc4122.txt">UUID</a></h2>
+
+<p>UUID由<code>[0-9a-f-]</code>字符组成，总共16个字节，转换成16进制的格式为：<code>XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX</code>。</p>
+
+<p>数据由5个部分组成：</p>
+
+<ol>
+<li>时间戳，占60位。<br /></li>
+<li>时钟序列，占13位。<br /></li>
+<li>结点编号，占48位。<br /></li>
+<li>版本号，版本不同以上1-3个字段的数据来源也不一样，占4位。<br /></li>
+<li>UUID类型，用于解析UUID数据中的意义，占3位。<br />
+<br /></li>
+</ol>
+
+<p>每个数据的位置：</p>
+
+<pre><code>    0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                          time_low                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |       time_mid                |         time_hi_and_version   |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |clk_seq_hi_res |  clk_seq_low  |         node (0-1)            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                         node (2-5)                            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</code></pre>
+
+<p><code>time_hi_and_version</code>的第4-7位是版本号，<code>clk_seq_hi_res</code>的第5-7位是UUID类型编号。</p>
+
+<p>UUID类型常用的有是<strong>IETF</strong>和微软兼容的类型，UUID类型编号分别是<code>10x</code>和<code>110</code>，x是任意值。以下讨论的是IETF。</p>
+
+<p>UUID总共有5个版本，每个版本数据源和算法各有差异。</p>
+
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>时间戳</th>
+<th>时钟序列</th>
+<th>结点编号</th>
+<th>版本号</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>自1582年10月15号，100纳秒数</td>
+<td>随机数。<br />如果时间戳回退，这个值需要在上一个序列上面递增</td>
+<td>mac地址</td>
+<td>1</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>自1582年10月15号，100纳秒数，同时会把低4个字节替换成GID或者UID（根据domain值）</td>
+<td>随机数。但是最低位会被替换成domain</td>
+<td>mac地址</td>
+<td>2</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>给定命名空间和字符串通过MD5计算散列值</td>
+<td>散列值</td>
+<td>散列值</td>
+<td>3</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>随机数</td>
+<td>随机数</td>
+<td>随机数</td>
+<td>4</td>
+</tr>
+
+<tr>
+<td>5</td>
+<td>给定命名空间和字符串通过SHA-1计算散列值</td>
+<td>散列值</td>
+<td>散列值</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+<p>最常用的还是版本1和4。显然，两个版本都无法保证绝对唯一。版本1在100纳秒里面就会重复，而版本4就是概率问题了。</p>
+
+<h2 id="mongodb的objectid">mongodb的ObjectID</h2>
+
+<p>ObjectID是UUID版本1的变种。总共12个字节。</p>
+
+<ol>
+<li>4个字节时间戳，unix时间，秒。<br /></li>
+<li>3个字节机器标识。<br /></li>
+<li>2个字节进程id。<br /></li>
+<li>3个字节计数，起始值是一个随机数，过秒不归零。<br />
+<br /></li>
+</ol>
+
+<p>每秒能支持2^24-1个不同的id，千万级别。</p>
+
+<h2 id="twitter-snowflake派号器">twitter snowflake派号器</h2>
+
+<p>snowflake占8个字节。</p>
+
+<ol>
+<li><p>1个bit保留。</p></li>
+
+<li><p>41个bit的时间戳，unix时间，毫秒。</p></li>
+
+<li><p>10个bit机器标识，5 bit是data center标识，5 bit是work标识。</p></li>
+
+<li><p>12个bit的序号，过毫秒归零，保证id的递增。</p></li>
+</ol>
+
+<p>没毫秒支持2^12=4096个不同的id。</p>
+
+<h2 id="uid要求">UID要求</h2>
+
+<p>文章<a href="http://ericliang.info/what-kind-of-id-generator-we-need-in-business-systems/">《业务系统需要什么样的ID生成器》</a>的提法很好： 唯一性，时间相关，粗略有序，可反解，可制造。</p>
+
+
+</div>
+</article>
+</main>
+
+
+
+
+<footer class="footer layout__footer" role="contentinfo">
+<p><span>© 老K随笔</span></p>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
+</div>
+
+
+
+
+<script src="/js/prism.js"></script>
+
+
+</body>
+</html>
