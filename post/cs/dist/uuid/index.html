@@ -229,13 +229,11 @@ Tags:
 <p>snowflake占8个字节。</p>
 
 <ol>
-<li><p>1个bit保留。</p></li>
-
-<li><p>41个bit的时间戳，unix时间，毫秒。</p></li>
-
-<li><p>10个bit机器标识，5 bit是data center标识，5 bit是work标识。</p></li>
-
-<li><p>12个bit的序号，过毫秒归零，保证id的递增。</p></li>
+<li>1个bit保留。<br /></li>
+<li>41个bit的时间戳，unix时间，毫秒。<br /></li>
+<li>10个bit机器标识，5 bit是data center标识，5 bit是work标识。<br /></li>
+<li>12个bit的序号，过毫秒归零，保证id的递增。<br />
+<br /></li>
 </ol>
 
 <p>没毫秒支持2^12=4096个不同的id。</p>
