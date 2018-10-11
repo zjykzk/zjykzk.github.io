@@ -8,8 +8,145 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 22 Aug 2018 11:08:28 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 11 Oct 2018 15:33:32 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>guava中RateLimiter的设计</title>
+      <link>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</link>
+      <pubDate>Thu, 11 Oct 2018 15:33:32 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</guid>
+      <description>
+
+&lt;p&gt;guava中的&lt;a href=&#34;https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131&#34;&gt;RateLimiter&lt;/a&gt;实现了比较有意思的功能：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;平滑。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;记录未使用的信息。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;保存下次请求被满足的时间。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;平滑&#34;&gt;平滑&lt;/h2&gt;
+
+&lt;p&gt;采用令牌桶算法实现。&lt;/p&gt;
+
+&lt;h2 id=&#34;记录未使用信息&#34;&gt;记录未使用信息&lt;/h2&gt;
+
+&lt;p&gt;实现中通过&lt;code&gt;storedPermits&lt;/code&gt;表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;资源充足。这个实现是Burst模式。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;Burst模式&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。&lt;code&gt;storedPermits&lt;/code&gt;代表的就是当前充足资源的数量。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Warmup模式&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;当RateLimiter发现资源没有没使用一段时间以后，请求再来的时候，资源需要一个预热，这个过程中请求处理会比预热玩以后有一个变化。这个变化的效果可以是快也可以是慢，这个是根据&lt;code&gt;coldFactor&lt;/code&gt;来定义。当这个值分三种情况：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;等于1，相当于没有预热效果。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;小于1，表示在没有使用这段时间里面，资源会有一部分的囤积，可以较快处理请求。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;大于1，表示在没有使用这段时间里面，资源被回收，需要重新申请来处理请求，所以会比较慢。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;保存下次请求被满足的时间&#34;&gt;保存下次请求被满足的时间&lt;/h2&gt;
+
+&lt;p&gt;这样做的好处是，可以比较方便判断在一段时间内，多个资源是否被满足的逻辑。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>限流</title>
+      <link>http://zjykzk.github.io/post/cs/dist/rate-limit/</link>
+      <pubDate>Thu, 30 Aug 2018 16:48:26 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/dist/rate-limit/</guid>
+      <description>
+
+&lt;h2 id=&#34;缘起&#34;&gt;缘起&lt;/h2&gt;
+
+&lt;p&gt;为了保证API的可用性，以及系统的可靠性，需要为API限速。不然，API请求量大到系统无法处理时就会出现系统变慢，甚至宕机的情况。常见的限速场景：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;挡住某个用户的过多请求（用户激增或者恶意请求），确保正常处理其他用户请求。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;挡住过多的低优先级的请求，确保核心请求得到处理。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;由于系统内部错误，导致系统处理能力下降，调节系统的处理能力。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;挡住过多某类请求，确保其他请求可以得到处理。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;限速类型&#34;&gt;限速类型&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;请求限速&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;限制API在一秒中内能够处理的请求数量。如果超过这个数量，等待或者拒绝服务。通常情况下这个是首选。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;并发限制&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;针对资源敏感的请求，比如CPU密集型API，进行并发限制，限制某一时刻最多只有有限个请求正在被处理。防止因为这些请求占用资源，导致其他请求得不到处理。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;基于资源利用率限速&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;针对不同的请求分配了不同百分比的资源，当某一类请求超载时，对这类请求限速。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;基于worker限速&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这个是基于代码特征的限速。每类API通过不同的worker线程负责处理，当worker线程中出现请求堆积时进行限速。&lt;/p&gt;
+
+&lt;h2 id=&#34;限速结果&#34;&gt;限速结果&lt;/h2&gt;
+
+&lt;p&gt;http服务的话按照场景返回429或者503。&lt;/p&gt;
+
+&lt;h2 id=&#34;常用算法&#34;&gt;常用算法&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;计数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;单位时间内计数，超过这个数量时，拒绝服务，每个单位时间开始后计数清零。缺点是在时间边界处，会超过上限。比如，每秒限速100，在0.9s的时候来了100个请求全部得到处理，在下一秒0.1s来了100个请求。在0.9s到1.1s这个范围小于1s，但是请求达到了200。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; 0.1s 0.2s 0.3s 0.4s 0.5s 0.6s 0.7s 0.8s 0.9s 0.1s 0.2s
++----+----+----+----+----+----+----+----+----+----+----+---
+| 0  | 0  | 0  | 0  | 0  | 0  | 0  | 0  | 100| 100| 0  | 0 
++----+----+----+----+----+----+----+----+----+----+----+---
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;队列&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;请求过来的时候，先如队列，处理逻辑处理队列中的请求。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;基于大小的队列：当队列大小超过一个阀值的时候，拒绝新来的请求。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;基于时间的队列：请求在队列里面的时间超过多长时间没有被处理，立即返回。RocketMQ就是采用这种方式。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;优先级队列：对请求做优先级分类，不同优先级的请求进入不同的队列。为了避免低优先级请求被饿死，需要对不同优先级队列分配不同的处理时间。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Leaky_bucket&#34;&gt;漏桶&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/leaky-bucket.jpeg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;有一个容量固定的桶，桶中的请求以恒定的速率被处理。请求过来的时候，尝试进入桶，当桶满时被丢弃。本质上是队列后面加一个速率限制器。&lt;/p&gt;
+
+&lt;p&gt;漏桶还有一个变形，在漏桶前面加一个队列。当桶满的时候，先放入队列，这样可以保留一部分请求。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Token_bucket&#34;&gt;令牌桶&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/token-bucket.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以恒定的速率向桶中加入token，当请求过来的时候从桶中获取token。如果桶空了，请求等待或者丢弃。相比漏桶令牌桶还可以做蓄水，当桶满的时候可以预留一部分token，可以做到突发(burst)的请求。&lt;/p&gt;
+
+&lt;h2 id=&#34;实现&#34;&gt;实现&lt;/h2&gt;
+
+&lt;p&gt;Guava中的&lt;a href=&#34;https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131&#34;&gt;RateLimter&lt;/a&gt;是一个平滑的基于令牌桶的实现，同时还实现了warm up特点的一个&lt;a href=&#34;https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L161&#34;&gt;Ratelimiter&lt;/a&gt;。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>分布式ID生成算法</title>
@@ -158,6 +295,14 @@
 &lt;h2 id=&#34;uid要求&#34;&gt;UID要求&lt;/h2&gt;
 
 &lt;p&gt;文章&lt;a href=&#34;http://ericliang.info/what-kind-of-id-generator-we-need-in-business-systems/&#34;&gt;《业务系统需要什么样的ID生成器》&lt;/a&gt;的提法很好： 唯一性，时间相关，粗略有序，可反解，可制造。&lt;/p&gt;
+
+&lt;h2 id=&#34;扩展阅读&#34;&gt;扩展阅读&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://calvin1978.blogcn.com/articles/uuid.html&#34;&gt;《服务化框架－分布式Unique ID的生成方法一览》&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://calvin1978.blogcn.com/articles/%E2%80%9Chttp://chuansong.me/n/2459549%E2%80%9D&#34;&gt;《细聊分布式ID生成方法》&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://mp.weixin.qq.com/s?__biz=MzA5Nzc4OTA1Mw==&amp;amp;mid=2659598286&amp;amp;idx=1&amp;amp;sn=3172172ccea316b0ed83429ae718b54d&amp;amp;chksm=8be9eadcbc9e63caa10d708274b4fa34ceffa416ef4527e10e6b7a1a2d2f32cf8592d65bf728&#34;&gt;《生成全局唯一ID的3个思路，来自一个资深架构师的总结》&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -2118,6 +2263,10 @@ Label值允许任意的Unicode字符&lt;/p&gt;
 &lt;h3 id=&#34;python&#34;&gt;Python&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://www.dabeaz.com/&#34;&gt;&lt;strong&gt;David Beazley&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;golang&#34;&gt;Golang&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://rakyll.org/&#34;&gt;&lt;strong&gt;Rakyll&lt;/strong&gt;&lt;/a&gt; | &lt;a href=&#34;https://peter.bourgon.org/&#34;&gt;&lt;strong&gt;Peter Bourgon&lt;/strong&gt;&lt;/a&gt; | &lt;a href=&#34;https://dave.cheney.net&#34;&gt;&lt;strong&gt;Dave Cheney&lt;/strong&gt;&lt;/a&gt; | &lt;a href=&#34;https://github.com/golang/go/wiki&#34;&gt;&lt;strong&gt;Golang Wiki&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;others&#34;&gt;Others&lt;/h3&gt;
 

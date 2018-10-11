@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Program on 老K随笔</title>
+    <link>http://zjykzk.github.io/tags/program/</link>
+    <description>Recent content in Program on 老K随笔</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
+    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <copyright>(c) 2017 zenk.</copyright>
+    <lastBuildDate>Thu, 11 Oct 2018 15:33:32 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/program/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>guava中RateLimiter的设计</title>
+      <link>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</link>
+      <pubDate>Thu, 11 Oct 2018 15:33:32 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</guid>
+      <description>
+
+&lt;p&gt;guava中的&lt;a href=&#34;https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131&#34;&gt;RateLimiter&lt;/a&gt;实现了比较有意思的功能：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;平滑。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;记录未使用的信息。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;保存下次请求被满足的时间。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;平滑&#34;&gt;平滑&lt;/h2&gt;
+
+&lt;p&gt;采用令牌桶算法实现。&lt;/p&gt;
+
+&lt;h2 id=&#34;记录未使用信息&#34;&gt;记录未使用信息&lt;/h2&gt;
+
+&lt;p&gt;实现中通过&lt;code&gt;storedPermits&lt;/code&gt;表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;资源充足。这个实现是Burst模式。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;Burst模式&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。&lt;code&gt;storedPermits&lt;/code&gt;代表的就是当前充足资源的数量。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Warmup模式&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;当RateLimiter发现资源没有没使用一段时间以后，请求再来的时候，资源需要一个预热，这个过程中请求处理会比预热玩以后有一个变化。这个变化的效果可以是快也可以是慢，这个是根据&lt;code&gt;coldFactor&lt;/code&gt;来定义。当这个值分三种情况：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;等于1，相当于没有预热效果。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;小于1，表示在没有使用这段时间里面，资源会有一部分的囤积，可以较快处理请求。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;大于1，表示在没有使用这段时间里面，资源被回收，需要重新申请来处理请求，所以会比较慢。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;保存下次请求被满足的时间&#34;&gt;保存下次请求被满足的时间&lt;/h2&gt;
+
+&lt;p&gt;这样做的好处是，可以比较方便判断在一段时间内，多个资源是否被满足的逻辑。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

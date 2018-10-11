@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="nojs" lang="zh" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>guava中RateLimiter的设计 – 老K随笔</title>
+<meta name="description" content="guava中RateLimiter的设计原理。">
+<meta name="created" content="2018-10-11T15:33:32&#43;0800">
+<meta name="modified" content="2018-10-11T15:33:32&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.48-DEV" />
+
+
+<link href="/css/prism.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/design/guava-ratelimiter/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "guava中RateLimiter的设计",
+    "datePublished": "2018-10-11T15:33:32+08:00",
+    "dateModified": "2018-10-11T15:33:32+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/design/guava-ratelimiter/",
+    "description": "guava中RateLimiter的设计原理。",
+    "keywords": ["program","design"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
+</head>
+
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
+</h1>
+<div class="region header__region"></div>
+</header>
+
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">主菜单</h2>
+<ul class="navbar">
+<li><a class="" href="/">首页</a></li>
+
+
+
+  <li><a  class=""href="/categories/buddhism">佛法</a>
+  </li>
+
+  <li><a  class="active"href="/categories/cs">计算机</a>
+  </li>
+
+
+<li><a class="" href="/post/about">关于</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
+<h1 class="title title-submitted">guava中RateLimiter的设计</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-10-11T15:33:32&#43;08:00">2018-10-11 15:33:32</time>
+</p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/program">program</a></li>
+<li><a href="/tags/design">design</a></li>
+</ul>
+</div>
+</header>
+<div class="content">
+
+
+<p>guava中的<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131">RateLimiter</a>实现了比较有意思的功能：</p>
+
+<ol>
+<li>平滑。<br /></li>
+<li>记录未使用的信息。<br /></li>
+<li>保存下次请求被满足的时间。<br />
+<br /></li>
+</ol>
+
+<h2 id="平滑">平滑</h2>
+
+<p>采用令牌桶算法实现。</p>
+
+<h2 id="记录未使用信息">记录未使用信息</h2>
+
+<p>实现中通过<code>storedPermits</code>表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：</p>
+
+<ol>
+<li>资源充足。这个实现是Burst模式。<br /></li>
+<li>资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。<br />
+<br /></li>
+</ol>
+
+<p><strong>Burst模式</strong></p>
+
+<p>当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。<code>storedPermits</code>代表的就是当前充足资源的数量。</p>
+
+<p><strong>Warmup模式</strong></p>
+
+<p>当RateLimiter发现资源没有没使用一段时间以后，请求再来的时候，资源需要一个预热，这个过程中请求处理会比预热玩以后有一个变化。这个变化的效果可以是快也可以是慢，这个是根据<code>coldFactor</code>来定义。当这个值分三种情况：</p>
+
+<ol>
+<li>等于1，相当于没有预热效果。<br /></li>
+<li>小于1，表示在没有使用这段时间里面，资源会有一部分的囤积，可以较快处理请求。<br /></li>
+<li>大于1，表示在没有使用这段时间里面，资源被回收，需要重新申请来处理请求，所以会比较慢。<br />
+<br /></li>
+</ol>
+
+<h2 id="保存下次请求被满足的时间">保存下次请求被满足的时间</h2>
+
+<p>这样做的好处是，可以比较方便判断在一段时间内，多个资源是否被满足的逻辑。</p>
+
+
+</div>
+</article>
+</main>
+
+
+
+
+<footer class="footer layout__footer" role="contentinfo">
+<p><span>© 老K随笔</span></p>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
+</div>
+
+
+
+
+<script src="/js/prism.js"></script>
+
+
+</body>
+</html>
