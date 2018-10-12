@@ -8,8 +8,81 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Thu, 11 Oct 2018 15:33:32 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 12 Oct 2018 14:23:18 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>熔断</title>
+      <link>http://zjykzk.github.io/post/cs/dist/circuit-breaker/</link>
+      <pubDate>Fri, 12 Oct 2018 14:23:18 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/dist/circuit-breaker/</guid>
+      <description>
+
+&lt;h2 id=&#34;缘起&#34;&gt;缘起&lt;/h2&gt;
+
+&lt;p&gt;在分布式系统中，会有很多的RPC调用，当某个服务超载时候，继续接收请求只会让系统变得不可用，甚至会导致多个系统的连锁反应。因此在这样的情况下，最好是把后续的请求挡住，直接返回错误。等到系统恢复正常以后再处理请求。熔断借鉴了电闸中的保险丝功能，当因为某个意外原因（比如插座进水导致短路）导致线路中的电流过大而产生大量热量，保险丝就会被融化掉，从而中断线路中的电流，防止事故发生。&lt;/p&gt;
+
+&lt;h2 id=&#34;设计&#34;&gt;设计&lt;/h2&gt;
+
+&lt;p&gt;通俗来说，它是一个服务代理（逻辑上说），监测服务的状态，决定是否处理当前的请求，如果不处理返回错误。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;服务状态&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;服务状态一般是通过记录请求失败的情况来表示，比如说服务因为文件句柄占用过多导致一致无法建立连接，从而请求失败，熔断器认为当前服务状态存在不可用情况。&lt;/p&gt;
+
+&lt;p&gt;熔断器包含三个状态：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;关闭（Closed）状态：在这个状态下，请求都会被转发给后端服务。同时会记录请求失败的次数，当请求失败次数在一段时间超过一定次数就会进入&lt;strong&gt;打开&lt;/strong&gt;状态。另外，失败次数会在特定时间间隔内重置。最后，除了基于一段时间内失败次数这个条件以外还可以使用连续失败次数。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;打开（Open）状态：在这个状态下，熔断器会直接拒绝请求，返回错误，而不去调用后端服务。同时，会有一个定时器，时间到的时候会变成&lt;strong&gt;半打开&lt;/strong&gt;状态。目的假设服务会在一段时间内恢复正常。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;半打开（Half Open）状态：在这个状态下，熔断器会尝试把部分请求转发给后端服务，目的是为了探测后端服务是否恢复。当请求失败的情况下会进入&lt;strong&gt;打开&lt;/strong&gt;状态，成功情况下会进入&lt;strong&gt;关闭&lt;/strong&gt;状态，同时重置计数。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/circuit-breaker.png&#34; alt=&#34;circuit breaker&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;设计重点&#34;&gt;设计重点&lt;/h2&gt;
+
+&lt;p&gt;在设计过程中需要考虑以下几个点。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;错误类型。后端服务会因为不同的问题返回不同的错误信息。针对不同的错误信息，熔断器可以采取不同的策略。比如说，针对限流错误，可以采用重试，如果连接拒绝大概率是服务宕机了，这中情况直接返回错误就可以了。另外，根据不同的错误类型可以使用不同的熔断条件，比如超时的threshold为10， 而连接拒绝的threshold值为3。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;日志监控。熔断器记录状态变化以及失败的请求应该被记录下来。这些信息反应的服务质量。方便管理员进一步处理。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;测试服务可用。在&lt;strong&gt;半打开&lt;/strong&gt;状态下，可以通过定制的接口探测后端服务是否恢复，而不是用用户的请求来探测。可以提高服务的质量。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;返回错误。返回给用户的错误，区分后端服务返回的错误和熔断器产生的错误。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;手工重置。因为有时候后端服务恢复时间的不确定性，导致熔断器判断失误。提供手工重置，可以方便熔断器的状态切换。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;并发问题。熔断器需要做计数，多个请求之间存在数据竞争。需要避免熔断器自己的开销影响请求的响应时间。可以采用无锁计数实现。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;资源区分。有时候，资源是分布在不同的服务器上，是独立。最好，熔断器对请求也做资源区分，针对在不同资源请求做熔断，不然一个资源有问题会影响其他资源的访问。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;重试错误的请求。有时候，错误和请求的参数有关系。把这部分请求记录下来，可以准备探测后端服务是否恢复。但是要做好重复请求的处理，比如幂等。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;实现&#34;&gt;实现&lt;/h2&gt;
+
+&lt;p&gt;Netflix中的&lt;a href=&#34;https://github.com/Netflix/Hystrix/wiki/How-it-Works#CircuitBreaker&#34;&gt;Hystrix&lt;/a&gt;有一个完整的实现。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/hystrix-circuit-breaker-1280.png&#34; alt=&#34;hystrix circuit breaker&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;流程如下：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;allowRequest()&lt;/code&gt;通过函数&lt;code&gt;isOpen()&lt;/code&gt;判断是否处理请求。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;isOpen()&lt;/code&gt;判断逻辑：&lt;br /&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如果熔断器处在打开状态，并且定时没到，返回&lt;code&gt;false&lt;/code&gt;，请求处理完毕，否则进入半打开状态并返回&lt;code&gt;true&lt;/code&gt;，走下一步。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;如果最近一秒内失败率超过了某个百分比，返回&lt;code&gt;false&lt;/code&gt;，请求处理完毕，否则返回&lt;code&gt;true&lt;/code&gt;，走下一步。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;返回&lt;code&gt;true&lt;/code&gt;，走下一步。&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;markSuccess(duration)&lt;/code&gt;，表示请求处理成功，更新处理成功次数和处理时间，同时如果熔断器处于打开状态，那么需要重置计数，并把状态变成关闭状态。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;markFailure(duration)&lt;/code&gt;，表示请求处理失败，更新处理失败次数。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Hystrix维护了10个时间间隔为1秒的桶，用于记录请求处理结果成功、失败、超时、拒绝的数量。每过1秒就会创建一个新的桶，如果桶的数量超过10个，最旧的那个会被删除掉。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>guava中RateLimiter的设计</title>
