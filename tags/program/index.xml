@@ -30,36 +30,69 @@
 
 &lt;h2 id=&#34;平滑&#34;&gt;平滑&lt;/h2&gt;
 
-&lt;p&gt;采用令牌桶算法实现。&lt;/p&gt;
+&lt;p&gt;通过令牌桶算法实现。&lt;/p&gt;
 
 &lt;h2 id=&#34;记录未使用信息&#34;&gt;记录未使用信息&lt;/h2&gt;
 
-&lt;p&gt;实现中通过&lt;code&gt;storedPermits&lt;/code&gt;表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：&lt;/p&gt;
+&lt;p&gt;实现中通过&lt;code&gt;storedPermits&lt;/code&gt;表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：&lt;br /&gt;
+1. 资源充足。这个实现是Burst模式。&lt;br /&gt;
+2. 资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;资源充足。这个实现是Burst模式。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;storedPermits&lt;/code&gt;的计算公式：&lt;code&gt;min(maxPermits, timeNotUsedMicros/coolDownIntervalMicros())&lt;/code&gt;，其中&lt;code&gt;coolDownIntervalMicros()&lt;/code&gt;和&lt;code&gt;maxPermits&lt;/code&gt;在不同模式下面计算方式不同。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Burst模式&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。&lt;code&gt;storedPermits&lt;/code&gt;代表的就是当前充足资源的数量。&lt;/p&gt;
 
+&lt;p&gt;另外，&lt;code&gt;coolDownIntervalMicros()&lt;/code&gt;返回&lt;code&gt;stableIntervalMicros&lt;/code&gt;，&lt;code&gt;maxPermits&lt;/code&gt;等于&lt;code&gt;permitsPerSecond&lt;/code&gt;。&lt;/p&gt;
+
 &lt;p&gt;&lt;strong&gt;Warmup模式&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;当RateLimiter发现资源没有没使用一段时间以后，请求再来的时候，资源需要一个预热，这个过程中请求处理会比预热玩以后有一个变化。这个变化的效果可以是快也可以是慢，这个是根据&lt;code&gt;coldFactor&lt;/code&gt;来定义。当这个值分三种情况：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;          ^ throttling
+          |
+    cold  +                  /
+ interval |                 /.
+          |                / .
+          |               /  .   ← &amp;quot;warmup period&amp;quot; is the area of the trapezoid between
+          |              /   .     thresholdPermits and maxPermits
+          |             /    .
+          |            /     .
+          |           /      .
+   stable +----------/  WARM .
+ interval |          .   UP  .
+          |          . PERIOD.
+          |          .       .
+        0 +----------+-------+--------------→ storedPermits
+          0 thresholdPermits maxPermits
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;ol&gt;
-&lt;li&gt;等于1，相当于没有预热效果。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;小于1，表示在没有使用这段时间里面，资源会有一部分的囤积，可以较快处理请求。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;大于1，表示在没有使用这段时间里面，资源被回收，需要重新申请来处理请求，所以会比较慢。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;上图是warmup模式消耗&lt;code&gt;storedPermits&lt;/code&gt;所需要时间的建模。&lt;br /&gt;
+1. RateLimiter的状态是一条垂直线，包含两个信息：当前的&lt;code&gt;storedPermits&lt;/code&gt;和被消耗时需要的时间。&lt;br /&gt;
+2. 当RateLimiter没有被使用时，&lt;code&gt;storedPermits&lt;/code&gt;向&lt;code&gt;maxPermits&lt;/code&gt;增加，增速是&lt;code&gt;warmupPeriodMicro/maxPermits&lt;/code&gt;。&lt;br /&gt;
+3. 当RateLimiter被使用时，&lt;code&gt;storedPermits&lt;/code&gt;向0减少，需要的时间是这个函数的积分。&lt;/p&gt;
+
+&lt;p&gt;注意：&lt;br /&gt;
+1. 这里&lt;code&gt;thresholdPermits&lt;/code&gt;是任意值，源代码中假设&lt;code&gt;storedPermits&lt;/code&gt;从&lt;code&gt;thresholdPermits&lt;/code&gt;减少到0需要的时间为&lt;code&gt;warmupPeriod/2&lt;/code&gt;。因此，&lt;code&gt;thresholdPermits=0.5*warmupPeriod/stableInterval&lt;/code&gt;。&lt;br /&gt;
+2. 另外，&lt;code&gt;storedPermits&lt;/code&gt;从&lt;code&gt;maxPermits&lt;/code&gt;减少到&lt;code&gt;thresholdPermits&lt;/code&gt;需要的时间为&lt;code&gt;warmupPeriod&lt;/code&gt;，因此&lt;code&gt;maxPermits=thresholdPermits + 2 * warmupPeriod / (stableInterval + coldInterval)&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;当RateLimiter发现资源没有没使用一段时间以后，请求再来的时候，资源需要一个预热，这个过程中请求处理会比预热完以后有一个变化。这个变化的效果可以是快也可以是慢，这个是根据&lt;code&gt;coldFactor&lt;/code&gt;来定义。当这个值分三种情况：&lt;br /&gt;
+1. 等于1，相当于没有预热效果。&lt;br /&gt;
+2. 小于1，表示在没有使用这段时间里面，资源会有一部分的囤积，可以较快处理请求。&lt;br /&gt;
+3. 大于1，表示在没有使用这段时间里面，资源被回收，需要重新申请来处理请求，所以会比较慢。&lt;/p&gt;
+
+&lt;p&gt;另外，&lt;code&gt;coolDownIntervalMicros()&lt;/code&gt;返回&lt;code&gt;warmupPeriodMicro/maxPermits&lt;/code&gt;。这是一个任意值，没有理论依据。&lt;/p&gt;
 
 &lt;h2 id=&#34;保存下次请求被满足的时间&#34;&gt;保存下次请求被满足的时间&lt;/h2&gt;
 
-&lt;p&gt;这样做的好处是，可以比较方便判断在一段时间内，多个资源是否被满足的逻辑。&lt;/p&gt;
+&lt;p&gt;这样做的好处是，可以比较方便判断在一段时间内，多个资源是否被满足的逻辑。permit的使用来源于两个地方：一段时间未使用而累积的&lt;code&gt;storedPermits&lt;/code&gt;，以及一段时间以后才能满足的，假设用&lt;code&gt;freshPermits&lt;/code&gt;表示。在不同模式下面消耗&lt;code&gt;storedPermits&lt;/code&gt;和&lt;code&gt;freshPermits&lt;/code&gt;需要的时间是不一样的。总的公式：&lt;code&gt;freshPermits * stableIntervalMicros + storedPermitsToWaitTime(storedPermits,permitsToTake)&lt;/code&gt;，其中&lt;code&gt;storedPermitsToWaitTime(...)&lt;/code&gt;在不同模式下面，实现方式不一样。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Burst模式&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;在这个模式下面，&lt;code&gt;storedPermitsToWaitTime(storedPermits,permitsToTake)&lt;/code&gt;返回值是0。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Warmup模式&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;storedPermitsToWaitTime(storedPermits,permitsToTake)&lt;/code&gt;返回的是建模函数在&lt;code&gt;storedPermits,permitsToTake&lt;/code&gt;之间的积分（图像面积）。&lt;/p&gt;
 </description>
     </item>
     
