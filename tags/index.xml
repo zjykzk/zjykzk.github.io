@@ -8,8 +8,17 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Thu, 11 Oct 2018 15:33:32 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 30 Aug 2018 16:48:26 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Algo</title>
+      <link>http://zjykzk.github.io/tags/algo/</link>
+      <pubDate>Thu, 30 Aug 2018 16:48:26 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/tags/algo/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Design</title>
@@ -17,6 +26,15 @@
       <pubDate>Thu, 11 Oct 2018 15:33:32 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/design/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Dist</title>
+      <link>http://zjykzk.github.io/tags/dist/</link>
+      <pubDate>Fri, 12 Oct 2018 14:23:18 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/tags/dist/</guid>
       <description></description>
     </item>
     
@@ -93,38 +111,11 @@
     </item>
     
     <item>
-      <title>分布式</title>
-      <link>http://zjykzk.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</link>
-      <pubDate>Fri, 12 Oct 2018 14:23:18 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>算法</title>
-      <link>http://zjykzk.github.io/tags/%E7%AE%97%E6%B3%95/</link>
-      <pubDate>Thu, 30 Aug 2018 16:48:26 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/tags/%E7%AE%97%E6%B3%95/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>编程</title>
       <link>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</link>
-      <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
+      <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>设计</title>
-      <link>http://zjykzk.github.io/tags/%E8%AE%BE%E8%AE%A1/</link>
-      <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/tags/%E8%AE%BE%E8%AE%A1/</guid>
       <description></description>
     </item>
     
