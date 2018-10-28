@@ -8,8 +8,82 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 12 Oct 2018 14:23:18 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 24 Oct 2018 14:57:53 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>如何定位一个文件。</title>
+      <link>http://zjykzk.github.io/post/cs/linux/open-file-progress/</link>
+      <pubDate>Wed, 24 Oct 2018 14:57:53 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/linux/open-file-progress/</guid>
+      <description>&lt;p&gt;linux的VFS包含4个重要概念：&lt;br /&gt;
+1. superblock，包含文件系统的信息，管理整个文件系统。&lt;br /&gt;
+2. inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。&lt;br /&gt;
+3. dentry，目录项，代表路径中的每个部分，包含文件路径到inode的映射。&lt;br /&gt;
+4. file，文件，是文件在进程中的表示。&lt;/p&gt;
+
+&lt;p&gt;同时，在linux中一切兼文件，包括目录。目录的内容是文件名和inode号。&lt;/p&gt;
+
+&lt;p&gt;当打开一个文件&lt;code&gt;/bin/vim&lt;/code&gt;，系统首先把路径分解成&lt;code&gt;/&lt;/code&gt;、&lt;code&gt;bin&lt;/code&gt;、&lt;code&gt;vim&lt;/code&gt;，根据dentry查&lt;code&gt;vim&lt;/code&gt;的inode，如果dentry还没有&lt;code&gt;bin&lt;/code&gt;，会根据superblock中&lt;strong&gt;根目录&lt;/strong&gt;的inode号得到它的子目录信息，其中就有&lt;code&gt;bin&lt;/code&gt;和它的inode，并把它放到dentry中，然后根据&lt;code&gt;bin&lt;/code&gt;的内容找到&lt;code&gt;vim&lt;/code&gt;的inode。最终，返回一个文件描述符（file descriptor）。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>slave和master同步连接经常重连，导致发送消息失败</title>
+      <link>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</link>
+      <pubDate>Mon, 22 Oct 2018 17:07:02 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
+      <description>
+
+&lt;h2 id=&#34;缘起&#34;&gt;缘起&lt;/h2&gt;
+
+&lt;p&gt;封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。&lt;/p&gt;
+
+&lt;h2 id=&#34;排查过程&#34;&gt;排查过程&lt;/h2&gt;
+
+&lt;p&gt;查看boots-broker日志，发现问题日志：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;说明，RocketMQ处理发送消息比较慢。可是，从&lt;code&gt;size of queue&lt;/code&gt;可以看出，堆积的消息为0。&lt;/p&gt;
+
+&lt;p&gt;查看机器资源消耗情况，发现资源都是充裕的。&lt;/p&gt;
+
+&lt;p&gt;查看RocketMQ日志，发现store.log中有异常，master中的store.log周期性的发生以下日志：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;2018-10-22 15:44:07 INFO AcceptSocketService - HAService receive new connection, /10.38.34.27:54052
+2018-10-22 15:44:07 INFO ReadSocketService - ReadSocketService service started
+2018-10-22 15:44:07 INFO WriteSocketService - WriteSocketService service started
+2018-10-22 15:44:08 INFO WriteSocketService - WriteSocketService service end
+2018-10-22 15:44:12 INFO ReadSocketService - slave[/10.38.34.27:54052] request offset 157843228
+2018-10-22 15:44:12 INFO WriteSocketService - master transfer data from 157843228 to slave[/10.38.34.27:54052], and slave request 157843228
+2018-10-22 15:44:33 WARN ReadSocketService - ha housekeeping, found this connection[/10.38.34.27:54052] expired, 20019
+2018-10-22 15:44:33 INFO ReadSocketService - ReadSocketService service end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;从上可以看出，slave主动向master建立连接，5s之后发送自己当前同步的进度，master收到以后向slave发送同步数据，最后master由于slave的连接过期，主动断开连接。&lt;/p&gt;
+
+&lt;p&gt;slave中的store.log周期性的发生以下日志：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;2018-10-22 15:44:07 WARN HAClient - HAClient, housekeeping, found this connection[10.38.33.22:10912] expired, 1540194247979
+2018-10-22 15:44:07 WARN HAClient - HAClient, master not response some time, so close connection
+2018-10-22 15:44:33 INFO HAClient - HAClient, processReadEvent read socket &amp;lt; 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;从上可以看出，slave也发现和master的连接超时，断开连接。&lt;/p&gt;
+
+&lt;p&gt;到这里，非常困惑，master和slave都主动断开连接！看代码，master的同步比较清晰和日志也比较一致。slave的同步日志和日志不一致。slave的同步代码核心&lt;a href=&#34;https://github.com/zjykzk/rocketmq/blob/master/store/src/main/java/org/apache/rocketmq/store/ha/HAService.java#L546&#34;&gt;代码&lt;/a&gt;中通过比较&lt;code&gt;lastWriteTimestamp&lt;/code&gt;和当前时间判断出与master的同步连接过期，以及master没有响应。在接收到master的消息、创建连接、关闭连接的时候都修改这个&lt;code&gt;lastWriteTimestamp&lt;/code&gt;值。关闭重置为0，其他重置为当前时间。看日志发现&lt;code&gt;lastWriteTimestamp&lt;/code&gt;和当前的时间差别巨大是&lt;code&gt;1540194247979&lt;/code&gt;，可以得出&lt;code&gt;lastWriteTimestamp&lt;/code&gt;其实是0。基本上可以判断是因为master主动关闭的。后来，通过tcpdump抓包得到了确认。这里要吐槽这个日志了，slave是被关闭的却是提示master没响应，其实master在关闭之前总共发了5次同步信息。&lt;/p&gt;
+
+&lt;p&gt;确认是master主动关闭，接下来的问题是为什么slave没有告诉master自己的进度。日志已经无能为力了，看到代码中有&lt;code&gt;while(true)&lt;/code&gt;片段，猜测会不会是死循环，通过&lt;code&gt;jstack&lt;/code&gt;发现没有。最后，通过手动添加日志发现master向slave发送的同步信息，slave都收到了，然后把&lt;code&gt;lastWriteTimestamp&lt;/code&gt;重置为当前的时间，巧合的是，每次函数&lt;code&gt;isTimeToReportOffset&lt;/code&gt;判断是否需要发送同步进度的时候恰好都为&lt;code&gt;false&lt;/code&gt;。这是因为master向slave同步间隔和slave向master报告同步进度的间隔默认都是5s，slave处理master的同步信息以后会重置&lt;code&gt;lastWriteTimestamp&lt;/code&gt;为当前时间，因此一直无法满足同步的条件，导致以上的现象。&lt;/p&gt;
+
+&lt;h2 id=&#34;解决方案&#34;&gt;解决方案&lt;/h2&gt;
+
+&lt;p&gt;可以知道，连接经常断开显然会影响同步的效率。解决方案可以把master同步时间设置的比slave的同步长，比如slave的同步间隔为3s，master同步间隔为5s。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>熔断</title>
@@ -860,6 +934,12 @@ L // 把当前的位置移到屏幕底部
 &lt;li&gt;&lt;p&gt;移动窗口&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;跳到某个字符的左（右）边&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;t{char} // 跳转到左边
+T{char} // 跳转到右边
 &lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 &lt;/ol&gt;
 </description>

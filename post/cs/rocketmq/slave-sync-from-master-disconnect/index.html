@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="nojs" lang="zh" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>slave和master同步连接经常重连，导致发送消息失败 – 老K随笔</title>
+<meta name="description" content="slave向master同步数据的时候，由于没有发送自己的同步，导致没有同步新的消息，在SYNC_MASTER模式下，发消息失败。">
+<meta name="created" content="2018-10-22T17:07:02&#43;0800">
+<meta name="modified" content="2018-10-22T17:07:02&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.49-DEV" />
+
+
+<link href="/css/prism.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "slave和master同步连接经常重连，导致发送消息失败",
+    "datePublished": "2018-10-22T17:07:02+08:00",
+    "dateModified": "2018-10-22T17:07:02+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/",
+    "description": "slave向master同步数据的时候，由于没有发送自己的同步，导致没有同步新的消息，在SYNC_MASTER模式下，发消息失败。",
+    "keywords": ["mq","rocketmq"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
+</head>
+
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
+</h1>
+<div class="region header__region"></div>
+</header>
+
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">主菜单</h2>
+<ul class="navbar">
+<li><a class="" href="/">首页</a></li>
+
+
+
+  <li><a  class=""href="/categories/buddhism">佛法</a>
+  </li>
+
+  <li><a  class="active"href="/categories/cs">计算机</a>
+  </li>
+
+
+<li><a class="" href="/post/about">关于</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
+<h1 class="title title-submitted">slave和master同步连接经常重连，导致发送消息失败</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-10-22T17:07:02&#43;08:00">2018-10-22 17:07:02</time>
+</p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/mq">mq</a></li>
+<li><a href="/tags/rocketmq">rocketmq</a></li>
+</ul>
+</div>
+</header>
+<div class="content">
+
+
+<h2 id="缘起">缘起</h2>
+
+<p>封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。</p>
+
+<h2 id="排查过程">排查过程</h2>
+
+<p>查看boots-broker日志，发现问题日志：</p>
+
+<pre><code>[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0
+</code></pre>
+
+<p>说明，RocketMQ处理发送消息比较慢。可是，从<code>size of queue</code>可以看出，堆积的消息为0。</p>
+
+<p>查看机器资源消耗情况，发现资源都是充裕的。</p>
+
+<p>查看RocketMQ日志，发现store.log中有异常，master中的store.log周期性的发生以下日志：</p>
+
+<pre><code>2018-10-22 15:44:07 INFO AcceptSocketService - HAService receive new connection, /10.38.34.27:54052
+2018-10-22 15:44:07 INFO ReadSocketService - ReadSocketService service started
+2018-10-22 15:44:07 INFO WriteSocketService - WriteSocketService service started
+2018-10-22 15:44:08 INFO WriteSocketService - WriteSocketService service end
+2018-10-22 15:44:12 INFO ReadSocketService - slave[/10.38.34.27:54052] request offset 157843228
+2018-10-22 15:44:12 INFO WriteSocketService - master transfer data from 157843228 to slave[/10.38.34.27:54052], and slave request 157843228
+2018-10-22 15:44:33 WARN ReadSocketService - ha housekeeping, found this connection[/10.38.34.27:54052] expired, 20019
+2018-10-22 15:44:33 INFO ReadSocketService - ReadSocketService service end
+</code></pre>
+
+<p>从上可以看出，slave主动向master建立连接，5s之后发送自己当前同步的进度，master收到以后向slave发送同步数据，最后master由于slave的连接过期，主动断开连接。</p>
+
+<p>slave中的store.log周期性的发生以下日志：</p>
+
+<pre><code>2018-10-22 15:44:07 WARN HAClient - HAClient, housekeeping, found this connection[10.38.33.22:10912] expired, 1540194247979
+2018-10-22 15:44:07 WARN HAClient - HAClient, master not response some time, so close connection
+2018-10-22 15:44:33 INFO HAClient - HAClient, processReadEvent read socket &lt; 0
+</code></pre>
+
+<p>从上可以看出，slave也发现和master的连接超时，断开连接。</p>
+
+<p>到这里，非常困惑，master和slave都主动断开连接！看代码，master的同步比较清晰和日志也比较一致。slave的同步日志和日志不一致。slave的同步代码核心<a href="https://github.com/zjykzk/rocketmq/blob/master/store/src/main/java/org/apache/rocketmq/store/ha/HAService.java#L546">代码</a>中通过比较<code>lastWriteTimestamp</code>和当前时间判断出与master的同步连接过期，以及master没有响应。在接收到master的消息、创建连接、关闭连接的时候都修改这个<code>lastWriteTimestamp</code>值。关闭重置为0，其他重置为当前时间。看日志发现<code>lastWriteTimestamp</code>和当前的时间差别巨大是<code>1540194247979</code>，可以得出<code>lastWriteTimestamp</code>其实是0。基本上可以判断是因为master主动关闭的。后来，通过tcpdump抓包得到了确认。这里要吐槽这个日志了，slave是被关闭的却是提示master没响应，其实master在关闭之前总共发了5次同步信息。</p>
+
+<p>确认是master主动关闭，接下来的问题是为什么slave没有告诉master自己的进度。日志已经无能为力了，看到代码中有<code>while(true)</code>片段，猜测会不会是死循环，通过<code>jstack</code>发现没有。最后，通过手动添加日志发现master向slave发送的同步信息，slave都收到了，然后把<code>lastWriteTimestamp</code>重置为当前的时间，巧合的是，每次函数<code>isTimeToReportOffset</code>判断是否需要发送同步进度的时候恰好都为<code>false</code>。这是因为master向slave同步间隔和slave向master报告同步进度的间隔默认都是5s，slave处理master的同步信息以后会重置<code>lastWriteTimestamp</code>为当前时间，因此一直无法满足同步的条件，导致以上的现象。</p>
+
+<h2 id="解决方案">解决方案</h2>
+
+<p>可以知道，连接经常断开显然会影响同步的效率。解决方案可以把master同步时间设置的比slave的同步长，比如slave的同步间隔为3s，master同步间隔为5s。</p>
+
+
+</div>
+</article>
+</main>
+
+
+
+
+<footer class="footer layout__footer" role="contentinfo">
+<p><span>© 老K随笔</span></p>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
+</div>
+
+
+
+
+<script src="/js/prism.js"></script>
+
+
+</body>
+</html>

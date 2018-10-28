@@ -58,6 +58,12 @@ L // 把当前的位置移到屏幕底部
 
 &lt;pre&gt;&lt;code&gt;CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签
 &lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;跳到某个字符的左（右）边&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;t{char} // 跳转到左边
+T{char} // 跳转到右边
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 &lt;/ol&gt;
 </description>
     </item>

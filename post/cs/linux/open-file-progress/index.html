@@ -2,10 +2,10 @@
 <html class="nojs" lang="zh" dir="ltr">
 <head>
 <meta charset="utf-8">
-<title>增加bug的编程实践 – 老K随笔</title>
-<meta name="description" content="最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。">
-<meta name="created" content="2016-06-04T11:12:13&#43;0800">
-<meta name="modified" content="2016-06-04T11:12:13&#43;0800">
+<title>如何定位一个文件。 – 老K随笔</title>
+<meta name="description" content="linux中怎么通过文件名找到具体的数据。">
+<meta name="created" content="2018-10-24T14:57:53&#43;0800">
+<meta name="modified" content="2018-10-24T14:57:53&#43;0800">
 <meta name="author" content="zenk">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 <meta name="MobileOptimized" content="width">
@@ -16,7 +16,7 @@
 <link href="/css/prism.css" rel="stylesheet" />
 
 <link rel="stylesheet" href="/css/styles.css">
-<link rel="canonical" href="http://zjykzk.github.io/post/cs/bug-op/">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/linux/open-file-progress/">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" as="style" href="/css/styles.css">
 <link rel="stylesheet" href="/css/styles.css">
@@ -25,12 +25,12 @@
   {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": "增加bug的编程实践",
-    "datePublished": "2016-06-04T11:12:13+08:00",
-    "dateModified": "2016-06-04T11:12:13+08:00",
-    "url" : "http://zjykzk.github.io/post/cs/bug-op/",
-    "description": "最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。",
-    "keywords": ["编程"],
+    "headline": "如何定位一个文件。",
+    "datePublished": "2018-10-24T14:57:53+08:00",
+    "dateModified": "2018-10-24T14:57:53+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/linux/open-file-progress/",
+    "description": "linux中怎么通过文件名找到具体的数据。",
+    "keywords": ["linux"],
     "author": {
       "@type": "Person",
       "name": "zenk"
@@ -85,44 +85,29 @@
 
 
 <main class="main layout__main" role="main">
-<h1 class="title title-submitted">增加bug的编程实践</h1>
+<h1 class="title title-submitted">如何定位一个文件。</h1>
 <article class="section-post single-view">
 <header>
 <p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2016-06-04T11:12:13&#43;08:00">2016-06-04 11:12:13</time>
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-10-24T14:57:53&#43;08:00">2018-10-24 14:57:53</time>
 </p>
 <div class="tags">
 Tags:
 <ul>
-<li><a href="/tags/%E7%BC%96%E7%A8%8B">编程</a></li>
+<li><a href="/tags/linux">linux</a></li>
 </ul>
 </div>
 </header>
 <div class="content">
+<p>linux的VFS包含4个重要概念：<br />
+1. superblock，包含文件系统的信息，管理整个文件系统。<br />
+2. inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。<br />
+3. dentry，目录项，代表路径中的每个部分，包含文件路径到inode的映射。<br />
+4. file，文件，是文件在进程中的表示。</p>
 
+<p>同时，在linux中一切兼文件，包括目录。目录的内容是文件名和inode号。</p>
 
-<h2 id="思路不清晰">思路不清晰</h2>
-
-<p>思路没有完全确定情况下写代码。造成不确定的情况有多方面：</p>
-
-<pre><code>1. 求快，把相似的需求当做一样的需求
-2. 缺少设计，大体明白实现方案，就开始编码
-3. 知识不充分，集中在前端的css、布局
-</code></pre>
-
-<p><strong>怎么办？</strong></p>
-
-<p><em>快是可以做到，心里不要慌就是。</em></p>
-
-<pre><code>1. 需求分析到位
-2. 仔细查看现有的代码
-3. 遗留代码多问老员工
-4. 放下别人对你问代码时的负面情绪
-</code></pre>
-
-<h2 id="破窗原理">破窗原理</h2>
-
-<p>在一个代码质量差的项目里面，就很容易被一种“别人也是这样，我也就这样得了”，尤其是在你不熟悉代码的情况下。<strong>短期内，代码是写给自己的，维护的人是自己，长期内是给别人的，对自己好就是对别人好，还有需要执行力。</strong></p>
+<p>当打开一个文件<code>/bin/vim</code>，系统首先把路径分解成<code>/</code>、<code>bin</code>、<code>vim</code>，根据dentry查<code>vim</code>的inode，如果dentry还没有<code>bin</code>，会根据superblock中<strong>根目录</strong>的inode号得到它的子目录信息，其中就有<code>bin</code>和它的inode，并把它放到dentry中，然后根据<code>bin</code>的内容找到<code>vim</code>的inode。最终，返回一个文件描述符（file descriptor）。</p>
 
 
 </div>
