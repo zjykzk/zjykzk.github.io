@@ -180,29 +180,29 @@
 &lt;h3 id=&#34;清理条件&#34;&gt;清理条件&lt;/h3&gt;
 
 &lt;ol&gt;
-&lt;li&gt;清理时间到达，默认是凌晨4点&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;消息所在的磁盘使用率或者其他数据所在磁盘使用率操作告警阀值和强制删除阀值&lt;br /&gt;
+&lt;li&gt;清理时间到达，默认是凌晨4点。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;消息所在的磁盘使用率或者其他数据所在磁盘使用率操作告警阀值和强制删除阀值。&lt;br /&gt;
 
 &lt;ul&gt;
-&lt;li&gt;保存消息的目录通过配置项 &lt;code&gt;storePathCommitLog&lt;/code&gt; 指定，默认是 &lt;code&gt;$HOME/store/commitlog&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;保存其他数据的目录通过配置项 &lt;code&gt;storePathRootDir&lt;/code&gt; 指定，默认是 &lt;code&gt;$HOME/store&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;告警的磁盘使用率阀值通过系统变量 &lt;code&gt;rocketmq.broker.diskSpaceWarningLevelRatio&lt;/code&gt;指定，默认是 0.9&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;强制删除的磁盘使用率阀值通过系统变量 &lt;code&gt;rocketmq.broker.diskSpaceCleanForciblyRatio&lt;/code&gt;指定，默认是 0.75&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;保存消息的目录通过配置项 &lt;code&gt;storePathCommitLog&lt;/code&gt; 指定，默认是 &lt;code&gt;$HOME/store/commitlog&lt;/code&gt;。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;保存其他数据的目录通过配置项 &lt;code&gt;storePathRootDir&lt;/code&gt; 指定，默认是 &lt;code&gt;$HOME/store&lt;/code&gt;。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;告警的磁盘使用率阀值通过系统变量 &lt;code&gt;rocketmq.broker.diskSpaceWarningLevelRatio&lt;/code&gt;指定，默认是 0.9。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;强制删除的磁盘使用率阀值通过系统变量 &lt;code&gt;rocketmq.broker.diskSpaceCleanForciblyRatio&lt;/code&gt;指定，默认是 0.75。&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;手动触发清理，这里提供了一个接口暴露给外面调用，调用以后会在连续执行20次删除&lt;br /&gt;
+&lt;li&gt;手动触发清理，这里提供了一个接口暴露给外面调用，调用以后会在连续执行20次删除。&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3 id=&#34;清理逻辑&#34;&gt;清理逻辑&lt;/h3&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;p&gt;正常清理过期的消息，过期时间可以通过配置项 &lt;code&gt;fileReservedTime&lt;/code&gt; 指定，默认是72小时&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;正常清理过期的消息，过期时间可以通过配置项 &lt;code&gt;fileReservedTime&lt;/code&gt; 指定，默认是72小时。&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;清理上次没有清理成功的消息，这是因为消息被清理时，其他地方正在使用。每隔一段时间执行一次，同时如果距离上次被清理时间超过了一段时间会被强制清理&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;清理上次没有清理成功的消息，这是因为消息被清理时，其他地方正在使用。每隔一段时间执行一次，同时如果距离上次被清理时间超过了一段时间会被强制清理。&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;通过配置项 &lt;code&gt;redeleteHangedFileInterval&lt;/code&gt;指定执行周期，默认120s&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;通过配置项 &lt;code&gt;destroyMapedFileIntervalForcibly&lt;/code&gt;指定强制清理的时间，默认120s&lt;br /&gt;
+&lt;li&gt;通过配置项 &lt;code&gt;redeleteHangedFileInterval&lt;/code&gt;指定执行周期，默认120s。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;通过配置项 &lt;code&gt;destroyMapedFileIntervalForcibly&lt;/code&gt;指定强制清理的时间，默认120s。&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ol&gt;
@@ -221,8 +221,8 @@
 &lt;p&gt;获取当前消息的最小偏移量，这个偏移量随着消息的清理会不停的变化。&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;消费队列：如果队列的最大消息偏移量都比当前最小的消息偏移量小，那么就可以清理本队列&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;消息索引：如果索引中最大的消息偏移量都比当前最小的消息偏移量小，那么就可以清理本索引&lt;br /&gt;
+&lt;li&gt;消费队列：如果队列的最大消息偏移量都比当前最小的消息偏移量小，那么就可以清理本队列。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;消息索引：如果索引中最大的消息偏移量都比当前最小的消息偏移量小，那么就可以清理本索引。&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
@@ -240,8 +240,8 @@
 &lt;p&gt;索引的key包含消息的两个属性：&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;code&gt;KEYS&lt;/code&gt;，支持多个值，每个值之间通过空格分割&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;UNIQ_KEY&lt;/code&gt;&lt;br /&gt;
+&lt;li&gt;&lt;code&gt;KEYS&lt;/code&gt;，支持多个值，每个值之间通过空格分割。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;UNIQ_KEY&lt;/code&gt;。&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
@@ -333,8 +333,8 @@
 &lt;h3 id=&#34;具体逻辑&#34;&gt;具体逻辑&lt;/h3&gt;
 
 &lt;ol&gt;
-&lt;li&gt;分派消息：构建消费队列，消息索引&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;同时long pull的客户端请求&lt;br /&gt;
+&lt;li&gt;分派消息：构建消费队列，消息索引。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;同时long pull的客户端请求。&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
@@ -352,16 +352,40 @@
 &lt;h3 id=&#34;消息同步逻辑&#34;&gt;消息同步逻辑&lt;/h3&gt;
 
 &lt;ol&gt;
-&lt;li&gt;启动的时候，MASTER会启动监听服务&lt;code&gt;AcceptSocketService&lt;/code&gt;，SLAVE会启动同步服务 &lt;code&gt;HAClient&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;建立连接&lt;code&gt;HAConnection&lt;/code&gt;之后，MASTER会为连接建立两个线程&lt;code&gt;WriteSocketService&lt;/code&gt;和&lt;code&gt;ReadSocketService&lt;/code&gt;分别负责这条连接的写和读&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;SLAVE向MASTER报告，当前同步的位置，具体是到目前为止同步到的偏移量&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;MASTER根据SLAVE报告的偏移量，发送消息数据&lt;br /&gt;
+&lt;li&gt;启动的时候，MASTER会启动监听线程&lt;code&gt;AcceptSocketService&lt;/code&gt;，SLAVE会启动同步线程 &lt;code&gt;HAClient&lt;/code&gt;。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;建立连接&lt;code&gt;HAConnection&lt;/code&gt;之后，MASTER会为连接建立两个线程&lt;code&gt;WriteSocketService&lt;/code&gt;和&lt;code&gt;ReadSocketService&lt;/code&gt;分别负责这条连接的写和读。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;SLAVE向MASTER报告，当前同步的位置，具体是到目前为止同步到的偏移量。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;MASTER根据SLAVE报告的偏移量，发送消息数据。&lt;br /&gt;
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;WriteSocketService&lt;/strong&gt;线程&lt;/p&gt;
+
+&lt;p&gt;主结点向从结点推送消息线程。线程会记录当前同步的位置确保同步的数据不会重复。当线程启动的时候会等待从结点上报同步进度，如果上报的结果是0，从当前新消息文件中的第一个消息偏移量开始同步（不理解* V *）。消息写完主结点之后，会通知本线程进行写消息。另外，写完消息以后会主动向从结点发送已经同步的位置，像是一个保活机制。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;ReadSocketService&lt;/strong&gt;线程&lt;/p&gt;
+
+&lt;p&gt;接收从结点的同步进度。它的任务就是接收从结点同步进度，然后通知等待从结点写完的消息。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;HAClient&lt;/strong&gt;线程&lt;/p&gt;
+
+&lt;p&gt;从结点和主结点同步线程。主要工作&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;和主结点建立同步连接。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;周期性的向主结点发送同步进度。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;接收主结点推送过来的数据，并把数据写入磁盘。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;检查是否有数据同步过来，有的话也会向主结点发送同步进度。&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h4 id=&#34;写buffer的影响&#34;&gt;写buffer的影响&lt;/h4&gt;
 
 &lt;p&gt;当开启写buffer的时候，主从同步的逻辑中使用到的当前消息的最大索引计算逻辑是不一样的。在这种情况下，系统会有一个线程&lt;code&gt;CommitRealTimeService&lt;/code&gt;负责把写buffer中的数据写入文件。只有写入以后数据，才会被同步到从broker。也就是说主从同步的实时性还会受到这个线程的影响。&lt;/p&gt;
+
+&lt;h3 id=&#34;主从同步发送消息过程&#34;&gt;主从同步发送消息过程&lt;/h3&gt;
+
+&lt;p&gt;当我们使用主从同步模式的时候，消息要等到主、从都写完才能返回。在这个过程中，除了主从同步逻辑以外还有消息等待从结点写完成的逻辑。这个逻辑是通过&lt;code&gt;GroupTransferService&lt;/code&gt;完成的。大致流程如下：消息写完主结点后向&lt;code&gt;GroupTransferService&lt;/code&gt;发送等待从结点写完请求，&lt;code&gt;GroupTransferService&lt;/code&gt;只做一件事情，就是不断对比当前从结点同步进度与当前接收到的消息物理偏移量，如果从结点的同步进度大，说明消息已经写入从结点，随即通知消息已经写完。另外，从结点的同步进度是通过&lt;code&gt;ReadSocketService&lt;/code&gt;接收到从结点主动发过来的；当消息写完主结点之后会通知主结点往从结点写消息服务&lt;code&gt;WriteSocketService&lt;/code&gt;。&lt;/p&gt;
 
 &lt;h3 id=&#34;核心代码-7&#34;&gt;核心代码&lt;/h3&gt;
 
@@ -447,9 +471,9 @@ org.apache.rocketmq.store.ha.HAConnection
 &lt;h4 id=&#34;预热&#34;&gt;预热&lt;/h4&gt;
 
 &lt;ol&gt;
-&lt;li&gt;新建&lt;code&gt;MappedFile&lt;/code&gt;时通过先把文件映射的内存都写一遍，内核为文件分配物理页&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;使用&lt;code&gt;mlock&lt;/code&gt;锁住文件映射的物理内存，确保这部分内存不被交换出去&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;使用&lt;code&gt;madvise&lt;/code&gt;通知内核这部分数据将来会读到&lt;br /&gt;
+&lt;li&gt;新建&lt;code&gt;MappedFile&lt;/code&gt;时通过先把文件映射的内存都写一遍，内核为文件分配物理页。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;使用&lt;code&gt;mlock&lt;/code&gt;锁住文件映射的物理内存，确保这部分内存不被交换出去。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;使用&lt;code&gt;madvise&lt;/code&gt;通知内核这部分数据将来会读到。&lt;br /&gt;
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 

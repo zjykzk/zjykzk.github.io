@@ -62,7 +62,7 @@
 
 &lt;p&gt;Netflix中的&lt;a href=&#34;https://github.com/Netflix/Hystrix/wiki/How-it-Works#CircuitBreaker&#34;&gt;Hystrix&lt;/a&gt;有一个完整的实现。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/hystrix-circuit-breaker-1280.png&#34; alt=&#34;hystrix circuit breaker&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/hystrix-circuit-breaker-1280.png&#34; alt=&#34;hystrix circuit breaker，图片来自hystrix的github wiki&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;流程如下：&lt;/p&gt;
 
