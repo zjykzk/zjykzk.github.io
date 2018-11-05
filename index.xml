@@ -8,8 +8,84 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 24 Oct 2018 14:57:53 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 02 Nov 2018 15:38:24 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>高可用</title>
+      <link>http://zjykzk.github.io/post/cs/dist/ha/</link>
+      <pubDate>Fri, 02 Nov 2018 15:38:24 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/dist/ha/</guid>
+      <description>
+
+&lt;h2 id=&#34;什么是高可用&#34;&gt;什么是高可用&lt;/h2&gt;
+
+&lt;p&gt;平时经常提到一个服务可用性4个9，5个9，其实说的就是高可用。一个服务服务的时间越久可用性越高。因此，在设计时候需要考虑各种失败的情况，尽量减少服务不可用的时间。&lt;/p&gt;
+
+&lt;h2 id=&#34;实现高可用原则&#34;&gt;实现高可用原则&lt;/h2&gt;
+
+&lt;p&gt;实现高可用的大法就是&lt;strong&gt;多副本&lt;/strong&gt;，或者叫&lt;strong&gt;冗余&lt;/strong&gt;，或者叫&lt;strong&gt;集群&lt;/strong&gt;。一个服务有多个结点，一个结点挂了，其他结点照样能够提供服务。另外，还需要一个&lt;strong&gt;故障转移&lt;/strong&gt;大法，不然请求都打向那个挂的结点，照样是失败。最后，还需要&lt;strong&gt;伸缩&lt;/strong&gt;大法，能够动态调整资源应付请求量的变化。&lt;/p&gt;
+
+&lt;h2 id=&#34;伸缩方案&#34;&gt;伸缩方案&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;DNS&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;使用方使用服务域名，动态添加删除DNS绑定的IP。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;服务发现机制&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;提供服务注册中心，服务提供者向注册中心注册服务地址，服务使用者从注册中心同步服务地址。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;配置文件&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;服务使用方通过配置控制可以使用的服务，并提供动态加载功能。&lt;/p&gt;
+
+&lt;h2 id=&#34;常见服务的多副本实践&#34;&gt;常见服务的多副本实践&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;接入层&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;比如向nginx、apache这样的反向代理服务。通过keeplived+virtual ip实现故障转移，通过DNS实现可伸缩性。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;业务层&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;实现业务逻辑的服务。通过使用方探测服务是否可用实现故障转移，通过服务发现机制或者配置文件的方式实现可伸缩。这一层的服务要求是无状态的，不然伸缩的时候会对用户造成影响。比如，保存了用户session，如果删除一个服务，势必会导致用户重新登入。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;缓存层&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;高可用，有两种方案：1. 多个缓存服务，使用方多写多读方式做到故障转移； 2. 主从同步，主服务挂了从服务接管。缓存的目的是为了减少数据库的压力，因此这里缓存的细粒度化，可以使得缓存服务器挂了以后只会有一小部分数据失效，从而保护数据库。&lt;/p&gt;
+
+&lt;p&gt;伸缩性，通过一致性hash实现。还需要考虑数据一致性问题，不同的一致性要求扩展的姿势不一样，尤其是强一致性情况下需要考虑：1. 读到过期数据，因为客户端更新配置有时间间隔，在这个间隔中会读到过期数据； 2. 读到脏数据：扩容然后缩容，就会出现扩容后结点缓存了新内容，新结点被缩容以后请求又回到了老结点。&lt;/p&gt;
+
+&lt;p&gt;常用的缓存服务：memcached、redis。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;数据库层&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;高可用，主主方案，需要确保数据双向复制，使用方探测做故障转移；主从；主备。通过分表、分库（水平、垂直拆分）、定期滚动实现扩展性。&lt;/p&gt;
+
+&lt;h2 id=&#34;影响可用性的几个地方&#34;&gt;影响可用性的几个地方&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;发布&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;灰度发布，同时支持回滚。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;服务&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;数量上N+2，N表示需要正常服务的数量，多出两个的原因是考虑热备容灾下，如果发布会失败就会失去热备容灾的功能。而发布失败概率不小。&lt;/p&gt;
+
+&lt;p&gt;互备的服务必须对等，避免一大一小，或者互相依赖。&lt;/p&gt;
+
+&lt;p&gt;流量控制：&lt;br /&gt;
+1. 隔离互相冲突的请求。&lt;br /&gt;
+2. 把消耗资源的请求限制在固定几个结点，避免这类请求把资源都占住影响其他请求。&lt;br /&gt;
+3. 防止一些导致服务挂掉的请求，打到全部结点，就是挂了几台服务以后，把这个请求给屏蔽掉，这个比较难。&lt;/p&gt;
+
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw&#34;&gt;https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31.png&#34;&gt;https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31.png&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>如何定位一个文件。</title>
