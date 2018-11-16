@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="nojs" lang="zh" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>为什么main函数是终结者 – 老K随笔</title>
+<meta name="description" content="为什么main函数退出以后不管是否有其他goroutine程序就直接退出了。">
+<meta name="created" content="2018-11-16T14:13:32&#43;0800">
+<meta name="modified" content="2018-11-16T14:13:32&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.48-DEV" />
+
+
+<link href="/css/prism.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "为什么main函数是终结者",
+    "datePublished": "2018-11-16T14:13:32+08:00",
+    "dateModified": "2018-11-16T14:13:32+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/",
+    "description": "为什么main函数退出以后不管是否有其他goroutine程序就直接退出了。",
+    "keywords": ["golang"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
+</head>
+
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
+</h1>
+<div class="region header__region"></div>
+</header>
+
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">主菜单</h2>
+<ul class="navbar">
+<li><a class="" href="/">首页</a></li>
+
+
+
+  <li><a  class=""href="/categories/buddhism">佛法</a>
+  </li>
+
+  <li><a  class="active"href="/categories/cs">计算机</a>
+  </li>
+
+
+<li><a class="" href="/post/about">关于</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
+<h1 class="title title-submitted">为什么main函数是终结者</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-11-16T14:13:32&#43;08:00">2018-11-16 14:13:32</time>
+</p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/golang">golang</a></li>
+</ul>
+</div>
+</header>
+<div class="content">
+<p>来一个<code>hello, world!</code>。</p>
+
+<pre><code>package main
+
+func main() {
+    println(&quot;hello, world!&quot;)
+} // line 5
+</code></pre>
+
+<p>编译调试。</p>
+
+<pre><code># go build -o debug_main main.go // 编译
+# gdb debug_main                 // 开始调试
+(gdb) b 5 // 在第5行打断点
+(gdb) r   // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main
+(gdb) s   // 单步往下走，进入runtime.main代码
+runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207
+207             if atomic.Load(&amp;runningPanicDefers) != 0 {
+(gdb) bt  // 查看调用栈
+#0  runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207
+#1  0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361
+#2  0x0000000000000000 in ?? ()
+(gdb) s
+216             if atomic.Load(&amp;panicking) != 0 {
+(gdb) s
+220             exit(0)
+(gdb) s
+runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
+52              MOVL    code+0(FP), DI
+</code></pre>
+
+<p>从上面的结果可以知道，自己写的<code>main</code>函数被编译成<code>main_main</code>，然后被<code>runtime.main</code>所调用。通过查看<code>runtime.main</code>可以看到以下代码，说明它执行结束以后会调用<code>exit(0)</code>。</p>
+
+<pre><code>   // file: goroot/src/runtime/proc.go: main()
+   220   exit(0)
+   221   for {
+   222     var x *int32
+   223     *x = 0
+   224   }
+</code></pre>
+
+<p>查看<code>exit</code>函数代码，它调用了系统调用<code>exit_group</code>，退出所有线程。</p>
+
+<pre><code>// file: goroot/src/runtime/sys_linux_amd64.s:52
+ 51 TEXT runtime·exit(SB),NOSPLIT,$0-4
+ 52     MOVL    code+0(FP), DI
+ 53     MOVL    $SYS_exit_group, AX
+ 54     SYSCALL
+ 55     RET
+</code></pre>
+
+<p>还有一个比较有意思的事情是当查看调用栈的时候，显示<code>runtime.main</code>是通过<code>runtime.goexit()</code>调用的。其实这是因为创建goroutine的时候会把<code>goexit</code>的地址加1这个值放到它的栈顶，这样goroutine的函数执行完毕就会接着执行<code>goexit</code>而<code>goexit</code>又会调用<code>schedule</code>这个函数，继续寻找goroutine并执行。</p>
+
+<p>把<code>goexit</code>放到goroutine的代码：</p>
+
+<pre><code>// file: goroot/src/runtime/proc.go:newproc1(fn *funcval, argp *uint8, narg int32, callerpc uintptr)
+
+3315   newg.sched.pc = funcPC(goexit) + sys.PCQuantum // +PCQuantum so that previous instruction is in same function
+3316   newg.sched.g = guintptr(unsafe.Pointer(newg))
+3317   gostartcallfn(&amp;newg.sched, fn)
+            |
+            V
+// file: goroot/src/runtime/stack.go:func gostartcallfn(gobuf *gobuf, fv *funcval) 
+1085   gostartcall(gobuf, fn, unsafe.Pointer(fv))
+            |
+            V
+// file: goroot/src/runtime/sys_x86.go:func gostartcall(buf *gobuf, fn, ctxt unsafe.Pointer)
+22   sp -= sys.PtrSize
+23   *(*uintptr)(unsafe.Pointer(sp)) = buf.pc // 这里的pc就是 funcPC(goexit) + sys.PCQuantum
+</code></pre>
+
+<p>再看<code>runtime.goexit</code>代码：</p>
+
+<pre><code>// file: goroot/src/runtime/asm_amd64.s
+2360 TEXT runtime·goexit(SB),NOSPLIT,$0-0
+2361     BYTE    $0x90   // NOP
+2362     CALL    runtime·goexit1(SB) // does not return
+2363     // traceback from goexit1 must hit code range of goexit
+2364     BYTE    $0x90   // NOP
+</code></pre>
+
+<p>因为压入goroutine栈的值是<code>runtime.goexit+sys.PCQuantum(=1)</code>，因此goroutine函数返回的时候会执行第<code>2361</code>行代码。</p>
+
+
+</div>
+</article>
+</main>
+
+
+
+
+<footer class="footer layout__footer" role="contentinfo">
+<p><span>© 老K随笔</span></p>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
+</div>
+
+
+
+
+<script src="/js/prism.js"></script>
+
+
+</body>
+</html>

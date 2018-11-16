@@ -8,8 +8,99 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 27 Feb 2018 19:51:16 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 16 Nov 2018 14:13:32 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>为什么main函数是终结者</title>
+      <link>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</link>
+      <pubDate>Fri, 16 Nov 2018 14:13:32 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</guid>
+      <description>&lt;p&gt;来一个&lt;code&gt;hello, world!&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+func main() {
+    println(&amp;quot;hello, world!&amp;quot;)
+} // line 5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;编译调试。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# go build -o debug_main main.go // 编译
+# gdb debug_main                 // 开始调试
+(gdb) b 5 // 在第5行打断点
+(gdb) r   // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main
+(gdb) s   // 单步往下走，进入runtime.main代码
+runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207
+207             if atomic.Load(&amp;amp;runningPanicDefers) != 0 {
+(gdb) bt  // 查看调用栈
+#0  runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207
+#1  0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361
+#2  0x0000000000000000 in ?? ()
+(gdb) s
+216             if atomic.Load(&amp;amp;panicking) != 0 {
+(gdb) s
+220             exit(0)
+(gdb) s
+runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
+52              MOVL    code+0(FP), DI
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;从上面的结果可以知道，自己写的&lt;code&gt;main&lt;/code&gt;函数被编译成&lt;code&gt;main_main&lt;/code&gt;，然后被&lt;code&gt;runtime.main&lt;/code&gt;所调用。通过查看&lt;code&gt;runtime.main&lt;/code&gt;可以看到以下代码，说明它执行结束以后会调用&lt;code&gt;exit(0)&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;   // file: goroot/src/runtime/proc.go: main()
+   220   exit(0)
+   221   for {
+   222     var x *int32
+   223     *x = 0
+   224   }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看&lt;code&gt;exit&lt;/code&gt;函数代码，它调用了系统调用&lt;code&gt;exit_group&lt;/code&gt;，退出所有线程。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// file: goroot/src/runtime/sys_linux_amd64.s:52
+ 51 TEXT runtime·exit(SB),NOSPLIT,$0-4
+ 52     MOVL    code+0(FP), DI
+ 53     MOVL    $SYS_exit_group, AX
+ 54     SYSCALL
+ 55     RET
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;还有一个比较有意思的事情是当查看调用栈的时候，显示&lt;code&gt;runtime.main&lt;/code&gt;是通过&lt;code&gt;runtime.goexit()&lt;/code&gt;调用的。其实这是因为创建goroutine的时候会把&lt;code&gt;goexit&lt;/code&gt;的地址加1这个值放到它的栈顶，这样goroutine的函数执行完毕就会接着执行&lt;code&gt;goexit&lt;/code&gt;而&lt;code&gt;goexit&lt;/code&gt;又会调用&lt;code&gt;schedule&lt;/code&gt;这个函数，继续寻找goroutine并执行。&lt;/p&gt;
+
+&lt;p&gt;把&lt;code&gt;goexit&lt;/code&gt;放到goroutine的代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// file: goroot/src/runtime/proc.go:newproc1(fn *funcval, argp *uint8, narg int32, callerpc uintptr)
+
+3315   newg.sched.pc = funcPC(goexit) + sys.PCQuantum // +PCQuantum so that previous instruction is in same function
+3316   newg.sched.g = guintptr(unsafe.Pointer(newg))
+3317   gostartcallfn(&amp;amp;newg.sched, fn)
+            |
+            V
+// file: goroot/src/runtime/stack.go:func gostartcallfn(gobuf *gobuf, fv *funcval) 
+1085   gostartcall(gobuf, fn, unsafe.Pointer(fv))
+            |
+            V
+// file: goroot/src/runtime/sys_x86.go:func gostartcall(buf *gobuf, fn, ctxt unsafe.Pointer)
+22   sp -= sys.PtrSize
+23   *(*uintptr)(unsafe.Pointer(sp)) = buf.pc // 这里的pc就是 funcPC(goexit) + sys.PCQuantum
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再看&lt;code&gt;runtime.goexit&lt;/code&gt;代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// file: goroot/src/runtime/asm_amd64.s
+2360 TEXT runtime·goexit(SB),NOSPLIT,$0-0
+2361     BYTE    $0x90   // NOP
+2362     CALL    runtime·goexit1(SB) // does not return
+2363     // traceback from goexit1 must hit code range of goexit
+2364     BYTE    $0x90   // NOP
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;因为压入goroutine栈的值是&lt;code&gt;runtime.goexit+sys.PCQuantum(=1)&lt;/code&gt;，因此goroutine函数返回的时候会执行第&lt;code&gt;2361&lt;/code&gt;行代码。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>golang中的tls</title>
