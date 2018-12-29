@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://zjykzk.github.io/post/cs/rocketmq/offset/</loc>
+    <lastmod>2018-12-28T16:03:51+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</loc>
     <lastmod>2018-11-16T14:13:32+08:00</lastmod>
   </url>
@@ -163,7 +168,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/categories/cs/</loc>
-    <lastmod>2018-11-16T14:13:32+08:00</lastmod>
+    <lastmod>2018-12-28T16:03:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -217,7 +222,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/post/</loc>
-    <lastmod>2018-11-16T14:13:32+08:00</lastmod>
+    <lastmod>2018-12-28T16:03:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -229,7 +234,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/tags/rocketmq/</loc>
-    <lastmod>2018-10-22T17:07:02+08:00</lastmod>
+    <lastmod>2018-12-28T16:03:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -259,7 +264,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/</loc>
-    <lastmod>2018-11-16T14:13:32+08:00</lastmod>
+    <lastmod>2018-12-28T16:03:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   

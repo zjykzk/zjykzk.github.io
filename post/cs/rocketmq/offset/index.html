@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="nojs" lang="zh" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>offset管理 – 老K随笔</title>
+<meta name="description" content="offset相关原理与实现">
+<meta name="created" content="2018-12-28T16:03:51&#43;0800">
+<meta name="modified" content="2018-12-28T16:03:51&#43;0800">
+<meta name="author" content="zenk">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+<meta name="MobileOptimized" content="width">
+<meta name="HandheldFriendly" content="true">
+<meta name="generator" content="Hugo 0.48-DEV" />
+
+
+<link href="/css/prism.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="canonical" href="http://zjykzk.github.io/post/cs/rocketmq/offset/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "offset管理",
+    "datePublished": "2018-12-28T16:03:51+08:00",
+    "dateModified": "2018-12-28T16:03:51+08:00",
+    "url" : "http://zjykzk.github.io/post/cs/rocketmq/offset/",
+    "description": "offset相关原理与实现",
+    "keywords": ["rocketmq"],
+    "author": {
+      "@type": "Person",
+      "name": "zenk"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://zjykzk.github.io/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "老K随笔",
+      "url": "http://zjykzk.github.io/",
+    }
+  }
+</script>
+
+</head>
+
+<body>
+<div class="page layout__page">
+<header class="header layout__header" role="banner">
+
+<h1 class="header__site-name">
+<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
+</h1>
+<div class="region header__region"></div>
+</header>
+
+
+
+
+
+
+<div class="layout-swap__top layout-3col__full">
+<nav class="main-menu layout__navigation" role="navigation">
+<h2 class="visually-hidden">主菜单</h2>
+<ul class="navbar">
+<li><a class="" href="/">首页</a></li>
+
+
+
+  <li><a  class=""href="/categories/buddhism">佛法</a>
+  </li>
+
+  <li><a  class="active"href="/categories/cs">计算机</a>
+  </li>
+
+
+<li><a class="" href="/post/about">关于</a></li>
+</ul>
+</nav>
+
+
+<main class="main layout__main" role="main">
+<h1 class="title title-submitted">offset管理</h1>
+<article class="section-post single-view">
+<header>
+<p class="submitted">
+<span class="author">zenk</span> – <time class="modified-date" datetime="2018-12-28T16:03:51&#43;08:00">2018-12-28 16:03:51</time>
+</p>
+<div class="tags">
+Tags:
+<ul>
+<li><a href="/tags/rocketmq">rocketmq</a></li>
+</ul>
+</div>
+</header>
+<div class="content">
+
+
+<h2 id="作用">作用</h2>
+
+<p>记录每个消费队列的消费进度。以topic，group为单位。</p>
+
+<h2 id="类型">类型</h2>
+
+<p>根据保存的位置可以分为本地和远程两种类型。本地类型就是一文件的形式保存在客户端，内容是json数据，而远程类型是指数据保存在broker服务器上面。</p>
+
+<p><strong>代码</strong></p>
+
+<p>本地类型：<code>org.apache.rocketmq.client.consumer.store.LocalFileOffsetStore</code>。<br />
+远程类型：<code>org.apache.rocketmq.client.consumer.store.RemoteBrokerOffsetStore</code>。</p>
+
+<p><strong>使用</strong></p>
+
+<p>默认情况，当消费模式是*广播*的时候使用*本地类型*，因为每个消费者管理自己的进度，而且是所有消费队列的进度，各个消费者之间不会有消费进度的交集。当消费模式是*集群*的时候使用*远程类型*，因为消息被多个消费者消费，每个消费者只负责消费其中部分消费队列，在添加、删除消费者的时候，原来消费者负责的消费队列会动态变化，因此需要集中管理消费进度，不然就冲突了。</p>
+
+<p>但是，代码中依然提供了接口，让用户自己指定类型。（有什么特殊用法么？）</p>
+
+<h2 id="存储">存储</h2>
+
+<p><strong>本地类型</strong></p>
+
+<p>数据保存在<code>$storeDir/.rocketmq_offsets/$clientID/$group/offsets.json</code>中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。其中<code>$storeDir</code>是可以通过系统变量<code>rocketmq.client.localOffsetStoreDir</code>配置，如果没有使用HOME目录。<code>$clientID</code>和<code>$group</code>分别表示消费者的id和分组。</p>
+
+<pre><code>// example
+{&quot;offsetTable&quot;:{{&quot;brokerName&quot;:&quot;topic&quot;,&quot;queueId&quot;:1,&quot;topic&quot;:&quot;broker&quot;}:0}}
+</code></pre>
+
+<p><strong>远程类型</strong></p>
+
+<p>数据保存在<code>$rootPath/config/consumerOffset.json</code>文件中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。<code>offsetTable</code>中的key格式是<code>topic@group</code>，value格式<code>queueID:offset</code>。</p>
+
+<pre><code>// example
+{
+    &quot;offsetTable&quot;:{
+        &quot;test@benchmark_consumer_61&quot;:{
+            0:5280,1:5312,2:5312,3:5312
+        }
+    }
+}
+</code></pre>
+
+<h2 id="接口">接口</h2>
+
+<p>通过接口类型<code>org.apache.rocketmq.client.consumer.store.OffsetStore</code>抽象了消费进度的相关操作。</p>
+
+<p><code>load</code></p>
+
+<p>在消费者启动的时候，需要把消费进度载入内存。只有本地类型会载入数据。</p>
+
+<p><code>updateOffset</code></p>
+
+<p>更新消费队列的进度。可以选择在比当前消费进度大的时候才更新，这个目的主要用于push模式下面消息是并发消费的，这样每批消息完成以后更新进度是并发，可能会导致进度低的晚于进度高的更新，这个模式就是为了避免这个情况，代码在类<code>ConsumeMessageConcurrentlyService</code>。</p>
+
+<p><code>readOffset</code></p>
+
+<p>读取消费队列的消费进度，数据存在内存和存储（本地或者broker服务）中，提供了三种读取的方式：1.内存；2.存储；3.先内存，如果没有后存储。在两个地方的实现中，从存储中读到数据以后会更新到内存。</p>
+
+<p><code>persistAll</code></p>
+
+<p>持久化指定的多个消费队列的消费进度。本地类型的实现中只会把指定的消费队列的消费进度保存到本地。远程类型除此之外，还会把指定的消费队列以外的那些队列从内存中移除。</p>
+
+<p><code>persist</code></p>
+
+<p>持久化指定的单个消费队列的消费进度。只有远程类型实现了该接口。</p>
+
+<p><code>removeOffset</code></p>
+
+<p>移除某个消费队列的消费进度。只有远程类型实现了该接口。</p>
+
+<p><code>updateConsumeOffsetToBroker</code></p>
+
+<p>更新消费队列到broker服务，只有远程类型实现了该接口。（这个设计好尴尬，本地类型需要么。。。）</p>
+
+<h2 id="管理">管理</h2>
+
+<p><code>org.apache.rocketmq.client.impl.consumer.RebalanceImpl.updateProcessQueueTableInRebalance</code>做消费的负载均衡时，会对消费进度做管理。这个过程通过对比新分配的消费队列（简称新队列）和<code>org.apache.rocketmq.client.impl.consumer.RebalanceImpl.processQueueTable</code>维护的消费队列（简称旧队列），有几种情况：</p>
+
+<ol>
+<li>如果旧队列的消费队列不在新队列中，那么就会先持久化该队列的消费进度，再做删除操作。<em>push模式同时优势有序的集群消费还需要做外的事情。</em><br /></li>
+<li>如果如果旧队列的消费队列在新队列中，<em>push模式下检查是否过期，过期的化先持久化，再删除进度。</em><br /></li>
+<li>如果新队列的消费队列不在旧队列中，删除消费进度。本地模式不会做删除操作，远程模式会把内存中的消费进度删除掉。同时，push模式下面会从存储中拉取消费进度并保存到内存。<br /></li>
+</ol>
+
+
+</div>
+</article>
+</main>
+
+
+
+
+<footer class="footer layout__footer" role="contentinfo">
+<p><span>© 老K随笔</span></p>
+
+<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
+</footer>
+
+</div>
+
+
+
+
+<script src="/js/prism.js"></script>
+
+
+</body>
+</html>
