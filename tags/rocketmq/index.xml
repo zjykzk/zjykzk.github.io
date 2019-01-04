@@ -9,7 +9,9 @@
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
     <lastBuildDate>Fri, 28 Dec 2018 16:03:51 +0800</lastBuildDate>
-    <atom:link href="http://zjykzk.github.io/tags/rocketmq/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="http://zjykzk.github.io/tags/rocketmq/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>offset管理</title>
@@ -17,93 +19,38 @@
       <pubDate>Fri, 28 Dec 2018 16:03:51 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/rocketmq/offset/</guid>
-      <description>
-
-&lt;h2 id=&#34;作用&#34;&gt;作用&lt;/h2&gt;
-
-&lt;p&gt;记录每个消费队列的消费进度。以topic，group为单位。&lt;/p&gt;
-
-&lt;h2 id=&#34;类型&#34;&gt;类型&lt;/h2&gt;
-
-&lt;p&gt;根据保存的位置可以分为本地和远程两种类型。本地类型就是一文件的形式保存在客户端，内容是json数据，而远程类型是指数据保存在broker服务器上面。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;代码&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;本地类型：&lt;code&gt;org.apache.rocketmq.client.consumer.store.LocalFileOffsetStore&lt;/code&gt;。&lt;br /&gt;
-远程类型：&lt;code&gt;org.apache.rocketmq.client.consumer.store.RemoteBrokerOffsetStore&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;使用&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;默认情况，当消费模式是*广播*的时候使用*本地类型*，因为每个消费者管理自己的进度，而且是所有消费队列的进度，各个消费者之间不会有消费进度的交集。当消费模式是*集群*的时候使用*远程类型*，因为消息被多个消费者消费，每个消费者只负责消费其中部分消费队列，在添加、删除消费者的时候，原来消费者负责的消费队列会动态变化，因此需要集中管理消费进度，不然就冲突了。&lt;/p&gt;
-
-&lt;p&gt;但是，代码中依然提供了接口，让用户自己指定类型。（有什么特殊用法么？）&lt;/p&gt;
-
-&lt;h2 id=&#34;存储&#34;&gt;存储&lt;/h2&gt;
-
-&lt;p&gt;&lt;strong&gt;本地类型&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;数据保存在&lt;code&gt;$storeDir/.rocketmq_offsets/$clientID/$group/offsets.json&lt;/code&gt;中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。其中&lt;code&gt;$storeDir&lt;/code&gt;是可以通过系统变量&lt;code&gt;rocketmq.client.localOffsetStoreDir&lt;/code&gt;配置，如果没有使用HOME目录。&lt;code&gt;$clientID&lt;/code&gt;和&lt;code&gt;$group&lt;/code&gt;分别表示消费者的id和分组。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// example
-{&amp;quot;offsetTable&amp;quot;:{{&amp;quot;brokerName&amp;quot;:&amp;quot;topic&amp;quot;,&amp;quot;queueId&amp;quot;:1,&amp;quot;topic&amp;quot;:&amp;quot;broker&amp;quot;}:0}}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;远程类型&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;数据保存在&lt;code&gt;$rootPath/config/consumerOffset.json&lt;/code&gt;文件中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。&lt;code&gt;offsetTable&lt;/code&gt;中的key格式是&lt;code&gt;topic@group&lt;/code&gt;，value格式&lt;code&gt;queueID:offset&lt;/code&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// example
-{
-    &amp;quot;offsetTable&amp;quot;:{
-        &amp;quot;test@benchmark_consumer_61&amp;quot;:{
-            0:5280,1:5312,2:5312,3:5312
-        }
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;接口&#34;&gt;接口&lt;/h2&gt;
-
-&lt;p&gt;通过接口类型&lt;code&gt;org.apache.rocketmq.client.consumer.store.OffsetStore&lt;/code&gt;抽象了消费进度的相关操作。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;load&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;在消费者启动的时候，需要把消费进度载入内存。只有本地类型会载入数据。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;updateOffset&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;更新消费队列的进度。可以选择在比当前消费进度大的时候才更新，这个目的主要用于push模式下面消息是并发消费的，这样每批消息完成以后更新进度是并发，可能会导致进度低的晚于进度高的更新，这个模式就是为了避免这个情况，代码在类&lt;code&gt;ConsumeMessageConcurrentlyService&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;readOffset&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;读取消费队列的消费进度，数据存在内存和存储（本地或者broker服务）中，提供了三种读取的方式：1.内存；2.存储；3.先内存，如果没有后存储。在两个地方的实现中，从存储中读到数据以后会更新到内存。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;persistAll&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;持久化指定的多个消费队列的消费进度。本地类型的实现中只会把指定的消费队列的消费进度保存到本地。远程类型除此之外，还会把指定的消费队列以外的那些队列从内存中移除。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;persist&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;持久化指定的单个消费队列的消费进度。只有远程类型实现了该接口。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;removeOffset&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;移除某个消费队列的消费进度。只有远程类型实现了该接口。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;updateConsumeOffsetToBroker&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;更新消费队列到broker服务，只有远程类型实现了该接口。（这个设计好尴尬，本地类型需要么。。。）&lt;/p&gt;
-
-&lt;h2 id=&#34;管理&#34;&gt;管理&lt;/h2&gt;
-
-&lt;p&gt;&lt;code&gt;org.apache.rocketmq.client.impl.consumer.RebalanceImpl.updateProcessQueueTableInRebalance&lt;/code&gt;做消费的负载均衡时，会对消费进度做管理。这个过程通过对比新分配的消费队列（简称新队列）和&lt;code&gt;org.apache.rocketmq.client.impl.consumer.RebalanceImpl.processQueueTable&lt;/code&gt;维护的消费队列（简称旧队列），有几种情况：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;如果旧队列的消费队列不在新队列中，那么就会先持久化该队列的消费进度，再做删除操作。&lt;em&gt;push模式同时优势有序的集群消费还需要做外的事情。&lt;/em&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;如果如果旧队列的消费队列在新队列中，&lt;em&gt;push模式下检查是否过期，过期的化先持久化，再删除进度。&lt;/em&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;如果新队列的消费队列不在旧队列中，删除消费进度。本地模式不会做删除操作，远程模式会把内存中的消费进度删除掉。同时，push模式下面会从存储中拉取消费进度并保存到内存。&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-</description>
+      <description> 作用 记录每个消费队列的消费进度。以topic，group为单位。
+类型 根据保存的位置可以分为本地和远程两种类型。本地类型就是以文本文件的形式保存在客户端，内容是非正式的json数据，而远程类型是指数据保存在broker服务器上面，内容同样是非正式的json数据。
+代码
+本地类型：org.apache.rocketmq.client.consumer.store.LocalFileOffsetStore。
+远程类型：org.apache.rocketmq.client.consumer.store.RemoteBrokerOffsetStore。
+使用
+默认情况，当消费模式是*广播*的时候使用*本地类型*，因为每个消费者管理自己的进度，而且是所有消费队列的进度，各个消费者之间也不会有消费进度的交集。当消费模式是*集群*的时候使用*远程类型*，因为消息被多个消费者消费，每个消费者只负责消费其中部分消费队列，在添加、删除消费者的时候，原来消费者负责的消费队列会动态变化，因此需要集中管理消费进度，不然就冲突了。
+但是，代码中依然提供了接口，让用户自己指定类型，比如可以保存数据到monogodb。
+存储 本地类型
+数据保存在$storeDir/.rocketmq_offsets/$clientID/$group/offsets.json中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。其中$storeDir是可以通过系统变量rocketmq.client.localOffsetStoreDir配置，如果没有指定参数就使用HOME目录。$clientID和$group分别表示消费者的id和分组。
+// example {&amp;quot;offsetTable&amp;quot;:{{&amp;quot;brokerName&amp;quot;:&amp;quot;topic&amp;quot;,&amp;quot;queueId&amp;quot;:1,&amp;quot;topic&amp;quot;:&amp;quot;broker&amp;quot;}:0}}  远程类型
+数据保存在$rootPath/config/consumerOffset.json文件中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。offsetTable中的key格式是topic@group，value格式queueID:offset。
+// example { &amp;quot;offsetTable&amp;quot;:{ &amp;quot;test@benchmark_consumer_61&amp;quot;:{ 0:5280,1:5312,2:5312,3:5312 } } }  接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
+load
+在消费者启动的时候，需要把消费进度载入内存。只有本地类型会载入数据。
+updateOffset
+更新消费队列的进度。可以选择在比当前消费进度大的时候才更新，这个目的主要用于push模式下面消息是并发消费的，这样每批消息完成以后更新进度是并发，可能会导致进度低的晚于进度高的更新，这个模式就是为了避免这个情况。代码在类ConsumeMessageConcurrentlyService中。
+readOffset
+读取消费队列的消费进度，数据存在内存和存储（本地或者broker服务）中，提供了三种读取的方式：1.内存；2.存储；3.先内存，如果没有后存储。在两个地方的实现中，从存储中读到数据以后会更新到内存。
+persistAll
+持久化指定的多个消费队列的消费进度。本地类型的实现中只会持久化内存中的消费进度。远程类型除此之外，还会把指定的消费队列以外的那些队列从内存中移除。
+persist
+持久化指定的单个消费队列的消费进度。只有远程类型实现了该接口。
+removeOffset
+移除某个消费队列的消费进度。只有远程类型实现了该接口。
+updateConsumeOffsetToBroker
+更新消费队列到broker服务，只有远程类型实现了该接口。（这个设计好尴尬，本地类型需要么。。。）
+管理 org.apache.rocketmq.client.impl.consumer.RebalanceImpl.updateProcessQueueTableInRebalance做消费的负载均衡时，会对消费进度做管理。这个过程通过对比新分配的消费队列（简称新队列）和org.apache.rocketmq.client.impl.consumer.RebalanceImpl.processQueueTable维护的消费队列（简称旧队列），有几种情况：
+ 如果旧队列的消费队列不在新队列中，那么就会先持久化该队列的消费进度，再做删除操作。push模式同时优势有序的集群消费还需要做外的事情。
+ 如果如果旧队列的消费队列在新队列中，push模式下检查是否过期，过期的化先持久化，再删除进度。
+ 如果新队列的消费队列不在旧队列中，删除消费进度。本地模式不会做删除操作，远程模式会把内存中的消费进度删除掉。同时，push模式下面会从存储中拉取消费进度并保存到内存。
+  </description>
     </item>
     
     <item>
@@ -112,54 +59,12 @@
       <pubDate>Mon, 22 Oct 2018 17:07:02 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
-      <description>
-
-&lt;h2 id=&#34;缘起&#34;&gt;缘起&lt;/h2&gt;
-
-&lt;p&gt;封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。&lt;/p&gt;
-
-&lt;h2 id=&#34;排查过程&#34;&gt;排查过程&lt;/h2&gt;
-
-&lt;p&gt;查看boots-broker日志，发现问题日志：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;说明，RocketMQ处理发送消息比较慢。可是，从&lt;code&gt;size of queue&lt;/code&gt;可以看出，堆积的消息为0。&lt;/p&gt;
-
-&lt;p&gt;查看机器资源消耗情况，发现资源都是充裕的。&lt;/p&gt;
-
-&lt;p&gt;查看RocketMQ日志，发现store.log中有异常，master中的store.log周期性的发生以下日志：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;2018-10-22 15:44:07 INFO AcceptSocketService - HAService receive new connection, /10.38.34.27:54052
-2018-10-22 15:44:07 INFO ReadSocketService - ReadSocketService service started
-2018-10-22 15:44:07 INFO WriteSocketService - WriteSocketService service started
-2018-10-22 15:44:08 INFO WriteSocketService - WriteSocketService service end
-2018-10-22 15:44:12 INFO ReadSocketService - slave[/10.38.34.27:54052] request offset 157843228
-2018-10-22 15:44:12 INFO WriteSocketService - master transfer data from 157843228 to slave[/10.38.34.27:54052], and slave request 157843228
-2018-10-22 15:44:33 WARN ReadSocketService - ha housekeeping, found this connection[/10.38.34.27:54052] expired, 20019
-2018-10-22 15:44:33 INFO ReadSocketService - ReadSocketService service end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;从上可以看出，slave主动向master建立连接，5s之后发送自己当前同步的进度，master收到以后向slave发送同步数据，最后master由于slave的连接过期，主动断开连接。&lt;/p&gt;
-
-&lt;p&gt;slave中的store.log周期性的发生以下日志：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;2018-10-22 15:44:07 WARN HAClient - HAClient, housekeeping, found this connection[10.38.33.22:10912] expired, 1540194247979
-2018-10-22 15:44:07 WARN HAClient - HAClient, master not response some time, so close connection
-2018-10-22 15:44:33 INFO HAClient - HAClient, processReadEvent read socket &amp;lt; 0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;从上可以看出，slave也发现和master的连接超时，断开连接。&lt;/p&gt;
-
-&lt;p&gt;到这里，非常困惑，master和slave都主动断开连接！看代码，master的同步比较清晰和日志也比较一致。slave的同步日志和日志不一致。slave的同步代码核心&lt;a href=&#34;https://github.com/zjykzk/rocketmq/blob/master/store/src/main/java/org/apache/rocketmq/store/ha/HAService.java#L546&#34;&gt;代码&lt;/a&gt;中通过比较&lt;code&gt;lastWriteTimestamp&lt;/code&gt;和当前时间判断出与master的同步连接过期，以及master没有响应。在接收到master的消息、创建连接、关闭连接的时候都修改这个&lt;code&gt;lastWriteTimestamp&lt;/code&gt;值。关闭重置为0，其他重置为当前时间。看日志发现&lt;code&gt;lastWriteTimestamp&lt;/code&gt;和当前的时间差别巨大是&lt;code&gt;1540194247979&lt;/code&gt;，可以得出&lt;code&gt;lastWriteTimestamp&lt;/code&gt;其实是0。基本上可以判断是因为master主动关闭的。后来，通过tcpdump抓包得到了确认。这里要吐槽这个日志了，slave是被关闭的却是提示master没响应，其实master在关闭之前总共发了5次同步信息。&lt;/p&gt;
-
-&lt;p&gt;确认是master主动关闭，接下来的问题是为什么slave没有告诉master自己的进度。日志已经无能为力了，看到代码中有&lt;code&gt;while(true)&lt;/code&gt;片段，猜测会不会是死循环，通过&lt;code&gt;jstack&lt;/code&gt;发现没有。最后，通过手动添加日志发现master向slave发送的同步信息，slave都收到了，然后把&lt;code&gt;lastWriteTimestamp&lt;/code&gt;重置为当前的时间，巧合的是，每次函数&lt;code&gt;isTimeToReportOffset&lt;/code&gt;判断是否需要发送同步进度的时候恰好都为&lt;code&gt;false&lt;/code&gt;。这是因为master向slave同步间隔和slave向master报告同步进度的间隔默认都是5s，slave处理master的同步信息以后会重置&lt;code&gt;lastWriteTimestamp&lt;/code&gt;为当前时间，因此一直无法满足同步的条件，导致以上的现象。&lt;/p&gt;
-
-&lt;h2 id=&#34;解决方案&#34;&gt;解决方案&lt;/h2&gt;
-
-&lt;p&gt;可以知道，连接经常断开显然会影响同步的效率。解决方案可以把master同步时间设置的比slave的同步长，比如slave的同步间隔为3s，master同步间隔为5s。&lt;/p&gt;
-</description>
+      <description>缘起 封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。
+排查过程 查看boots-broker日志，发现问题日志：
+[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0  说明，RocketMQ处理发送消息比较慢。可是，从size of queue可以看出，堆积的消息为0。
+查看机器资源消耗情况，发现资源都是充裕的。
+查看RocketMQ日志，发现store.log中有异常，master中的store.log周期性的发生以下日志：
+2018-10-22 15:44:07 INFO AcceptSocketService - HAService receive new connection, /10.38.34.27:54052 2018-10-22 15:44:07 INFO ReadSocketService - ReadSocketService service started 2018-10-22 15:44:07 INFO WriteSocketService - WriteSocketService service started 2018-10-22 15:44:08 INFO WriteSocketService - WriteSocketService service end 2018-10-22 15:44:12 INFO ReadSocketService - slave[/10.38.34.27:54052] request offset 157843228 2018-10-22 15:44:12 INFO WriteSocketService - master transfer data from 157843228 to slave[/10.</description>
     </item>
     
     <item>
@@ -168,430 +73,27 @@
       <pubDate>Fri, 08 Dec 2017 17:59:56 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/rocketmq/store/</guid>
-      <description>
-
-&lt;h2 id=&#34;功能&#34;&gt;功能&lt;/h2&gt;
-
-&lt;p&gt;store模块是rocketmq的核心模块。主要功能有：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;消息存储&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;消息索引&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;消费队列&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;主从同步&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;延迟消息&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;清理过期的消息和消费队列&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;消息存储&#34;&gt;消息存储&lt;/h2&gt;
-
-&lt;p&gt;负责消息存储，包括写消息，刷盘。&lt;/p&gt;
-
-&lt;h3 id=&#34;消息文件&#34;&gt;消息文件&lt;/h3&gt;
-
-&lt;p&gt;消息保存在默认值为&lt;code&gt;${user.home}\store\commitlog&lt;/code&gt;文件夹下，可以通过配置项&lt;code&gt;storePathCommitLog&lt;/code&gt;修改。所有的消息都写入一个逻辑文件，每个逻辑文件包含大小相等的物理文件。&lt;/p&gt;
-
-&lt;h3 id=&#34;写消息&#34;&gt;写消息&lt;/h3&gt;
-
-&lt;p&gt;写消息在不同的场景下面会有不同的逻辑。&lt;/p&gt;
-
-&lt;h4 id=&#34;同步刷盘&#34;&gt;同步刷盘&lt;/h4&gt;
-
-&lt;p&gt;每条消息要写到磁盘以后才算完成。&lt;/p&gt;
-
-&lt;p&gt;在同步刷盘的场景下，会有一个定期检查消息是否已经写入磁盘的线程：&lt;code&gt;GroupCommitService&lt;/code&gt;，除了检查还会进行刷盘的操作 。写消息的时候会生成一个&lt;code&gt;GroupCommitRequest&lt;/code&gt;提交到&lt;code&gt;GroupCommitService&lt;/code&gt;，并等待被唤醒或者超时。当&lt;code&gt;GroupCommitService&lt;/code&gt;发现已经刷盘的最后一个消息的索引大于等于本消息的索引时就会唤醒&lt;code&gt;GroupCommitRequest&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;备注&lt;/strong&gt;：以上的场景还依赖于消息的属性&lt;code&gt;WAIT&lt;/code&gt;，只有该属性为空或者为&lt;code&gt;true&lt;/code&gt;才会执行同步刷盘逻辑，默认是空的。&lt;/p&gt;
-
-&lt;h4 id=&#34;异步刷盘&#34;&gt;异步刷盘&lt;/h4&gt;
-
-&lt;p&gt;在异步刷盘的场景下，会有一个把数据刷到磁盘的辅助线程：&lt;code&gt;FlushRealTimeService&lt;/code&gt;。写消息仅仅唤醒该线程就结束了写盘操作。&lt;/p&gt;
-
-&lt;h4 id=&#34;主从同步&#34;&gt;主从同步&lt;/h4&gt;
-
-&lt;p&gt;每条消息要等一个从broker同步完才算完成。&lt;/p&gt;
-
-&lt;p&gt;在主从同步的场景下，会有一个定期检查消息是否已经被从broker同步的辅助线程：&lt;code&gt;GroupTransferService&lt;/code&gt;。写消息的时候会生成一个&lt;code&gt;GroupCommitRequest&lt;/code&gt;提交给&lt;code&gt;GroupTransferService&lt;/code&gt;，并等待被唤醒或者超时。当&lt;code&gt;GroupTransferService&lt;/code&gt;发现从broker已经同步的最后一个消息的索引大于本次消息的索引时就会唤醒&lt;code&gt;GroupCommitRequest&lt;/code&gt;。&lt;/p&gt;
-
-&lt;h4 id=&#34;写buffer&#34;&gt;写buffer&lt;/h4&gt;
-
-&lt;p&gt;使用了写buffer以后，写消息的全部逻辑就是把消息写入buffer。同时，系统会有一个线程&lt;code&gt;CommitRealTimeService&lt;/code&gt;定期把消息写入文件。&lt;/p&gt;
-
-&lt;h3 id=&#34;核心代码&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.CommitLog
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;消费队列&#34;&gt;消费队列&lt;/h2&gt;
-
-&lt;p&gt;每个topic对应多个消费队列，这个是提高消费并发度的前提。&lt;/p&gt;
-
-&lt;h3 id=&#34;结构&#34;&gt;结构&lt;/h3&gt;
-
-&lt;p&gt;每个消费队列对应一个逻辑文件，文件中对应每个消息的内容大小是固定的20个字节，包含消息的偏移量，大小以及tag哈希值。&lt;/p&gt;
-
-&lt;h4 id=&#34;文件目录&#34;&gt;文件目录&lt;/h4&gt;
-
-&lt;p&gt;数据保存在目录&lt;code&gt;${rootpath}/consumequeue&lt;/code&gt;下面，&lt;code&gt;rootpath&lt;/code&gt; 通过配置项&lt;code&gt;storePathRootDir&lt;/code&gt;指定，默认的是&lt;code&gt;${user.home}/store&lt;/code&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;${rootpath}/consumequeue
-└── 0%default                     // topic
-    ├── 0                         // queue 0
-    │   └── 00000000000000000000
-    ├── 1                         // queue 1
-    │   └── 00000000000000000000
-    ├── 2                         // queue 2
-    │   └── 00000000000000000000
-    └── 3                         // queue 3
-        └── 00000000000000000000
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;队列元素&#34;&gt;队列元素&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;|&amp;lt;----- 8 byte -----&amp;gt;|&amp;lt;- 4 byte -&amp;gt;|&amp;lt;------ 8 byte ------&amp;gt;|
-+--------------------+------------+----------------------+
-|   commitlog offset |   size     | message tag hash code|
-+--------------------+------------+----------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;执行&#34;&gt;执行&lt;/h3&gt;
-
-&lt;p&gt;通过线程&lt;code&gt;ReputMessageService&lt;/code&gt;的分派消息的逻辑执行。&lt;/p&gt;
-
-&lt;h3 id=&#34;写盘&#34;&gt;写盘&lt;/h3&gt;
-
-&lt;p&gt;系统每隔1000ms（可配置）进行一次消费队列的写盘操作。&lt;/p&gt;
-
-&lt;h4 id=&#34;核心代码-1&#34;&gt;核心代码&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.DefaultMessageStore.FlushConsumeQueueService
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;清理消息&#34;&gt;清理消息&lt;/h2&gt;
-
-&lt;p&gt;系统每隔10s（可以配置）执行尝试删除过期的消息。&lt;/p&gt;
-
-&lt;h3 id=&#34;清理条件&#34;&gt;清理条件&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;清理时间到达，默认是凌晨4点。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;消息所在的磁盘使用率或者其他数据所在磁盘使用率操作告警阀值和强制删除阀值。&lt;br /&gt;
-
-&lt;ul&gt;
-&lt;li&gt;保存消息的目录通过配置项 &lt;code&gt;storePathCommitLog&lt;/code&gt; 指定，默认是 &lt;code&gt;$HOME/store/commitlog&lt;/code&gt;。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;保存其他数据的目录通过配置项 &lt;code&gt;storePathRootDir&lt;/code&gt; 指定，默认是 &lt;code&gt;$HOME/store&lt;/code&gt;。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;告警的磁盘使用率阀值通过系统变量 &lt;code&gt;rocketmq.broker.diskSpaceWarningLevelRatio&lt;/code&gt;指定，默认是 0.9。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;强制删除的磁盘使用率阀值通过系统变量 &lt;code&gt;rocketmq.broker.diskSpaceCleanForciblyRatio&lt;/code&gt;指定，默认是 0.75。&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;手动触发清理，这里提供了一个接口暴露给外面调用，调用以后会在连续执行20次删除。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;清理逻辑&#34;&gt;清理逻辑&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;正常清理过期的消息，过期时间可以通过配置项 &lt;code&gt;fileReservedTime&lt;/code&gt; 指定，默认是72小时。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;清理上次没有清理成功的消息，这是因为消息被清理时，其他地方正在使用。每隔一段时间执行一次，同时如果距离上次被清理时间超过了一段时间会被强制清理。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;通过配置项 &lt;code&gt;redeleteHangedFileInterval&lt;/code&gt;指定执行周期，默认120s。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;通过配置项 &lt;code&gt;destroyMapedFileIntervalForcibly&lt;/code&gt;指定强制清理的时间，默认120s。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;核心代码-2&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.DefaultMessageStore.CleanCommitLogService
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;清理消费队列以及索引&#34;&gt;清理消费队列以及索引&lt;/h2&gt;
-
-&lt;p&gt;随着消息的清理，包含已经清理掉消息的消费队列以及索引就变得没有用处了，所以系统每隔100ms（可以配置）执行清理消费队列和索引。&lt;/p&gt;
-
-&lt;h3 id=&#34;清理逻辑-1&#34;&gt;清理逻辑&lt;/h3&gt;
-
-&lt;p&gt;获取当前消息的最小偏移量，这个偏移量随着消息的清理会不停的变化。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;消费队列：如果队列的最大消息偏移量都比当前最小的消息偏移量小，那么就可以清理本队列。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;消息索引：如果索引中最大的消息偏移量都比当前最小的消息偏移量小，那么就可以清理本索引。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;核心代码-3&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.DefaultMessageStore.CleanConsumeQueueService
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;消息索引&#34;&gt;消息索引&lt;/h2&gt;
-
-&lt;p&gt;消息索引是方便用户查询消息的一个结构。系统可以通过配置项&lt;code&gt;messageIndexEnable&lt;/code&gt;开关消息索引，默认是打开的。索引允许重复构建，通过配置项&lt;code&gt;duplicationEnable&lt;/code&gt;指定。系统启动的时候，如果允许重复索引会重头构建，不然就从当前文件大小开始。&lt;/p&gt;
-
-&lt;h3 id=&#34;索引内容&#34;&gt;索引内容&lt;/h3&gt;
-
-&lt;p&gt;索引的key包含消息的两个属性：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;code&gt;KEYS&lt;/code&gt;，支持多个值，每个值之间通过空格分割。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;UNIQ_KEY&lt;/code&gt;。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;索引的内容是消息的偏移量和时间（秒的精度）。&lt;/p&gt;
-
-&lt;h3 id=&#34;结构-1&#34;&gt;结构&lt;/h3&gt;
-
-&lt;h4 id=&#34;目录结构&#34;&gt;目录结构&lt;/h4&gt;
-
-&lt;p&gt;数据保存在目录&lt;code&gt;${rootpath}/index&lt;/code&gt;下面，&lt;code&gt;rootpath&lt;/code&gt; 通过配置项&lt;code&gt;storePathRootDir&lt;/code&gt;指定，默认的是&lt;code&gt;${user.home}/store&lt;/code&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;index/
-└── 20171225143756745
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;文件内容&#34;&gt;文件内容&lt;/h4&gt;
-
-&lt;p&gt;每个文件内容分成3部分，header, slot table和index linked list。组织如下：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;|&amp;lt;-- 40 byte --&amp;gt;|&amp;lt;---   500w   ---&amp;gt;|&amp;lt;---   2000w   ---&amp;gt;|
-+---------------+------------------+-------------------+
-|    header     |   slot table     | index linked list |
-+---------------+------------------+-------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h5 id=&#34;header&#34;&gt;header&lt;/h5&gt;
-
-&lt;pre&gt;&lt;code&gt;+---------------------+--0
-| beginTimestampIndex | ----&amp;gt; 第一条消息的保存时间
-+---------------------+--8
-| endTimestampIndex   | ----&amp;gt; 最后一条消息的保存时间
-+---------------------+--16
-| beginPhyoffsetIndex | ----&amp;gt; 第一条消息的在commitlog中的偏移量
-+---------------------+--24
-| endPhyoffsetIndex   | ----&amp;gt; 最后一条消息的在commitlog中的偏移量
-+---------------------+--32
-| hashSlotcountIndex  | ----&amp;gt; 哈希槽数量，保存添加到本槽列表的最新索引位置
-+---------------------+--36
-| indexCountIndex     | ----&amp;gt; 索引数量，具体索引数据
-+---------------------+--40
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h5 id=&#34;slot-table-和-index-linked-list&#34;&gt;slot table 和 index linked list&lt;/h5&gt;
-
-&lt;p&gt;&lt;strong&gt;slot table&lt;/strong&gt;总共有500w个位置，每个位置保存的是在这个slot上的索引列表中最新的那个索引。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;index linked list&lt;/strong&gt;保存每个消息的索引数据&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;   
-   -  +-----+ &amp;lt;==== [slot table]
-   ^  |  10 |
-   |  +-----+
-   |  | 200 |
-   |  +-----+     +-----------+-------------+  +-----------+-------------+&amp;lt;=[index linked list]
-   |  |  18 | --&amp;gt; | index data| next index  |=&amp;gt;| index data| next index  |
- 500w +-----+     +-----------+-------------+  +-----------+-------------+
-   |  | ... |     /                         \
-   |  +-----+    /                           \------------------------------------\
-   |  | 90  |    |&amp;lt;--4 byte--&amp;gt;|&amp;lt;--- 8 byte    ---&amp;gt;|&amp;lt;--4 byte--&amp;gt;|&amp;lt;-----4 byte-----&amp;gt;|
-   |  +-----+    +------------+-------------------|------------+------------------+ &amp;lt;= [index]
-   v  | 100 |    | key hash   | commit log offset | timestamp  | next index offset|
-   -  +-----+    +------------+-------------------|------------+------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;执行-1&#34;&gt;执行&lt;/h3&gt;
-
-&lt;p&gt;通过线程&lt;code&gt;ReputMessageService&lt;/code&gt;的分派消息的逻辑执行。&lt;/p&gt;
-
-&lt;h3 id=&#34;核心代码-4&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.index
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;预分配mappedfile&#34;&gt;预分配MappedFile&lt;/h2&gt;
-
-&lt;p&gt;写消息写到内存映射的文件，每次去新建一个文件同时会做内存映射操作，新建过程当中根据配置会执行比较耗时的预热操作。为了加快这个操作。系统通过一个线程预分配需要的&lt;code&gt;MappedFile&lt;/code&gt;。具体逻辑就是在获取新的文件的时候发送两个请求，分别对应当前的需要的文件以及这个文件写满以后需要的下一个文件，然后等待直到预分配线程分配完当前需要的文件，或者超时。&lt;/p&gt;
-
-&lt;h3 id=&#34;核心代码-5&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.AllocateMappedFileService
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;消息后续逻辑&#34;&gt;消息后续逻辑&lt;/h2&gt;
-
-&lt;p&gt;当消息写入完成以后，系统有一个线程对消息可以做其他一些逻辑。比如：构建索引，消费队列，通知long pull的客户端请求。线程会维护一个消息索引，根据这个索引跟当前最大已经写入的消息的最大偏移量进行比较得到是否有消息需要处理。&lt;/p&gt;
-
-&lt;p&gt;当系统重启的时候，会根据&lt;code&gt;duplicationEnable&lt;/code&gt;来决定是否从头开始处理消息还是只处理新来的消息。在&lt;code&gt;duplicationEnable&lt;/code&gt;是&lt;code&gt;true&lt;/code&gt;的情况下，还需要设置&lt;code&gt;CommitLog.confirmOffset&lt;/code&gt;才能从头开始处理消息，因为默认情况下系统启动以后&lt;code&gt;CommitLog.confirmOffset&lt;/code&gt;和&lt;code&gt;ReputMessageService.reputFromOffset&lt;/code&gt;是相等的，详见代码&lt;code&gt;ReputMessageService.doReput&lt;/code&gt;。&lt;/p&gt;
-
-&lt;h3 id=&#34;具体逻辑&#34;&gt;具体逻辑&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;分派消息：构建消费队列，消息索引。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;同时long pull的客户端请求。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;核心代码-6&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.DefaultMessageStore.ReputMessageService
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ha&#34;&gt;HA&lt;/h2&gt;
-
-&lt;p&gt;RocketMQ的HA是最朴素的一主多从同步，主broker挂了从broker可以读数据，但是不能写，也不会自动主从切换。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://zjykzk.github.io/imgs/rocketmq/ha.png&#34; alt=&#34;ha&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;消息同步逻辑&#34;&gt;消息同步逻辑&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;启动的时候，MASTER会启动监听线程&lt;code&gt;AcceptSocketService&lt;/code&gt;，SLAVE会启动同步线程 &lt;code&gt;HAClient&lt;/code&gt;。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;建立连接&lt;code&gt;HAConnection&lt;/code&gt;之后，MASTER会为连接建立两个线程&lt;code&gt;WriteSocketService&lt;/code&gt;和&lt;code&gt;ReadSocketService&lt;/code&gt;分别负责这条连接的写和读。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;SLAVE向MASTER报告，当前同步的位置，具体是到目前为止同步到的偏移量。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;MASTER根据SLAVE报告的偏移量，发送消息数据。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;WriteSocketService&lt;/strong&gt;线程&lt;/p&gt;
-
-&lt;p&gt;主结点向从结点推送消息线程。线程会记录当前同步的位置确保同步的数据不会重复。当线程启动的时候会等待从结点上报同步进度，如果上报的结果是0，从当前新消息文件中的第一个消息偏移量开始同步（不理解* V *）。消息写完主结点之后，会通知本线程进行写消息。另外，写完消息以后会主动向从结点发送已经同步的位置，像是一个保活机制。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;ReadSocketService&lt;/strong&gt;线程&lt;/p&gt;
-
-&lt;p&gt;接收从结点的同步进度。它的任务就是接收从结点同步进度，然后通知等待从结点写完的消息。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;HAClient&lt;/strong&gt;线程&lt;/p&gt;
-
-&lt;p&gt;从结点和主结点同步线程。主要工作&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;和主结点建立同步连接。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;周期性的向主结点发送同步进度。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;接收主结点推送过来的数据，并把数据写入磁盘。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;检查是否有数据同步过来，有的话也会向主结点发送同步进度。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h4 id=&#34;写buffer的影响&#34;&gt;写buffer的影响&lt;/h4&gt;
-
-&lt;p&gt;当开启写buffer的时候，主从同步的逻辑中使用到的当前消息的最大索引计算逻辑是不一样的。在这种情况下，系统会有一个线程&lt;code&gt;CommitRealTimeService&lt;/code&gt;负责把写buffer中的数据写入文件。只有写入以后数据，才会被同步到从broker。也就是说主从同步的实时性还会受到这个线程的影响。&lt;/p&gt;
-
-&lt;h3 id=&#34;主从同步发送消息过程&#34;&gt;主从同步发送消息过程&lt;/h3&gt;
-
-&lt;p&gt;当我们使用主从同步模式的时候，消息要等到主、从都写完才能返回。在这个过程中，除了主从同步逻辑以外还有消息等待从结点写完成的逻辑。这个逻辑是通过&lt;code&gt;GroupTransferService&lt;/code&gt;完成的。大致流程如下：消息写完主结点后向&lt;code&gt;GroupTransferService&lt;/code&gt;发送等待从结点写完请求，&lt;code&gt;GroupTransferService&lt;/code&gt;只做一件事情，就是不断对比当前从结点同步进度与当前接收到的消息物理偏移量，如果从结点的同步进度大，说明消息已经写入从结点，随即通知消息已经写完。另外，从结点的同步进度是通过&lt;code&gt;ReadSocketService&lt;/code&gt;接收到从结点主动发过来的；当消息写完主结点之后会通知主结点往从结点写消息服务&lt;code&gt;WriteSocketService&lt;/code&gt;。&lt;/p&gt;
-
-&lt;h3 id=&#34;核心代码-7&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.ha.HAService
-org.apache.rocketmq.store.ha.HAConnection
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;定时任务&#34;&gt;定时任务&lt;/h2&gt;
-
-&lt;p&gt;实现了定时调度某个消息的功能。用户通过给消息设置&lt;code&gt;DELAY&lt;/code&gt;属性值来实现。&lt;/p&gt;
-
-&lt;p&gt;系统包含了一个名字为&lt;code&gt;SCHEDULE_TOPIC_XXXX&lt;/code&gt;的topic，当消息指定了&lt;code&gt;DELALY&lt;/code&gt;属性时，消息就会被发送到topic &lt;code&gt;SCHEDULE_TOPIC_XXXX&lt;/code&gt; 中，同时会保存原来的topic、消费队列、以及其他属性值。这些值都作为消息的属性来保存。&lt;/p&gt;
-
-&lt;p&gt;系统通过配置项&lt;code&gt;messageDelayLevel&lt;/code&gt;预定义可以延迟多长时间，同时每个延迟的级别对应着的消费队列。&lt;/p&gt;
-
-&lt;p&gt;系统通过一个定时器，周期性从每个延迟级别对应的消费队列中拿取消息，并检查是否到期，如果到期就会把消息放入到原来的topic和队列中，同时会把先前用于保存原来消息的属性值删除，并设置投递时间。&lt;/p&gt;
-
-&lt;h3 id=&#34;核心代码-8&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.schedule.ScheduleMessageService
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;统计&#34;&gt;统计&lt;/h2&gt;
-
-&lt;p&gt;消息的统计。包含：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;发送消息的总数&lt;code&gt;putMessageTimesTotal&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;发送消息时，不同响应时间级别的消息数量&lt;code&gt;putMessageDistributeTime&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;发送消息请求的最长响应时间&lt;code&gt;putMessageEntireTimeMax&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;发送消息的总大小&lt;code&gt;putMessageSizeTotal&lt;/code&gt;、平均大小&lt;code&gt;putMessageAverageSize&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;发消息的TPS&lt;code&gt;putTps&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;拉取消息请求的最长响应时间&lt;code&gt;getMessageEntireTimeMax&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;拉取消息请求命中TPS&lt;code&gt;getFoundTps&lt;/code&gt;、没有命中TPS &lt;code&gt;getMissTps&lt;/code&gt;以及总的请求TPS&lt;code&gt;getTotalTps&lt;/code&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;拉取消息的TPS，拉取消息请求，并返回消息的TPS &lt;code&gt;getTransferedTps&lt;/code&gt;&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;核心代码-9&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.StoreStatsService
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;写buffer-1&#34;&gt;写buffer&lt;/h2&gt;
-
-&lt;p&gt;如果开启了这个功能，系统启动时会向系统申请多块写buffer。每块buffer都会被锁在内存中。这个buffer只会被commitlog使用,写消息的时候写到这些buffer。&lt;/p&gt;
-
-&lt;h3 id=&#34;核心代码-10&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.TransientStorePool
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;内存映射的文件管理&#34;&gt;内存映射的文件管理&lt;/h2&gt;
-
-&lt;p&gt;rocketmq中的索引、消费队列、消息这些数据都通过内存映射进行读写。&lt;/p&gt;
-
-&lt;h3 id=&#34;映射文件&#34;&gt;映射文件&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;逻辑文件：数据按照顺序写入，由类&lt;code&gt;org.apache.rocketmq.store.MappedFileQueue&lt;/code&gt; 表示&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;物理文件：具体写数据的文件，由类&lt;code&gt;org.apache.rocketmq.store.MappedFile&lt;/code&gt; 表示&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;它们之间的关系：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;|&amp;lt;-                                  MappedFileQueue                                        -&amp;gt;|
-+-------------------+--------------------+-------------+-------------------+------------------+
-|000000000000000000 | 000000000000000100 |   ...       |000000000000010000 |000000000000020000|
-+-------------------+--------------------+-------------+-------------------+------------------+
-|&amp;lt;- MappedFile-0  -&amp;gt;|&amp;lt;-  MappedFile-1  -&amp;gt;|   ...       |&amp;lt;- MappedFile-n-1-&amp;gt;|&amp;lt;- MappedFile-n -&amp;gt;|
-+-------------------+--------------------+-------------+-------------------+------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;一个 &lt;code&gt;MappedFileQueue&lt;/code&gt; 由多个 &lt;code&gt;MappedFile&lt;/code&gt; 组成，每个 &lt;code&gt;MappedFile&lt;/code&gt; 文件大小相等，文件名是32个字符，并且表示当前文件中第一个记录在 &lt;code&gt;MappedFileQueue&lt;/code&gt;所代表的逻辑文件中的序号。&lt;/p&gt;
-
-&lt;h3 id=&#34;引用计数&#34;&gt;引用计数&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;MappedFile&lt;/code&gt;在一个多线程环境里面，在使用的时候有可能已经被执行了删除操作，通过引用计数的方式进行安全管理&lt;code&gt;MappedFile&lt;/code&gt;的生命周期。&lt;/p&gt;
-
-&lt;h3 id=&#34;优化&#34;&gt;优化&lt;/h3&gt;
-
-&lt;h4 id=&#34;预热&#34;&gt;预热&lt;/h4&gt;
-
-&lt;ol&gt;
-&lt;li&gt;新建&lt;code&gt;MappedFile&lt;/code&gt;时通过先把文件映射的内存都写一遍，内核为文件分配物理页。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;使用&lt;code&gt;mlock&lt;/code&gt;锁住文件映射的物理内存，确保这部分内存不被交换出去。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;使用&lt;code&gt;madvise&lt;/code&gt;通知内核这部分数据将来会读到。&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h4 id=&#34;写buffer-2&#34;&gt;写buffer&lt;/h4&gt;
-
-&lt;p&gt;建立一个buffer池，这些buffer是堆外内存。buffer所占用的内存是不会被交换出去的，同时也会通知内核这部分数据将来会读到。&lt;code&gt;MappedFile&lt;/code&gt;新建的时候可以通过这个池子获得buffer作为写的buffer。&lt;/p&gt;
-
-&lt;h3 id=&#34;核心代码-11&#34;&gt;核心代码&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;org.apache.rocketmq.store.MappedFileQueue
-org.apache.rocketmq.store.MappedFile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;备注&#34;&gt;备注&lt;/h2&gt;
-
-&lt;h3 id=&#34;代码版本&#34;&gt;代码版本&lt;/h3&gt;
-
-&lt;p&gt;4.1.0&lt;/p&gt;
-
-&lt;h3 id=&#34;参考文档&#34;&gt;参考文档&lt;/h3&gt;
-
-&lt;p&gt;RocketMQ design&lt;/p&gt;
-</description>
+      <description>功能 store模块是rocketmq的核心模块。主要功能有：
+ 消息存储
+ 消息索引
+ 消费队列
+ 主从同步
+ 延迟消息
+ 清理过期的消息和消费队列
+  消息存储 负责消息存储，包括写消息，刷盘。
+消息文件 消息保存在默认值为${user.home}\store\commitlog文件夹下，可以通过配置项storePathCommitLog修改。所有的消息都写入一个逻辑文件，每个逻辑文件包含大小相等的物理文件。
+写消息 写消息在不同的场景下面会有不同的逻辑。
+同步刷盘 每条消息要写到磁盘以后才算完成。
+在同步刷盘的场景下，会有一个定期检查消息是否已经写入磁盘的线程：GroupCommitService，除了检查还会进行刷盘的操作 。写消息的时候会生成一个GroupCommitRequest提交到GroupCommitService，并等待被唤醒或者超时。当GroupCommitService发现已经刷盘的最后一个消息的索引大于等于本消息的索引时就会唤醒GroupCommitRequest。
+备注：以上的场景还依赖于消息的属性WAIT，只有该属性为空或者为true才会执行同步刷盘逻辑，默认是空的。
+异步刷盘 在异步刷盘的场景下，会有一个把数据刷到磁盘的辅助线程：FlushRealTimeService。写消息仅仅唤醒该线程就结束了写盘操作。
+主从同步 每条消息要等一个从broker同步完才算完成。
+在主从同步的场景下，会有一个定期检查消息是否已经被从broker同步的辅助线程：GroupTransferService。写消息的时候会生成一个GroupCommitRequest提交给GroupTransferService，并等待被唤醒或者超时。当GroupTransferService发现从broker已经同步的最后一个消息的索引大于本次消息的索引时就会唤醒GroupCommitRequest。
+写buffer 使用了写buffer以后，写消息的全部逻辑就是把消息写入buffer。同时，系统会有一个线程CommitRealTimeService定期把消息写入文件。
+核心代码 org.apache.rocketmq.store.CommitLog  消费队列 每个topic对应多个消费队列，这个是提高消费并发度的前提。
+结构 每个消费队列对应一个逻辑文件，文件中对应每个消息的内容大小是固定的20个字节，包含消息的偏移量，大小以及tag哈希值。
+文件目录 数据保存在目录${rootpath}/consumequeue下面，rootpath 通过配置项storePathRootDir指定，默认的是${user.home}/store。
+${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │ └── 00000000000000000000 ├── 1 // queue 1 │ └── 00000000000000000000 ├── 2 // queue 2 │ └── 00000000000000000000 └── 3 // queue 3 └── 00000000000000000000  队列元素 |&amp;lt;----- 8 byte -----&amp;gt;|&amp;lt;- 4 byte -&amp;gt;|&amp;lt;------ 8 byte ------&amp;gt;| +--------------------+------------+----------------------+ | commitlog offset | size | message tag hash code| +--------------------+------------+----------------------+  执行 通过线程ReputMessageService的分派消息的逻辑执行。</description>
     </item>
     
   </channel>

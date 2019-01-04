@@ -9,7 +9,9 @@
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
     <lastBuildDate>Fri, 16 Nov 2018 14:13:32 +0800</lastBuildDate>
-    <atom:link href="http://zjykzk.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="http://zjykzk.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>为什么main函数是终结者</title>
@@ -17,89 +19,9 @@
       <pubDate>Fri, 16 Nov 2018 14:13:32 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</guid>
-      <description>&lt;p&gt;来一个&lt;code&gt;hello, world!&lt;/code&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-func main() {
-    println(&amp;quot;hello, world!&amp;quot;)
-} // line 5
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;编译调试。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# go build -o debug_main main.go // 编译
-# gdb debug_main                 // 开始调试
-(gdb) b 5 // 在第5行打断点
-(gdb) r   // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main
-(gdb) s   // 单步往下走，进入runtime.main代码
-runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207
-207             if atomic.Load(&amp;amp;runningPanicDefers) != 0 {
-(gdb) bt  // 查看调用栈
-#0  runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207
-#1  0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361
-#2  0x0000000000000000 in ?? ()
-(gdb) s
-216             if atomic.Load(&amp;amp;panicking) != 0 {
-(gdb) s
-220             exit(0)
-(gdb) s
-runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
-52              MOVL    code+0(FP), DI
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;从上面的结果可以知道，自己写的&lt;code&gt;main&lt;/code&gt;函数被编译成&lt;code&gt;main_main&lt;/code&gt;，然后被&lt;code&gt;runtime.main&lt;/code&gt;所调用。通过查看&lt;code&gt;runtime.main&lt;/code&gt;可以看到以下代码，说明它执行结束以后会调用&lt;code&gt;exit(0)&lt;/code&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;   // file: goroot/src/runtime/proc.go: main()
-   220   exit(0)
-   221   for {
-   222     var x *int32
-   223     *x = 0
-   224   }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;查看&lt;code&gt;exit&lt;/code&gt;函数代码，它调用了系统调用&lt;code&gt;exit_group&lt;/code&gt;，退出所有线程。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// file: goroot/src/runtime/sys_linux_amd64.s:52
- 51 TEXT runtime·exit(SB),NOSPLIT,$0-4
- 52     MOVL    code+0(FP), DI
- 53     MOVL    $SYS_exit_group, AX
- 54     SYSCALL
- 55     RET
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;还有一个比较有意思的事情是当查看调用栈的时候，显示&lt;code&gt;runtime.main&lt;/code&gt;是通过&lt;code&gt;runtime.goexit()&lt;/code&gt;调用的。其实这是因为创建goroutine的时候会把&lt;code&gt;goexit&lt;/code&gt;的地址加1这个值放到它的栈顶，这样goroutine的函数执行完毕就会接着执行&lt;code&gt;goexit&lt;/code&gt;而&lt;code&gt;goexit&lt;/code&gt;又会调用&lt;code&gt;schedule&lt;/code&gt;这个函数，继续寻找goroutine并执行。&lt;/p&gt;
-
-&lt;p&gt;把&lt;code&gt;goexit&lt;/code&gt;放到goroutine的栈顶代码：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// file: goroot/src/runtime/proc.go:newproc1(fn *funcval, argp *uint8, narg int32, callerpc uintptr)
-
-3315   newg.sched.pc = funcPC(goexit) + sys.PCQuantum // +PCQuantum so that previous instruction is in same function
-3316   newg.sched.g = guintptr(unsafe.Pointer(newg))
-3317   gostartcallfn(&amp;amp;newg.sched, fn)
-            |
-            V
-// file: goroot/src/runtime/stack.go:func gostartcallfn(gobuf *gobuf, fv *funcval) 
-1085   gostartcall(gobuf, fn, unsafe.Pointer(fv))
-            |
-            V
-// file: goroot/src/runtime/sys_x86.go:func gostartcall(buf *gobuf, fn, ctxt unsafe.Pointer)
-22   sp -= sys.PtrSize
-23   *(*uintptr)(unsafe.Pointer(sp)) = buf.pc // 这里的pc就是 funcPC(goexit) + sys.PCQuantum
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;再看&lt;code&gt;runtime.goexit&lt;/code&gt;代码：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// file: goroot/src/runtime/asm_amd64.s
-2360 TEXT runtime·goexit(SB),NOSPLIT,$0-0
-2361     BYTE    $0x90   // NOP
-2362     CALL    runtime·goexit1(SB) // does not return
-2363     // traceback from goexit1 must hit code range of goexit
-2364     BYTE    $0x90   // NOP
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;因为压入goroutine栈的值是&lt;code&gt;runtime.goexit+sys.PCQuantum(=1)&lt;/code&gt;，因此goroutine函数返回的时候会执行第&lt;code&gt;2361&lt;/code&gt;行代码。&lt;/p&gt;
-</description>
+      <description>来一个hello, world!。
+package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5  编译调试。
+# go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?</description>
     </item>
     
     <item>
@@ -108,65 +30,12 @@ runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
       <pubDate>Tue, 27 Feb 2018 19:51:16 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/golang/tls/</guid>
-      <description>&lt;p&gt;在golang中，为了性能的目的，当前执行的&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332&#34;&gt;&lt;code&gt;g&lt;/code&gt;&lt;/a&gt;是保存在当前线程的TLS中的，而TLS的地址在结构体&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412&#34;&gt;&lt;code&gt;m&lt;/code&gt;&lt;/a&gt;里面。问题是怎么放进去的呢？&lt;/p&gt;
-
-&lt;p&gt;可以从程序的启动入手，顺藤摸瓜。&lt;/p&gt;
-
-&lt;p&gt;编写一个打印&lt;code&gt;hello,world&lt;/code&gt;的程序&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// hello.go
-
-package main
-
-func main() {
-        print(&amp;quot;hello, world&amp;quot;)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;编译生成可执行文件&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;go build -o hello hello.go
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;用gdb进行调试，找到程序的入口 &lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L7&#34;&gt;&lt;code&gt;_rt0_amd64_linux&lt;/code&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;gdb hello
-(gdb) info files
-...
-Entry point: 0x448f20
-...
-(gdb) list *0x448f20
-0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8)
-3       // license that can be found in the LICENSE file.
-4
-5       #include &amp;quot;textflag.h&amp;quot;
-6
-7       TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8
-8               LEAQ    8(SP), SI // argv
-9               MOVQ    0(SP), DI // argc
-10              MOVQ    $main(SB), AX
-11              JMP     AX
-12
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;发现&lt;code&gt;_rt0_amd64_linux&lt;/code&gt;调用了&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L72&#34;&gt;&lt;code&gt;main&lt;/code&gt;&lt;/a&gt;函数，后者调用了&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/asm_amd64.s#L10&#34;&gt;&lt;code&gt;runtime.rt0_go&lt;/code&gt;&lt;/a&gt;。而在函数&lt;code&gt;runtime.rt0_go&lt;/code&gt;中&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;127 	LEAQ	runtime·m0+m_tls(SB), DI
-128 	CALL	runtime·settls(SB)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;把&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/proc.go#L79&#34;&gt;&lt;code&gt;m0.tls&lt;/code&gt;&lt;/a&gt;的地址放到寄存器&lt;code&gt;DI&lt;/code&gt;，并调用了函数&lt;code&gt;runtime.settls&lt;/code&gt;，查看&lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/sys_linux_amd64.s#L496&#34;&gt;&lt;code&gt;runtime.settls&lt;/code&gt;&lt;/a&gt;核心代码&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;503 	ADDQ	$8, DI	// ELF wants to use -8(FS)
-504 #endif
-505 	MOVQ	DI, SI
-506 	MOVQ	$0x1002, DI	// ARCH_SET_FS
-507 	MOVQ	$158, AX	// arch_prctl
-508 	SYSCALL
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可以看到，这里调用了系统调用&lt;a href=&#34;http://man7.org/linux/man-pages/man2/arch_prctl.2.html&#34;&gt;&lt;code&gt;arch_prctl&lt;/code&gt;&lt;/a&gt;，在linux下把&lt;code&gt;m0.tls+8&lt;/code&gt;的地址保存到&lt;code&gt;fs&lt;/code&gt;寄存器。到此，完成TLS的设置。&lt;/p&gt;
-</description>
+      <description>在golang中，为了性能的目的，当前执行的g是保存在当前线程的TLS中的，而TLS的地址在结构体m里面。问题是怎么放进去的呢？
+可以从程序的启动入手，顺藤摸瓜。
+编写一个打印hello,world的程序
+// hello.go package main func main() { print(&amp;quot;hello, world&amp;quot;) }  编译生成可执行文件
+go build -o hello hello.go  用gdb进行调试，找到程序的入口 _rt0_amd64_linux
+gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;quot;textflag.h&amp;quot; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12  发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
     </item>
     
     <item>
@@ -175,188 +44,9 @@ Entry point: 0x448f20
       <pubDate>Thu, 15 Jun 2017 19:13:25 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/golang/map/</guid>
-      <description>
-
-&lt;h1 id=&#34;类型&#34;&gt;类型&lt;/h1&gt;
-
-&lt;p&gt;golang中的map是一个 &lt;strong&gt;指针&lt;/strong&gt;。当执行语句 &lt;code&gt;make(map[string]string)&lt;/code&gt; 的时候，其实是调用了 &lt;code&gt;makemap&lt;/code&gt; 函数：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// file: runtime/hashmap.go:L222
-func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;显然，&lt;code&gt;makemap&lt;/code&gt; 返回的是指针。&lt;/p&gt;
-
-&lt;h1 id=&#34;数据结构&#34;&gt;数据结构&lt;/h1&gt;
-
-&lt;h2 id=&#34;hashmap&#34;&gt;hashmap&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// hash map
-type hmap struct {
-    // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用
-    count     int
-
-    // map标记:
-    // 1. key和value是否包指针
-    // 2. 是否正在扩容
-    // 3. 是否是同样大小的扩容
-    // 4. 是否正在 `range`方式访问当前的buckets
-    // 5. 是否有 `range`方式访问旧的bucket
-    flags     uint8
-    B         uint8  // log_2(B) == bucket数量
-    noverflow uint16 // overflow bucket的数量，是个近似值
-    hash0     uint32 // hash种子
-
-    buckets    unsafe.Pointer // bucket slice指针，如果count == 0，这里的值为 nil
-    oldbuckets unsafe.Pointer // bucket slice指针，仅当在扩容的时候不为nil
-    nevacuate  uintptr        // 扩容时已经移到新的map中的bucket数量
-
-    // 当key和value的类型不包含指针的时候，key和value就会做inline处理(怎么处理的)
-    // 保证overflow的bucket活着，不被gc回收
-    overflow *[2]*[]*bmap
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;bucket&#34;&gt;bucket&lt;/h2&gt;
-
-&lt;p&gt;每个bucket固定包含8个key和value。实现上面是一个固定的大小连续内存块，分成四部分：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;每个条目的状态&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;8个key值&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;8个value值&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;指向下个bucket的指针&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;数据结构定义如下：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// bucket
-type bmap struct {
-        // 每个条目的状态，tophash[0]表示当前bucket中的条目是否已经完全移到新的bucket中去了
-        tophash [bucketCnt]uint8
-        // keys
-        // values
-        // Followed by an overflow pointer.
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;条目状态&#34;&gt;条目状态&lt;/h3&gt;
-
-&lt;p&gt;. &lt;code&gt;0&lt;/code&gt; 空，可以被使用&lt;/p&gt;
-
-&lt;p&gt;. &lt;code&gt;1&lt;/code&gt; 空，bucket中的内容已经被移到了新的bucket中&lt;/p&gt;
-
-&lt;p&gt;. &lt;code&gt;2&lt;/code&gt; 该条目已经被移到了新的bucket，该bucket的位置在处在前半部分&lt;/p&gt;
-
-&lt;p&gt;. &lt;code&gt;3&lt;/code&gt; 该条目已经被移到了新的bucket，该bucket的位置在处在后半部分&lt;/p&gt;
-
-&lt;p&gt;. 其他大于等于&lt;code&gt;4&lt;/code&gt; 的值，来自key的hash值的最高8位，如果高8位值小于4，则加4&lt;/p&gt;
-
-&lt;h4 id=&#34;第一个条目状态&#34;&gt;第一个条目状态&lt;/h4&gt;
-
-&lt;p&gt;bucket的第一个条目&lt;code&gt;tophash[0]&lt;/code&gt; 用来标识bucket中的条目是否已经全部被移到了新的bucket中去了， &lt;code&gt;1-3&lt;/code&gt; 表示已经移动完。&lt;/p&gt;
-
-&lt;h3 id=&#34;内存布局&#34;&gt;内存布局&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;   ----+-----------------+ -.
-   ^   |     bucket0     |  |------&amp;gt; +------------+
-   |   +-----------------+ -&#39;        | tophash0-7 |
-2^h.B  |     .......     |           +------------+
-   |   +-----------------+           |   key0-7   |
-   v   | bucket2^h.B - 1 |           +------------+
-   ----+-----------------+           |  value0-7  |
-                                     +------------+ -.
-                                     |overflow_ptr|  |-----&amp;gt; new bucket address
-                                     +------------+ -&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;选择这样的布局的好处：由于对齐的原因，&lt;em&gt;key0/value0/key1/value1&amp;hellip;&lt;/em&gt; 这样的形式可能需要更多的补齐空间，比如 &lt;code&gt;map[int64]int8&lt;/code&gt; ，1字节的value后面需要补齐7个字节才能保证下一个key是 &lt;code&gt;int64&lt;/code&gt; 对齐的。&lt;/p&gt;
-
-&lt;h2 id=&#34;装载因子&#34;&gt;装载因子&lt;/h2&gt;
-
-&lt;p&gt;装载因子决定map的资源使用率以及性能高低，在实现map时，考虑四个方面：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;%overflow：拥有overflow的bucket的百分比&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;bytes/entry: 每个key/value的额外开销&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;hitprobe: 查找存在的key时需要检查的条目数量&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;missprobe: 查找不存在的key是需要检查的条目数量&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;其测试数据如下：&lt;/p&gt;
-
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th align=&#34;center&#34;&gt;装载因子&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;%overflow&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;bytes/entry&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;hitprobe&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;missprobe&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td align=&#34;center&#34;&gt;6.5&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;20.90&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;10.79&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;4.25&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;6.5&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;h1 id=&#34;hash函数&#34;&gt;hash函数&lt;/h1&gt;
-
-&lt;p&gt;map中的key对应着一个hash函数，用于定位bucket。在golang的hash函数是固定的，用户无法修改。golang中的预定义基本类型，像 &lt;code&gt;int32/int64/string/interface&lt;/code&gt; 等等都有一个hash函数与之对应，代码在runtime/alg.go中。对于struct/数组/slice，如果它每个字段或者元素都是有hash函数，那么该类型就有hash函数，hash值由每个字段的hash值来定义，代码在reflect/type.go函数&lt;code&gt;StructOf&lt;/code&gt;中。&lt;/p&gt;
-
-&lt;p&gt;注：&lt;code&gt;map&lt;/code&gt;是不能作为key的。&lt;/p&gt;
-
-&lt;h1 id=&#34;扩容&#34;&gt;扩容&lt;/h1&gt;
-
-&lt;p&gt;当进行添加元素的操作时，如果超过装载因子，或者overflow的bucket数量超出阈值，就会触发扩容的操作。如果是因为overflow的bucket数量过多引起的，map的容量不会扩大，不然就扩大为原来的大小的两倍。&lt;/p&gt;
-
-&lt;p&gt;在实现扩容的时候，会先为需要的bucket分配新内存，然后把旧的bucket保存起来，再把旧的内容移到新的bucket中去。&lt;/p&gt;
-
-&lt;h1 id=&#34;线程安全&#34;&gt;线程安全&lt;/h1&gt;
-
-&lt;p&gt;map是线程不安全的。但是在实现中有很多关于并发访问的代码，比如&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;在迭代的时候会做是否正在扩容&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;添加数据的时候是否有其他数据正在写，有的话会panic&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;既然不是线程安全，为啥要做这样的检查，不检查的话可以简化代码提高性能。检查的好处就是告知提醒用户并发访问了map，但是这个检查也不是百分之一百的检测到所有的并发访问。&lt;/p&gt;
-
-&lt;h1 id=&#34;键值nan&#34;&gt;键值NaN&lt;/h1&gt;
-
-&lt;p&gt;&lt;code&gt;NaN&lt;/code&gt; 的hash值是随机(&lt;a href=&#34;https://research.swtch.com/randhash&#34;&gt;原因&lt;/a&gt;)，也就是说每次计算hash值都有可能是不一样的。这个跟python/java等其他语言有比较大的差别。&lt;/p&gt;
-
-&lt;p&gt;正是因为这样有了以下几个有趣的事情：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;当 &lt;code&gt;NaN&lt;/code&gt; 作为key的时候，为了保持hash值的不变性，利用 &lt;code&gt;tophash&lt;/code&gt; 的最低位来判断是放在扩容以后bucket的上半部份还是下半部分&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;用 &lt;code&gt;NaN&lt;/code&gt; 做key取数据时永远也取不到，用 &lt;code&gt;for&lt;/code&gt; 迭代map是唯一一种访问 key为&lt;code&gt;NaN&lt;/code&gt; 的内容的方式&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h1 id=&#34;迭代&#34;&gt;迭代&lt;/h1&gt;
-
-&lt;p&gt;&lt;code&gt;for&lt;/code&gt; 语句迭代map，在会调用函数 &lt;code&gt;mapiterinit&lt;/code&gt; 做初始化工作：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;随机挑选一个起始位置开始迭代：a. bucket随机选一个，b. bucket中的起始条目也是随机的&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;初始化overflow，目的是为了防止那些内联的数据被gc，导致迭代失败&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;每次获取一个元素的时候调用函数&lt;code&gt;mapiternext&lt;/code&gt;&lt;/p&gt;
-</description>
+      <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
+// file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap  显然，makemap 返回的是指针。
+数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用 count int // map标记: // 1. key和value是否包指针 // 2. 是否正在扩容 // 3. 是否是同样大小的扩容 // 4. 是否正在 `range`方式访问当前的buckets // 5. 是否有 `range`方式访问旧的bucket flags uint8 B uint8 // log_2(B) == bucket数量 noverflow uint16 // overflow bucket的数量，是个近似值 hash0 uint32 // hash种子 buckets unsafe.</description>
     </item>
     
     <item>
@@ -365,184 +55,15 @@ type bmap struct {
       <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/golang/go-memory-model/</guid>
-      <description>
-
-&lt;p&gt;内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。&lt;/p&gt;
-
-&lt;h2 id=&#34;happens-before&#34;&gt;Happens Before&lt;/h2&gt;
-
-&lt;p&gt;编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;int a = 0;
-int b = 1;
-print(a);
-print(b);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;int a = 0;
-print(a);
-int b = 1;
-print(b);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;happens before&lt;/strong&gt;定义了内存操作的顺序，它是一种偏序。&lt;em&gt;e1&lt;/em&gt; happens before &lt;em&gt;e2&lt;/em&gt;, &lt;em&gt;e2&lt;/em&gt; happens after &lt;em&gt;e1&lt;/em&gt; 。如果 &lt;em&gt;e1&lt;/em&gt; 既不happens before &lt;em&gt;e2&lt;/em&gt; 也不happens after &lt;em&gt;e2&lt;/em&gt; ，那么 &lt;em&gt;e1&lt;/em&gt; 和 &lt;em&gt;e2&lt;/em&gt; 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;在一个goroutine中，happens before的顺序就是代码表达的顺序。&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;共享变量 &lt;em&gt;v&lt;/em&gt; 的读操作 &lt;em&gt;r&lt;/em&gt; ，能够读到是另一个对变量 &lt;em&gt;v&lt;/em&gt; 写操作 &lt;em&gt;w&lt;/em&gt; 写入的值的条件是：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;em&gt;w&lt;/em&gt; happens before &lt;em&gt;r&lt;/em&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;没有其他的对变量 &lt;em&gt;v&lt;/em&gt; 写操作happens before &lt;em&gt;r&lt;/em&gt; 并且happens after &lt;em&gt;w&lt;/em&gt;&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;这两个条件并不能保证有一个与 &lt;em&gt;r&amp;amp;w&lt;/em&gt; 没有任何happens before关系的对共享变量 &lt;em&gt;v&lt;/em&gt; 写操作 &lt;em&gt;w&amp;rsquo;&lt;/em&gt; 的存在，导致 &lt;em&gt;r&lt;/em&gt; 读到的是 &lt;em&gt;w&amp;rsquo;&lt;/em&gt; 的结果。所以，保证 &lt;em&gt;r&lt;/em&gt; 的结果是 &lt;em&gt;w&lt;/em&gt; 的值的条件是：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;em&gt;w&lt;/em&gt; happens before &lt;em&gt;r&lt;/em&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;在 &lt;em&gt;w&lt;/em&gt; 和 &lt;em&gt;r&lt;/em&gt; 之间没有任何写操作，也就是说其他的写操作要么happens before &lt;em&gt;w&lt;/em&gt; ，要么happens after &lt;em&gt;r&lt;/em&gt;&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;在只有一个goroutine中1和2是等价的。 &lt;em&gt;r&lt;/em&gt; 的结果一定是最近一次 &lt;em&gt;w&lt;/em&gt; 的结果。&lt;strong&gt;如果多个goroutine访问共享变量，就会产生竞争，必须要通过同步机制建立happens before关系才能确定共享变量的值&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;另外，1) 变量自动的初始化为其类型对应的0时，相当于是一个写操作，也会产生竞争；2) 对多个机器字进行读写的时候，哪个字先读写是不确定的。&lt;/p&gt;
-
-&lt;h2 id=&#34;同步机制&#34;&gt;同步机制&lt;/h2&gt;
-
-&lt;h3 id=&#34;初始化&#34;&gt;初始化&lt;/h3&gt;
-
-&lt;p&gt;程序的初始化是通过一个goroutine执行的，这个goroutine会生成一个新的goroutine，因此会有竞争存在。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;包 &lt;em&gt;p&lt;/em&gt; 依赖 *q*，&lt;em&gt;q&lt;/em&gt; 的 &lt;em&gt;init&lt;/em&gt; 函数happens before包 &lt;em&gt;p&lt;/em&gt; 的任何操作&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;所有 &lt;em&gt;init&lt;/em&gt; 函数执行结束happens before &lt;em&gt;main.main&lt;/em&gt; 函数&lt;br /&gt;
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;goroutine-创建&#34;&gt;Goroutine 创建&lt;/h3&gt;
-
-&lt;p&gt;&lt;em&gt;go&lt;/em&gt; 语句happens before新创建的goroutine的运行。以下代码中，&lt;strong&gt;&lt;em&gt;1&lt;/em&gt;&lt;/strong&gt; happens before &lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt;，&lt;strong&gt;&lt;em&gt;2&lt;/em&gt;&lt;/strong&gt; happens before 函数&lt;strong&gt;&lt;em&gt;f&lt;/em&gt;&lt;/strong&gt;的执行，在将来的某个时刻所以打印 &lt;code&gt;hello, world&lt;/code&gt;（可能是在hello函数返回之后）。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
-
-func f() {
-	print(a)
-}
-
-func hello() {
-	a = &amp;quot;hello, world&amp;quot; // 1
-	go f()             // 2
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;goroutine-销毁&#34;&gt;Goroutine 销毁&lt;/h3&gt;
-
-&lt;p&gt;goroutine的退出跟其他的操作没有任何的happens before操作。以下代码无法保证&lt;strong&gt;&lt;em&gt;print(a)&lt;/em&gt;&lt;/strong&gt;的结果就是 &lt;code&gt;hello, world&lt;/code&gt;。事实上，编译器完全有可能把 &lt;em&gt;go&lt;/em&gt; 语句完全的删除掉。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var a string
-
-func hello() {
-	go func() { a = &amp;quot;hello&amp;quot; }()
-	print(a)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;channel通信&#34;&gt;Channel通信&lt;/h3&gt;
-
-&lt;p&gt;channel在golang里面是同步的一个重要手段。channel上面的每个发送操作，都唯一对应着一个channel上面的接受操作，显然发送／接受操作在不同的goroutine下面才需要讨论。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;在一个channel上面的发送操作的完成happens before想对应的接受操作的完成。&lt;/strong&gt;以下代码中，按照本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var c = make(chan int, 10)
-var a string
-
-func f() {
-	a = &amp;quot;hello, world&amp;quot;
-	c &amp;lt;- 0       // 1
-}
-
-func main() {
-	go f()
-	&amp;lt;-c          // 2
-	print(a)     // 3
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;channel的关闭操作happens before因为关闭channel读到的0值。&lt;/strong&gt;上面例子中，用 &lt;em&gt;close( c)&lt;/em&gt; 代替 &lt;em&gt;ch &amp;lt;- 0&lt;/em&gt; 同样能够保证 &lt;em&gt;1&lt;/em&gt;  happens before &lt;em&gt;2&lt;/em&gt;  。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;没有缓冲的channel上面的接受操作happens before发送操作。也就是说，发送操作只有在channel上面进行的接受操作结束以后才返回。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; 。另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var c = make(chan int)
-var a string
-
-func f() {
-	a = &amp;quot;hello, world&amp;quot;
-	&amp;lt;-c	                 // 1
-}
-
-func main() {
-	go f()
-	c &amp;lt;- 0               // 2
-	print(a)             // 3
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;如果一个channel有 &lt;em&gt;C&lt;/em&gt; 容量的缓冲，第 &lt;em&gt;k&lt;/em&gt; 个接受操作happens before第 &lt;em&gt;k+C&lt;/em&gt; 个发送操作。&lt;/strong&gt;根据这个规则可以用带缓冲的channel来模拟信号量。以下程序就保证了，同时最多只有3个goroutine同时执行 &lt;em&gt;w&lt;/em&gt; 函数。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var limit = make(chan int, 3)
-
-func main() {
-	for _, w := range work {
-		go func(w func()) {
-			limit &amp;lt;- 1
-			w()
-			&amp;lt;-limit
-		}(w)
-	}
-	select{}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;locks&#34;&gt;Locks&lt;/h3&gt;
-
-&lt;p&gt;包 &lt;em&gt;sync&lt;/em&gt; 实现了两类锁分别是： &lt;em&gt;sync.Mutex&lt;/em&gt; 和 &lt;em&gt;sync.RWMutex。&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;给定类型为 &lt;em&gt;sync.Mutex&lt;/em&gt; 或者是 &lt;em&gt;sync.RWMutex&lt;/em&gt; 的变量 &lt;em&gt;l&lt;/em&gt; ,以及满足 &lt;em&gt;n&amp;lt;m&lt;/em&gt; 条件的整数。调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock()&lt;/em&gt;  happens before 调用 &lt;em&gt;m&lt;/em&gt; 次 &lt;em&gt;l.Lock()&lt;/em&gt; （返回）。&lt;/strong&gt;以下代码中，根据本规则 &lt;em&gt;1&lt;/em&gt; happens before &lt;em&gt;2&lt;/em&gt; ，另外，因为 &lt;em&gt;2&lt;/em&gt; 和 &lt;em&gt;3&lt;/em&gt; 在同一个goroutine中执行， &lt;em&gt;2&lt;/em&gt; happens before &lt;em&gt;3&lt;/em&gt; ，所以能够打印出 &lt;code&gt;hello, world&lt;/code&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var l sync.Mutex
-var a string
-
-func f() {
-	a = &amp;quot;hello, world&amp;quot;
-	l.Unlock()       // 1
-}
-
-func main() {
-	l.Lock()
-	go f()
-	l.Lock()         // 2
-	print(a)         // 3
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;对于 &lt;em&gt;sync.RWMutex&lt;/em&gt; 类型的变量l，存在一个整数 &lt;em&gt;n&lt;/em&gt; ， &lt;em&gt;l.RLock&lt;/em&gt; 的调用happens after(返回)调用 &lt;em&gt;n&lt;/em&gt; 次 &lt;em&gt;l.Unlock&lt;/em&gt; ，与这个 &lt;em&gt;l.RLock&lt;/em&gt; 想对应的 &lt;em&gt;l.RUnlock&lt;/em&gt; happens before 第 &lt;em&gt;n+1&lt;/em&gt; 的 &lt;em&gt;l.Lock&lt;/em&gt; 。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;once&#34;&gt;Once&lt;/h3&gt;
-
-&lt;p&gt;Once提供了保证某段代码只执行一次的机制。对某个函数 &lt;em&gt;f&lt;/em&gt; ， &lt;em&gt;once.Do(f)&lt;/em&gt; 调用保证了 &lt;em&gt;f&lt;/em&gt; 只被执行一次，如果有多个goroutine执行 &lt;em&gt;once.Do(f)&lt;/em&gt; ，其中一个执行了，其他就等待直到f执行完毕。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;调用 &lt;em&gt;once.Do(f)&lt;/em&gt; 中 &lt;em&gt;f&lt;/em&gt; (返回)happens before 其他 &lt;em&gt;once.Do(f)&lt;/em&gt; 调用完成。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
-
-&lt;p&gt;为了更有效率的执行程序，编译器，CPU都会一某种方式进行优化。当程序是并发执行的时候，内存的数据就变得无法根据程序代码判断内存中的值。内存模型的作用就是在程序的层面规定内存的操作顺序，以达到确定内存值的目的。而happens before是一个定义这个操作顺序的规范。&lt;/p&gt;
-</description>
+      <description>内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
+Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
+int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
+int a = 0; print(a); int b = 1; print(b);  但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.
+happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 e2 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
+在一个goroutine中，happens before的顺序就是代码表达的顺序。
+共享变量 v 的读操作 r ，能够读到是另一个对变量 v 写操作 w 写入的值的条件是：
+ w happens before r
+ 没有其他的对变量 v 写操作happens before r 并且happens after w</description>
     </item>
     
   </channel>

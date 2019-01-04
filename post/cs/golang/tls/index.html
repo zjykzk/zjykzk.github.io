@@ -1,105 +1,17 @@
 <!DOCTYPE html>
-<html class="nojs" lang="zh" dir="ltr">
-<head>
-<meta charset="utf-8">
-<title>golang中的tls – 老K随笔</title>
-<meta name="description" content="golang中tls的使用。">
-<meta name="created" content="2018-02-27T19:51:16&#43;0800">
-<meta name="modified" content="2018-02-27T19:51:16&#43;0800">
-<meta name="author" content="zenk">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-<meta name="MobileOptimized" content="width">
-<meta name="HandheldFriendly" content="true">
-<meta name="generator" content="Hugo 0.48-DEV" />
-
-
-<link href="/css/prism.css" rel="stylesheet" />
-
-<link rel="stylesheet" href="/css/styles.css">
-<link rel="canonical" href="http://zjykzk.github.io/post/cs/golang/tls/">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preload" as="style" href="/css/styles.css">
-<link rel="stylesheet" href="/css/styles.css">
-<link rel="stylesheet" href="/css/print.css" media="print">
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "golang中的tls",
-    "datePublished": "2018-02-27T19:51:16+08:00",
-    "dateModified": "2018-02-27T19:51:16+08:00",
-    "url" : "http://zjykzk.github.io/post/cs/golang/tls/",
-    "description": "golang中tls的使用。",
-    "keywords": ["golang"],
-    "author": {
-      "@type": "Person",
-      "name": "zenk"
-    },
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "http://zjykzk.github.io/"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "老K随笔",
-      "url": "http://zjykzk.github.io/",
-    }
-  }
-</script>
-
-</head>
-
-<body>
-<div class="page layout__page">
-<header class="header layout__header" role="banner">
-
-<h1 class="header__site-name">
-<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
-</h1>
-<div class="region header__region"></div>
-</header>
-
-
-
-
-
-
-<div class="layout-swap__top layout-3col__full">
-<nav class="main-menu layout__navigation" role="navigation">
-<h2 class="visually-hidden">主菜单</h2>
-<ul class="navbar">
-<li><a class="" href="/">首页</a></li>
-
-
-
-  <li><a  class=""href="/categories/buddhism">佛法</a>
-  </li>
-
-  <li><a  class="active"href="/categories/cs">计算机</a>
-  </li>
-
-
-<li><a class="" href="/post/about">关于</a></li>
-</ul>
-</nav>
-
-
-<main class="main layout__main" role="main">
-<h1 class="title title-submitted">golang中的tls</h1>
-<article class="section-post single-view">
-<header>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-02-27T19:51:16&#43;08:00">2018-02-27 19:51:16</time>
-</p>
-<div class="tags">
-Tags:
-<ul>
-<li><a href="/tags/golang">golang</a></li>
-</ul>
-</div>
-</header>
-<div class="content">
-<p>在golang中，为了性能的目的，当前执行的<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332"><code>g</code></a>是保存在当前线程的TLS中的，而TLS的地址在结构体<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412"><code>m</code></a>里面。问题是怎么放进去的呢？</p>
+<html lang="zh">
+<meta charset=utf-8>
+<title>golang中的tls</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>golang中的tls</strong>
+<hr> <p>在golang中，为了性能的目的，当前执行的<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332"><code>g</code></a>是保存在当前线程的TLS中的，而TLS的地址在结构体<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412"><code>m</code></a>里面。问题是怎么放进去的呢？</p>
 
 <p>可以从程序的启动入手，顺藤摸瓜。</p>
 
@@ -158,27 +70,6 @@ Entry point: 0x448f20
 
 <p>可以看到，这里调用了系统调用<a href="http://man7.org/linux/man-pages/man2/arch_prctl.2.html"><code>arch_prctl</code></a>，在linux下把<code>m0.tls+8</code>的地址保存到<code>fs</code>寄存器。到此，完成TLS的设置。</p>
 
-
-</div>
-</article>
-</main>
-
-
-
-
-<footer class="footer layout__footer" role="contentinfo">
-<p><span>© 老K随笔</span></p>
-
-<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
-</footer>
-
-</div>
-
-
-
-
-<script src="/js/prism.js"></script>
-
-
-</body>
+<div class="np"><a href=/post/buddhism/dazuo/>← 打坐感悟</a> <a href=/post/cs/dist/cons-hash/>一致性hash算法 →</a></div>
 </html>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>

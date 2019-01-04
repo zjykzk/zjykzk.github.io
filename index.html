@@ -1,452 +1,142 @@
 <!DOCTYPE html>
-<html class="nojs" lang="zh" dir="ltr">
-<head>
-<meta charset="utf-8">
+<html lang="zh" dir="ltr"><meta charset="utf-8">
 <title>老K随笔</title>
-<link rel="alternate" type="application/rss&#43;xml" title="RSS" href="http://zjykzk.github.io/index.xml">
-<meta name="description" content="">
-<meta name="created" content="2018-12-28T16:03:51&#43;0800">
-<meta name="modified" content="2018-12-28T16:03:51&#43;0800">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-<meta name="MobileOptimized" content="width">
-<meta name="HandheldFriendly" content="true">
-<meta name="generator" content="Hugo 0.48-DEV" />
-
-
-<link href="/css/prism.css" rel="stylesheet" />
-
-<link rel="stylesheet" href="/css/styles.css">
-<link rel="canonical" href="http://zjykzk.github.io/">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preload" as="style" href="/css/styles.css">
-<link rel="stylesheet" href="/css/styles.css">
-<link rel="stylesheet" href="/css/print.css" media="print">
-
-</head>
-
-<body>
-<div class="page layout__page">
-<header class="header layout__header" role="banner">
-
-<h1 class="header__site-name">
-<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
-</h1>
-<div class="region header__region"></div>
-</header>
-
-
-
-
-
-
-<div class="layout-swap__top layout-3col__full">
-<nav class="main-menu layout__navigation" role="navigation">
-<h2 class="visually-hidden">主菜单</h2>
-<ul class="navbar">
-<li><a class="active" href="/">首页</a></li>
-
-
-
-  <li><a  class=""href="/categories/buddhism">佛法</a>
-  </li>
-
-  <li><a  class=""href="/categories/cs">计算机</a>
-  </li>
-
-
-<li><a class="" href="/post/about">关于</a></li>
-</ul>
-</nav>
-
-
-<main class="main layout__main" role="main">
-<article class="single-view">
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/rocketmq/offset/">offset管理</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-12-28T16:03:51&#43;08:00">2018-12-28 16:03:51</time>
-</p>
-
-</header>
-<div class="content">
-offset相关原理与实现
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+    img{max-width:100%;height:auto}
+    pre{max-width:100%;height:auto;white-space:pre-wrap}
+    .np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+</style>
+<script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create', 'UA-43852829-1', 'auto');ga('send', 'pageview');
+</script>
+<script async src=//www.google-analytics.com/analytics.js></script>
+<link rel=icon href="data:;base64,=">
+<body><div id="content">
+<style>
+.pd{width:4em;flex-shrink:0;padding-bottom:.9em}
+.par div{display:flex}
+</style>
+<script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43852829-1','auto');ga('send','pageview');
+</script>
+<script async src=//www.google-analytics.com/analytics.js></script><meta name=viewport content="width=device-width">
+<div class=par>
+<div>
+    <div class="pd">12/18</div>
+    <a href=/post/cs/rocketmq/offset/>offset管理</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/golang/how-main-goroutine-is-terminator/">为什么main函数是终结者</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-11-16T14:13:32&#43;08:00">2018-11-16 14:13:32</time>
-</p>
-
-</header>
-<div class="content">
-为什么main函数退出以后不管是否有其他goroutine程序就直接退出了。
+<div>
+    <div class="pd">11/18</div>
+    <a href=/post/cs/golang/how-main-goroutine-is-terminator/>为什么main函数是终结者</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/dist/ha/">高可用</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-11-02T15:38:24&#43;08:00">2018-11-02 15:38:24</time>
-</p>
-
-</header>
-<div class="content">
-高可用原理和实践
+<div>
+    <div class="pd">11/18</div>
+    <a href=/post/cs/dist/ha/>高可用</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/linux/open-file-progress/">如何定位一个文件。</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-10-24T14:57:53&#43;08:00">2018-10-24 14:57:53</time>
-</p>
-
-</header>
-<div class="content">
-linux中怎么通过文件名找到具体的数据。
+<div>
+    <div class="pd">10/18</div>
+    <a href=/post/cs/linux/open-file-progress/>如何定位一个文件。</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/rocketmq/slave-sync-from-master-disconnect/">slave和master同步连接经常重连，导致发送消息失败</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-10-22T17:07:02&#43;08:00">2018-10-22 17:07:02</time>
-</p>
-
-</header>
-<div class="content">
-slave向master同步数据的时候，由于没有发送自己的同步，导致没有同步新的消息，在SYNC_MASTER模式下，发消息失败。
+<div>
+    <div class="pd">10/18</div>
+    <a href=/post/cs/rocketmq/slave-sync-from-master-disconnect/>slave和master同步连接经常重连，导致发送消息失败</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/dist/circuit-breaker/">熔断</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-10-12T14:23:18&#43;08:00">2018-10-12 14:23:18</time>
-</p>
-
-</header>
-<div class="content">
-熔断原理与实例。
+<div>
+    <div class="pd">10/18</div>
+    <a href=/post/cs/dist/circuit-breaker/>熔断</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/design/guava-ratelimiter/">guava中RateLimiter的设计</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-10-11T15:33:32&#43;08:00">2018-10-11 15:33:32</time>
-</p>
-
-</header>
-<div class="content">
-guava中RateLimiter的设计原理。
+<div>
+    <div class="pd">10/18</div>
+    <a href=/post/cs/design/guava-ratelimiter/>guava中RateLimiter的设计</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/dist/rate-limit/">限流</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-08-30T16:48:26&#43;08:00">2018-08-30 16:48:26</time>
-</p>
-
-</header>
-<div class="content">
-限流常用算法。
+<div>
+    <div class="pd">08/18</div>
+    <a href=/post/cs/dist/rate-limit/>限流</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/dist/uuid/">分布式ID生成算法</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-08-22T11:08:28&#43;08:00">2018-08-22 11:08:28</time>
-</p>
-
-</header>
-<div class="content">
-介绍生成分布式ID的常用算法。
+<div>
+    <div class="pd">08/18</div>
+    <a href=/post/cs/dist/uuid/>分布式ID生成算法</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/mongodb/">mongodb索引</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-07-20T16:18:23&#43;08:00">2018-07-20 16:18:23</time>
-</p>
-
-</header>
-<div class="content">
-mongodb中的索引。
+<div>
+    <div class="pd">07/18</div>
+    <a href=/post/cs/mongodb/>mongodb索引</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/design/interface-owner/">接口在哪里定义？</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-07-15T15:11:11&#43;08:00">2018-07-15 15:11:11</time>
-</p>
-
-</header>
-<div class="content">
-讨论接口定义放在哪里比较合适
+<div>
+    <div class="pd">07/18</div>
+    <a href=/post/cs/design/interface-owner/>接口在哪里定义？</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/design/soild/">常用面向对象设计原则</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-07-04T22:28:20&#43;08:00">2018-07-04 22:28:20</time>
-</p>
-
-</header>
-<div class="content">
-常用的面向对象设计原则，SOILD
+<div>
+    <div class="pd">07/18</div>
+    <a href=/post/cs/design/soild/>常用面向对象设计原则</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/dist/cons-hash/">一致性hash算法</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-04-28T13:58:46&#43;08:00">2018-04-28 13:58:46</time>
-</p>
-
-</header>
-<div class="content">
-一致性hash算法介绍。
+<div>
+    <div class="pd">04/18</div>
+    <a href=/post/cs/dist/cons-hash/>一致性hash算法</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/golang/tls/">golang中的tls</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-02-27T19:51:16&#43;08:00">2018-02-27 19:51:16</time>
-</p>
-
-</header>
-<div class="content">
-golang中tls的使用。
+<div>
+    <div class="pd">02/18</div>
+    <a href=/post/cs/golang/tls/>golang中的tls</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/buddhism/dazuo/">打坐感悟</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-02-04T17:13:52&#43;08:00">2018-02-04 17:13:52</time>
-</p>
-
-</header>
-<div class="content">
-打坐感悟，克服腿疼的一次经历。
+<div>
+    <div class="pd">02/18</div>
+    <a href=/post/buddhism/dazuo/>打坐感悟</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/vim-tips/">vim常用操作</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-01-10T18:16:35&#43;08:00">2018-01-10 18:16:35</time>
-</p>
-
-</header>
-<div class="content">
-vim常用操作
+<div>
+    <div class="pd">01/18</div>
+    <a href=/post/cs/vim-tips/>vim常用操作</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/jit/">jit的基本原理以及实现</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-01-03T15:12:25&#43;08:00">2018-01-03 15:12:25</time>
-</p>
-
-</header>
-<div class="content">
-jit的基本原理以及hello,world实现
+<div>
+    <div class="pd">01/18</div>
+    <a href=/post/cs/jit/>jit的基本原理以及实现</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/rocketmq/store/">rocketmq store模块</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2017-12-08T17:59:56&#43;08:00">2017-12-08 17:59:56</time>
-</p>
-
-</header>
-<div class="content">
-消息队列RocketMQ的核心模块store的设计与实现。
+<div>
+    <div class="pd">12/17</div>
+    <a href=/post/cs/rocketmq/store/>rocketmq store模块</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/first-optimal/">记一次mongo数据库优化经历</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2017-10-24T18:46:11&#43;08:00">2017-10-24 18:46:11</time>
-</p>
-
-</header>
-<div class="content">
-优化首要的是profile，profile一切。
+<div>
+    <div class="pd">10/17</div>
+    <a href=/post/cs/first-optimal/>记一次mongo数据库优化经历</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/golang/map/">map 内部实现</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2017-06-15T19:13:25&#43;08:00">2017-06-15 19:13:25</time>
-</p>
-
-</header>
-<div class="content">
-golang 中map的实现细节，它是一个典型的hashmap。
+<div>
+    <div class="pd">06/17</div>
+    <a href=/post/cs/golang/map/>map 内部实现</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/complement/">补码</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2017-05-30T23:18:02&#43;08:00">2017-05-30 23:18:02</time>
-</p>
-
-</header>
-<div class="content">
-计算机通过补码来表示整数，其实补码是比较通用的一种表示数字方式。
+<div>
+    <div class="pd">05/17</div>
+    <a href=/post/cs/complement/>补码</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/golang/go-memory-model/">GO 内存模型</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2017-03-28T11:22:09&#43;08:00">2017-03-28 11:22:09</time>
-</p>
-
-</header>
-<div class="content">
-GO内存模型，happens before 定义。
+<div>
+    <div class="pd">03/17</div>
+    <a href=/post/cs/golang/go-memory-model/>GO 内存模型</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/str/">字符串</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2017-01-19T14:05:14&#43;08:00">2017-01-19 14:05:14</time>
-</p>
-
-</header>
-<div class="content">
-字符串与编码
+<div>
+    <div class="pd">01/17</div>
+    <a href=/post/cs/str/>字符串</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/prometheus/">prometheus</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2016-10-09T14:45:21&#43;08:00">2016-10-09 14:45:21</time>
-</p>
-
-</header>
-<div class="content">
-prometheus是开源的现代监控系统。它用go开发，发布于2012。社区热度比较高，功能比较丰富灵活。
+<div>
+    <div class="pd">10/16</div>
+    <a href=/post/cs/prometheus/>prometheus</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/bug-op/">增加bug的编程实践</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2016-06-04T11:12:13&#43;08:00">2016-06-04 11:12:13</time>
-</p>
-
-</header>
-<div class="content">
-最近一个任务，时间比较仓促，需要在老系统上面修改添加功能，结果出现不少bug。小结一下工作中引入bug的一些实践。
+<div>
+    <div class="pd">06/16</div>
+    <a href=/post/cs/bug-op/>增加bug的编程实践</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/flume/">flume</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2016-03-27T22:17:17&#43;08:00">2016-03-27 22:17:17</time>
-</p>
-
-</header>
-<div class="content">
-通用的数据收集框架。特点是分布式、高可靠、高可用、高可定制化。
+<div>
+    <div class="pd">03/16</div>
+    <a href=/post/cs/flume/>flume</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/cs/friend-links/">价值博客</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2016-02-15T11:19:35&#43;08:00">2016-02-15 11:19:35</time>
-</p>
-
-</header>
-<div class="content">
-价值博客
+<div>
+    <div class="pd">02/16</div>
+    <a href=/post/cs/friend-links/>价值博客</a>
 </div>
-</article>
-
-<article class="section-post list-view">
-<header>
-<h2 class="title title-submitted"><a href="/post/about/">About</a></h2>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2016-02-02T21:33:21&#43;08:00">2016-02-02 21:33:21</time>
-</p>
-
-</header>
-<div class="content">
-
+<div>
+    <div class="pd">02/16</div>
+    <a href=/post/about/>About</a>
 </div>
-</article>
-
-
-</article>
-</main>
-
-
-
-
-<footer class="footer layout__footer" role="contentinfo">
-<p><span>© 老K随笔</span></p>
-
-<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
-</footer>
-
 </div>
+ 
 
-
-
-
-<script src="/js/prism.js"></script>
-
-
+        </div><div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 </body>
 </html>

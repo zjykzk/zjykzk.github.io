@@ -1,106 +1,17 @@
 <!DOCTYPE html>
-<html class="nojs" lang="zh" dir="ltr">
-<head>
-<meta charset="utf-8">
-<title>限流 – 老K随笔</title>
-<meta name="description" content="限流常用算法。">
-<meta name="created" content="2018-08-30T16:48:26&#43;0800">
-<meta name="modified" content="2018-08-30T16:48:26&#43;0800">
-<meta name="author" content="zenk">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-<meta name="MobileOptimized" content="width">
-<meta name="HandheldFriendly" content="true">
-<meta name="generator" content="Hugo 0.48-DEV" />
-
-
-<link href="/css/prism.css" rel="stylesheet" />
-
-<link rel="stylesheet" href="/css/styles.css">
-<link rel="canonical" href="http://zjykzk.github.io/post/cs/dist/rate-limit/">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preload" as="style" href="/css/styles.css">
-<link rel="stylesheet" href="/css/styles.css">
-<link rel="stylesheet" href="/css/print.css" media="print">
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "限流",
-    "datePublished": "2018-08-30T16:48:26+08:00",
-    "dateModified": "2018-08-30T16:48:26+08:00",
-    "url" : "http://zjykzk.github.io/post/cs/dist/rate-limit/",
-    "description": "限流常用算法。",
-    "keywords": ["dist","algo"],
-    "author": {
-      "@type": "Person",
-      "name": "zenk"
-    },
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "http://zjykzk.github.io/"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "老K随笔",
-      "url": "http://zjykzk.github.io/",
-    }
-  }
-</script>
-
-</head>
-
-<body>
-<div class="page layout__page">
-<header class="header layout__header" role="banner">
-
-<h1 class="header__site-name">
-<a href="http://zjykzk.github.io/" title="Home" class="header__site-link" rel="home"><span>老K随笔</span></a>
-</h1>
-<div class="region header__region"></div>
-</header>
-
-
-
-
-
-
-<div class="layout-swap__top layout-3col__full">
-<nav class="main-menu layout__navigation" role="navigation">
-<h2 class="visually-hidden">主菜单</h2>
-<ul class="navbar">
-<li><a class="" href="/">首页</a></li>
-
-
-
-  <li><a  class=""href="/categories/buddhism">佛法</a>
-  </li>
-
-  <li><a  class="active"href="/categories/cs">计算机</a>
-  </li>
-
-
-<li><a class="" href="/post/about">关于</a></li>
-</ul>
-</nav>
-
-
-<main class="main layout__main" role="main">
-<h1 class="title title-submitted">限流</h1>
-<article class="section-post single-view">
-<header>
-<p class="submitted">
-<span class="author">zenk</span> – <time class="modified-date" datetime="2018-08-30T16:48:26&#43;08:00">2018-08-30 16:48:26</time>
-</p>
-<div class="tags">
-Tags:
-<ul>
-<li><a href="/tags/dist">分布式</a></li>
-<li><a href="/tags/algo">算法</a></li>
-</ul>
-</div>
-</header>
-<div class="content">
-
+<html lang="zh">
+<meta charset=utf-8>
+<title>限流</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>限流</strong>
+<hr> 
 
 <h2 id="缘起">缘起</h2>
 
@@ -177,27 +88,6 @@ Tags:
 
 <p>Guava中的<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131">RateLimter</a>是一个平滑的基于令牌桶的实现，同时还实现了warm up特点的一个<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L161">Ratelimiter</a>。</p>
 
-
-</div>
-</article>
-</main>
-
-
-
-
-<footer class="footer layout__footer" role="contentinfo">
-<p><span>© 老K随笔</span></p>
-
-<p>Powered by <a href="https://gohugo.io/">Hugo</a> and the <a href="https://github.com/frjo/hugo-theme-zen">Zen theme</a>.</p>
-</footer>
-
-</div>
-
-
-
-
-<script src="/js/prism.js"></script>
-
-
-</body>
+<div class="np"><a href=/post/cs/dist/uuid/>← 分布式ID生成算法</a> <a href=/post/cs/design/guava-ratelimiter/>guava中RateLimiter的设计 →</a></div>
 </html>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
