@@ -447,7 +447,8 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
       <pubDate>Tue, 24 Oct 2017 18:46:11 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/post/cs/first-optimal/</guid>
-      <description>缘起 最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：
+      <description>缘起 table{border-collapse:collapse;}table,td,th{border:1px solid #000}td{text-align:center}
+最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：
    发送线程数量 消费线程数量 发送TPS 消费TPS     3 3 200-400 20-60    而且，随着消费线程的数量增加发送&amp;amp;消费的TPS都下降。
 排查 接口 一次发送涉及的数据库操作：
  一次topic查询
@@ -463,10 +464,7 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
  从缓存写到磁盘的io比较高好几百/s
  内存使用率非常低
   结论 问题一定是使用mongodb上面。
-排查 profile程序 通过golang自带的profile功能，在程序里面添加profile代码，通过go tool pprof对程序做profile，用 go-torch生成火焰图。发现果不其然，一个请求过程中，数据操作耗时占整体的40%以上。
-发送消息火焰图
-拉取消息火焰图
-确认消息火焰图</description>
+排查 profile程序 通过golang自带的profile功能，在程序里面添加profile代码，通过go tool pprof对程序做profile，用 go-torch生成火焰图。发现果不其然，一个请求过程中，数据操作耗时占整体的40%以上。</description>
     </item>
     
     <item>

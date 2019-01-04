@@ -15,7 +15,8 @@ pre{max-width:100%;height:auto;white-space:pre-wrap}
 
 <h1 id="缘起">缘起</h1>
 
-<p>最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：</p>
+<p><style>table{border-collapse:collapse;}table,td,th{border:1px solid #000}td{text-align:center}</style><br />
+最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：</p>
 
 <table>
 <thead>
@@ -127,5 +128,5 @@ pre{max-width:100%;height:auto;white-space:pre-wrap}
 <p>本次调优最大问题是思维盲区，由于自己对mongodb不熟悉，就没有想到去profile mongodb，把精力放在了优化代码层面的数据库操作，中间还做过把消息放在缓存中虽然达到预期，但是有数据不一致的问题。其实，方法没对，<strong>优化的首要原则是做profile，profile一切。</strong></p>
 
 <div class="np"><a href=/post/cs/golang/map/>← map 内部实现</a> <a href=/post/cs/rocketmq/store/>rocketmq store模块 →</a></div>
-</html>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+</html>
