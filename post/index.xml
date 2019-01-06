@@ -102,7 +102,7 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
     </item>
     
     <item>
-      <title>如何定位一个文件。</title>
+      <title>如何定位一个文件</title>
       <link>http://zjykzk.github.io/post/cs/linux/open-file-progress/</link>
       <pubDate>Wed, 24 Oct 2018 14:57:53 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
@@ -371,7 +371,7 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
       <guid>http://zjykzk.github.io/post/buddhism/dazuo/</guid>
       <description>自从老师教打坐已经7年了。在腿疼这一点上一直无法完全克服，经常被想去除腿疼的念头带走，然后起坐。今天趁儿子午睡入座，结果50分钟起坐了，原因照旧。但是，打坐腿疼时并没有忘记观照：腿疼的境，以及想起坐的念头无非都是自己的心念而已，如何对待依然由“自己”做主。
 起坐以后，接着打坐时的思路继续思维，在境来时不是恰好我练习的关照的最好时刻么，趁儿子未醒，接着下座。这次，入座腿疼的境以及起坐的念头如期而至，有了上次的思维，我把心专注在大明咒上，尽量保持不让腿疼的境和起坐的念头所带走，一直到心中有把握任他们起落而不被他们带走，起坐，心中法喜充满。至此，腿疼的问题可以告一段落。
-在坐中居然还冒出一句：心念出现，心不随念转，它就上伤到你；心念本伤不到你，心也就不会随境所转。当然，这是对负面的念头而言，其实正面的念头何尝不是如此。感恩老师教诲！</description>
+在坐中居然还冒出一句：心念出现，心不随念转，它就上伤不到你；心念本伤不到你，心也就不会随境所转。当然，这是对负面的念头而言，其实正面的念头何尝不是如此。感恩老师教诲！</description>
     </item>
     
     <item>
@@ -388,7 +388,7 @@ gg=G  把数字替换成原来的数字减一
 H // 把当前行的位置移到最上面 M // 把当前行的位置移到屏幕中间 L // 把当前的位置移到屏幕底部  全局操作g
 :{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果  移动窗口
 CTRL-W [K/J/H/L/T] // 把窗口移到最上面、下面、左边、右边、新标签  跳到某个字符的左（右）边
-  t{char} // 跳转到左边 T{char} // 跳转到右边  </description>
+t{char} // 跳转到左边 T{char} // 跳转到右边   </description>
     </item>
     
     <item>
