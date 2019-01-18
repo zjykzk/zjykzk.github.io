@@ -8,10 +8,52 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 28 Dec 2018 16:03:51 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 16 Jan 2019 16:54:09 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/categories/cs/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>push模式的实现细节</title>
+      <link>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</link>
+      <pubDate>Wed, 16 Jan 2019 16:54:09 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</guid>
+      <description>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：
+ DefaultMQPushConsumerImpl：拉消息的类型。
+ ProcessQueue：保存拉出来的消息。
+ PullMessageService：执行拉消息服务。
+ ConsumeMessageService：消费消息服务。
+ ReblanceService：负载均衡服务。
+  类关系
+（真想吐槽！）
+执行过程
+DefaultMQPushConsumerImpl DefaultMQPushConsumerImpl实现了消费者的接口。同时是个启动者，通过它直接或间接启动了拉消息服务，消费消息服务。
+其中提供了一个重要的接口pullMessage。该接口的流程如下：
+在拉消息过程中，做了流控，防止拉的太快，消费的太慢。主要从三个方面检测：
+ 从某个消费队列拉取的等待消费的消息数量。如果超过阀值，延迟50ms后再次拉取消息。阀值默认是1000。如果设置了topic级别的阀值（默认没有限制），在队列负载均衡以后会重新计算，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdForQueue和DefaultMQPushConsumerImpl.pullThresholdForTopic。
+ 从某个消费队列拉取的等待消费的消息大小（只考虑body）。同样，超过阀值就会延迟50ms后再次拉取消息。阀值默认是100M。如果topic设置了级别（默认没有限制），队列负载均衡以后会重新计算队列的限制，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdSizeForQueue和DefaultMQPushConsumerImpl.pullThresholdSizeForTopic。
+ 在并发消费模式下，从某个消费队列拉取的等待消费的消息中，在消费队列中的最大位置和最小位置之间差别。如果超过阀值，也会延迟50ms后再拉取消息。默认是2000，这里可能会存在误判。因为，有条件拉取消息的时候，是有可能出现同一个消费队列中拉到的两个消息在队列中的位置距离很远。
+  几个考虑：
+ NO_NEW_MSG/NO_MATCHED_MSG情况下，correctTagsOffset的逻辑为什么需要考虑有没有消息？如果还有消息说明本地还没有消息没被消费，此时更新的offset是服务端返回的，存在比没有被消费的消息偏移量大的情况。
+ OFFSET_ILLEAGL的情况下为什么要过10s以后才去更新offsetstore，保存offset，在reblance中移除process queue？出现这个问题是因为NO_MATCHED_LOGIC_QUEUE/NO_MESSAGE_IN_QUEUE/OFFSET_OVERFLOW_BADLY/OFFSET_TOO_SMALL这四种情况，而这些情况可能发生在服务端在恢复数据的时候，因此考虑是暂停消费这个队列。如果drop之后不延迟，就会有可能又去拉取消息了。
+  ProcessQueue 保存push的消费者拉到的消息。同时，有序消费模式还记录了情况下正在消费的消息。
+PullMessageService PullMessageService只负责拉取消息，它会调用DefaultMQPushConsumerImpl.pullMessage。
+当ReblanceService执行负载均衡的时候如果发现被分配了新的消息队列就会最终调用PullMessage.executePullRequestImmediately执行拉取消息。代码执行路径：
+ReblanceService.run -&amp;gt;MQClientInstance.doReblance -&amp;gt;MQConsumerInnter.doReblance[DefaultMQPushConsumerImpl.doReblance] -&amp;gt;ReblanceImpl.doReblance -&amp;gt;ReblanceImpl.dispatchPullRequest[ReblancePushImpl.dispatchPullRequest] -&amp;gt;DefaultMQPushConsumerImpl.executePullRequestImmediately -&amp;gt;PullMessage.executePullRequestImmediately  另外，在DefaultMQPushConsumerImpl.pullMessage执行时，也会根据条件调用PullMessageService.executePullRequestImmediately、PullMessageService.executeTaskLater或者PullMessageService.executePullRequestLater触发拉取消息。
+ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别在于提交消费任务逻辑，消费逻辑和处理消费结果的逻辑，以及对message queue的处理逻辑。另外，顺序消费是指在同一个消费队列里面的消息顺序消费。
+提交消费任务
+并发消费：把消息分成多个批次并发处理，一批多少个消息是自定义的，默认是1。如果提交异常，则延迟5s后提交。
+顺序消费：依赖于process queue是否正在被消费，这样避免同时消费多个不同的消息，不然就没法保证有序了。
+消费逻辑
+下图中左边是*并发消费*，右边是*顺序消费*。
+消费消息的时候，在可能停顿的执行点上面都加上了process queue是否已经drop的检查。
+因为提交任务的方式不一样导致了不同模式下面消费逻辑的差别。并发消费只考虑当前的消息即可，而顺序消费却要在这里从process queue中取消息。
+顺序消费的时候需要确保：
+ 每个消费队列某一时候只有一个消费请求被执行。
+ 只有一个地方在执行用户的消费逻辑。
+  以上两个条件中只要一个条件不满足，就没法保证消息顺序消费。</description>
+    </item>
     
     <item>
       <title>offset管理</title>
@@ -377,7 +419,7 @@ gg=G  把数字替换成原来的数字减一
 H // 把当前行的位置移到最上面 M // 把当前行的位置移到屏幕中间 L // 把当前的位置移到屏幕底部  全局操作g
 :{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果  移动窗口
 CTRL-W [K/J/H/L/T] // 把窗口移到最上面、下面、左边、右边、新标签  跳到某个字符的左（右）边
-t{char} // 跳转到左边 T{char} // 跳转到右边   </description>
+  t{char} // 跳转到左边 T{char} // 跳转到右边  </description>
     </item>
     
     <item>
