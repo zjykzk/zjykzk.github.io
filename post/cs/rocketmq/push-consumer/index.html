@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <meta charset=utf-8>
-<title>push模式的实现细节</title>
+<title>RocketMQ push模式的实现细节</title>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <style>
 img{max-width:100%;height:auto}
@@ -10,7 +10,7 @@ pre{max-width:100%;height:auto;white-space:pre-wrap}
 </style>
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>push模式的实现细节</strong>
+<strong>RocketMQ push模式的实现细节</strong>
 <hr> 
 
 <p>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：</p>

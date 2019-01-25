@@ -14,7 +14,7 @@
     
     
     <item>
-      <title>push模式的实现细节</title>
+      <title>RocketMQ push模式的实现细节</title>
       <link>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</link>
       <pubDate>Wed, 16 Jan 2019 16:54:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
