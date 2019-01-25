@@ -8,55 +8,43 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 16 Jan 2019 16:54:09 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 25 Jan 2019 15:35:52 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/tags/rocketmq/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>RocketMQ push模式的实现细节</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</link>
-      <pubDate>Wed, 16 Jan 2019 16:54:09 +0800</pubDate>
+      <title>RocketMQ HA实现</title>
+      <link>http://zjykzk.github.io/post/cs/rocketmq/ha/</link>
+      <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</guid>
-      <description>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：
- DefaultMQPushConsumerImpl：拉消息的类型。
- ProcessQueue：保存拉出来的消息。
- PullMessageService：执行拉消息服务。
- ConsumeMessageService：消费消息服务。
- ReblanceService：负载均衡服务。
-  类关系
-（真想吐槽！）
-执行过程
-DefaultMQPushConsumerImpl DefaultMQPushConsumerImpl实现了消费者的接口。同时是个启动者，通过它直接或间接启动了拉消息服务，消费消息服务。
-其中提供了一个重要的接口pullMessage。该接口的流程如下：
-在拉消息过程中，做了流控，防止拉的太快，消费的太慢。主要从三个方面检测：
- 从某个消费队列拉取的等待消费的消息数量。如果超过阀值，延迟50ms后再次拉取消息。阀值默认是1000。如果设置了topic级别的阀值（默认没有限制），在队列负载均衡以后会重新计算，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdForQueue和DefaultMQPushConsumerImpl.pullThresholdForTopic。
- 从某个消费队列拉取的等待消费的消息大小（只考虑body）。同样，超过阀值就会延迟50ms后再次拉取消息。阀值默认是100M。如果topic设置了级别（默认没有限制），队列负载均衡以后会重新计算队列的限制，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdSizeForQueue和DefaultMQPushConsumerImpl.pullThresholdSizeForTopic。
- 在并发消费模式下，从某个消费队列拉取的等待消费的消息中，在消费队列中的最大位置和最小位置之间差别。如果超过阀值，也会延迟50ms后再拉取消息。默认是2000，这里可能会存在误判。因为，有条件拉取消息的时候，是有可能出现同一个消费队列中拉到的两个消息在队列中的位置距离很远。
-  几个考虑：
- NO_NEW_MSG/NO_MATCHED_MSG情况下，correctTagsOffset的逻辑为什么需要考虑有没有消息？如果还有消息说明本地还没有消息没被消费，此时更新的offset是服务端返回的，存在比没有被消费的消息偏移量大的情况。
- OFFSET_ILLEAGL的情况下为什么要过10s以后才去更新offsetstore，保存offset，在reblance中移除process queue？出现这个问题是因为NO_MATCHED_LOGIC_QUEUE/NO_MESSAGE_IN_QUEUE/OFFSET_OVERFLOW_BADLY/OFFSET_TOO_SMALL这四种情况，而这些情况可能发生在服务端在恢复数据的时候，因此考虑是暂停消费这个队列。如果drop之后不延迟，就会有可能又去拉取消息了。
-  ProcessQueue 保存push的消费者拉到的消息。同时，有序消费模式还记录了情况下正在消费的消息。
-PullMessageService PullMessageService只负责拉取消息，它会调用DefaultMQPushConsumerImpl.pullMessage。
-当ReblanceService执行负载均衡的时候如果发现被分配了新的消息队列就会最终调用PullMessage.executePullRequestImmediately执行拉取消息。代码执行路径：
-ReblanceService.run -&amp;gt;MQClientInstance.doReblance -&amp;gt;MQConsumerInnter.doReblance[DefaultMQPushConsumerImpl.doReblance] -&amp;gt;ReblanceImpl.doReblance -&amp;gt;ReblanceImpl.dispatchPullRequest[ReblancePushImpl.dispatchPullRequest] -&amp;gt;DefaultMQPushConsumerImpl.executePullRequestImmediately -&amp;gt;PullMessage.executePullRequestImmediately  另外，在DefaultMQPushConsumerImpl.pullMessage执行时，也会根据条件调用PullMessageService.executePullRequestImmediately、PullMessageService.executeTaskLater或者PullMessageService.executePullRequestLater触发拉取消息。
-ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别在于提交消费任务逻辑，消费逻辑和处理消费结果的逻辑，以及对message queue的处理逻辑。另外，顺序消费是指在同一个消费队列里面的消息顺序消费。
-提交消费任务
-并发消费：把消息分成多个批次并发处理，一批多少个消息是自定义的，默认是1。如果提交异常，则延迟5s后提交。
-顺序消费：依赖于process queue是否正在被消费，这样避免同时消费多个不同的消息，不然就没法保证有序了。
-消费逻辑
-下图中左边是*并发消费*，右边是*顺序消费*。
-消费消息的时候，在可能停顿的执行点上面都加上了process queue是否已经drop的检查。
-因为提交任务的方式不一样导致了不同模式下面消费逻辑的差别。并发消费只考虑当前的消息即可，而顺序消费却要在这里从process queue中取消息。
-顺序消费的时候需要确保：
- 每个消费队列某一时候只有一个消费请求被执行。
- 每个消费队列某一时刻只有一个地方在执行用户的消费逻辑。
-  以上两个条件中只要一个条件不满足，就没法保证消息顺序消费。但是，在代码层面第一个逻辑已经确保了第二个逻辑。另外，第一个逻辑需要的锁，是因为消费慢，同时队列被分配别的消费者，在消费结束之前又分配回来了，就有可能导致1条件不满足，所以需要加锁。</description>
+      <guid>http://zjykzk.github.io/post/cs/rocketmq/ha/</guid>
+      <description> HA原理 RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：
+ 等于0，主结点会从当前最新commitlog文件中第一个消息的偏移量开始传输。
+ 大于0，从该值开始传输。
+ 小于0，这种情况不存在。
+  所以，这里我们可以知道如果从结点已经就有数据情况，如果数据不是从主结点同步过来的，那么同步之后就会有问题了。比如说：从结点已经有10000条数据，同时某个topic，暂时就叫OLD_TOPIC的*消费队列0*长度1000。这个时候，主结点就会从第10000条数据开始同步，可能会发送几种情况：
+ 主结点没有10000数据，那么就不会同步数据，造成从结点上面数据丢失。
+ 主结点有超过10000数据，但是它的OLD_TOPIC的*消费队列0*的长度小于1000，那么同步过来的数据就会覆盖原来的数据。
+  所以，从结点的初始状态需要从0开始或者本来就是和主同步过的状态。因此，在删除topic的时候从结点要保证删除干净，不然从结点就会脏数据，影响消费。
+为什么这样同步不会有问题呢？
+那是因为同步的数据里面包含了具体消费队列ID，队列中的偏移量以及消息的偏移量，所以同步的时候能够写到同一个位置。
+主结点同步逻辑 发送一条消息的时候，在开启SYNC_MASTER情况下，需要四个线程合作才能完成消息的发送。
+ SendMessageProcessor负责处理接收发送消息的请求并落盘（异步或者同步），接着向GroupTransferService发送等待同步完成的请求，然后等待知道超时或者GroupTransferService通知同步完成。同时，还会同时WriteSocketService有数据可以写了。
+ WriteSocketService负责根据从结点上报的位置（变量slaveRequestOffset），不断的向从结点传输数据。同时会维护和从结点的一个心跳，如果一段时间没有通不过数据，就会发送一个消息头，包含当前同步的起始位置。
+ GroupTransferService不断的轮询比较当前已经被从结点同步的最大偏移（变量push2SlaveMaxOffset）和SendMessageProcessor发送过来的请求中包含的偏移量，如果大于或者等于就会通知SendMessageProcessor。
+ ReadSocketService负责读取从结点上报上来的同步偏移量。更新变量push2SlaveMaxOffset和slaveRequestOffset并通知GroupTransferService。从而，它也会影响WriteSocketService的行为。同时，它还维护着和从结点连接的过期工作，如果超过指定时间没有收到消息就会断开连接，同时会停止WriteSocketService。
+  从结点同步逻辑 从结点的同步逻辑相对简单主要做几件事情：
+ 管理和主结点的连接，如果超过一段时间没有收到主点结点的数据，就会断开连接。这个时间戳保存在变量lastWriteTimestamp中，刚刚连接上主结点和从主结点读到数据都会更新该变量。
+ 上报当前commitlog的最大偏移量，该行为会发生三个地方：a.写完一个消息；b.处理完当前收到的所有数据；c.一段时间内没有收到主结点的数据。
+ 维护收到的数据。这里有两个接收数据的buffer，主要方便处理当一个buffer的空间用完以后处理剩余的消息。一个buffer的情况下，先拷贝到一个临时byte数据，然后再拷贝回去，需要两次内存拷贝。如果两个buffer只需要一次拷贝。
+ 写消息。把从主结点同步过来的数据写到磁盘。收到数据的时候会判断主结点发过来的偏移量是否等于自己当前的偏移量如果不一样就会断开和主结点的连接。
+ 任何从连接中读数据的时候如果有错误就会断开连接。
+  </description>
     </item>
     
     <item>
-      <title>offset管理</title>
+      <title>RocketMQ offset管理</title>
       <link>http://zjykzk.github.io/post/cs/rocketmq/offset/</link>
       <pubDate>Fri, 28 Dec 2018 16:03:51 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
