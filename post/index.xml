@@ -8,10 +8,31 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 25 Jan 2019 15:35:52 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>技术选型</title>
+      <link>http://zjykzk.github.io/post/cs/select-tech/</link>
+      <pubDate>Fri, 19 Apr 2019 16:19:31 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/select-tech/</guid>
+      <description>因数 项目因数 规模 小：可以选用新技术
+大：使用成熟技术
+时间 紧：买商用的
+宽裕：自己搞
+成本 有钱：买现成的
+没钱：自己撸
+非功能性需求 高并发、低延迟、高可用、数据一致性、安全性。
+团队因数 当前团队成员的技术栈 选大家都熟悉的：方便开发，排查问题。
+领导需要前瞻性。
+分析和实验 征求团队意见，大家讨论分析实验。
+版权因数 选择合适的开源协议的软件：GPL/BSD/LGPL。考虑因数：商用、闭源、修改。
+技术因数 标准功能 我们需要的功能，比如说我们需要一个MQ，标准功能就是发拉消息，pub/sub。
+非标准功能    特性 描述     可伸缩性 产品在性能上必须能容易且有效地伸缩以满足业务需求增长的需求。   灵活性 产品必须易于适应新的需求。   可操作性 产品必须被设计成易于与共享的数据和广泛可得的系统通讯。   可扩展性 产品功能必须在供应商很少介入的情况下能够定制和快速地增强。   可使用性 只需很少的培训就能使让顾客使用产品和他的任何特性，产品应该被设计成其目标使用者的技术水平很匹配。   高效率 产品应能在各种性能水平上工作，能够应付应用对效率的要求。   可靠性 产品必须有被证实可在预定环境中工作的功能与特性。   可管理性 产品必须能被配置、部署、监控和优化以确保其在预定的环境中工作良好   安全 产品必须保护信息和事务的完整性   高可用 通常来描述一个系统经过专门的设计，从而减少停工时间，而保持其服务的高度可用性。    技术标准</description>
+    </item>
     
     <item>
       <title>RocketMQ HA实现</title>
