@@ -7,11 +7,16 @@
 img{max-width:100%;height:auto}
 pre{max-width:100%;height:auto;white-space:pre-wrap}
 .np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
 </style>
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>价值博客</strong>
 <hr> 
+
+<h3 id="有趣的一些项目">有趣的一些项目</h3>
+
+<p><a href="https://hackaday.com/"><strong>hackaday</strong></a></p>
 
 <h3 id="python">Python</h3>
 
@@ -69,12 +74,38 @@ pre{max-width:100%;height:auto;white-space:pre-wrap}
 
 <p><a href="http://hi.baidu.com/tombkeeper">TK</a> | <a href="http://wuyizi.spaces.live.com/">wuyizi</a> | <a href="http://yelz.spaces.live.com/">Yelz</a> | <a href="http://tintin.sfview.org/">丁丁虫</a> | <a href="http://ifire.cn/">付翀</a> | <a href="http://blog.sina.com.cn/lcx"><strong>刘慈欣</strong></a> | <a href="http://www.changhai.org/"><strong>卢昌海</strong></a> | <a href="http://www.luoyonghao.net/blogs/luoyonghao/"><strong>老罗</strong></a> | <a href="http://immusoul.com/"><strong>土摩托</strong></a></p>
 
-<p><a href="http://blog.wuxinan.net/">吴欣安(atppp)</a> | <a href="http://blog.csdn.net/aimingoo/"><strong>周爱民</strong></a> | <a href="http://www.hecaitou.net/">和菜头</a> |  | <a href="http://www.watch-life.net/">守望轩</a> | <a href="http://flowerfei.com/">小花</a></p>
+<p><a href="http://blog.wuxinan.net/">吴欣安(atppp)</a> | <a href="http://blog.csdn.net/aimingoo/"><strong>周爱民</strong></a> | <a href="http://www.hecaitou.net/">和菜头</a> | <a href="http://dahua.spaces.live.com/">林达华</a> | <a href="http://www.puyuping.com/">浦宇平</a> | <a href="http://uicom.net/blog/"><strong>白鸦</strong></a></p>
 
-<p><a href="http://dahua.spaces.live.com/">林达华</a> | <a href="http://www.puyuping.com/">浦宇平</a> | <a href="http://uicom.net/blog/"><strong>白鸦</strong></a> | <a href="http://blog.csdn.net/hellothere/">程化</a> | <a href="http://meditic.com/"><strong>罗浩|Startup Game</strong></a> | <a href="http://www.ruanyifeng.com/blog/"><strong>阮一峰</strong></a></p>
+<p><a href="http://blog.csdn.net/hellothere/">程化</a> | <a href="http://meditic.com/"><strong>罗浩|Startup Game</strong></a> | <a href="http://www.ruanyifeng.com/blog/"><strong>阮一峰</strong></a></p>
 
 <p><a href="http://www.charlesgao.com/">高远</a> | <a href="http://fsbao.net/">鲍盛</a> | <a href="http://xiaoxiao.com.cn/">Xiaoxiao</a> | <a href="http://blog.pluskid.org/"><strong>张驰原</strong></a> | <a href="http://blog.donews.com/keso"><strong>Keso</strong></a> | <a href="http://ethinker.blog.china.alibaba.com/"><strong>思践</strong></a>|<a href="http://tonybai.com/">Tony Bai</a></p>
 
 <div class="np"><a href=/post/cs/flume/>← flume</a> <a href=/post/about/>About →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
 </html>
