@@ -8,10 +8,19 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 29 May 2019 14:44:31 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>golang</title>
+      <link>http://zjykzk.github.io/tags/golang/</link>
+      <pubDate>Wed, 29 May 2019 14:44:31 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/tags/golang/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>method</title>
@@ -46,15 +55,6 @@
       <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/rocketmq/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>golang</title>
-      <link>http://zjykzk.github.io/tags/golang/</link>
-      <pubDate>Fri, 16 Nov 2018 14:13:32 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/tags/golang/</guid>
       <description></description>
     </item>
     

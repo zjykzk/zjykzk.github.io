@@ -8,10 +8,23 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 29 May 2019 14:44:31 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>sync.Map实现分析</title>
+      <link>http://zjykzk.github.io/post/cs/golang/sync.map/</link>
+      <pubDate>Wed, 29 May 2019 14:44:31 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/post/cs/golang/sync.map/</guid>
+      <description>golang的SDK中提供线程安全的map实现sync.Map。它是针对RWMutex+map的实现方案中存在cache line的false share提出来的。主要适用于两个场景：
+ 针对一个key一次写多次读。
+ 多个goroutine并发读写修改的key是没有交集。
+  在这两种情况下，相比一个Mutex或者RWMutex加上普通的map，锁的竞争要少的多。那为什么呢？
+数据结构 type Map struct { mu Mutex // read contains the portion of the map&#39;s contents that are safe for // concurrent access (with or without mu held). // // The read field itself is always safe to load, but must only be stored with // mu held. // // Entries stored in read may be updated concurrently without mu, but updating // a previously-expunged entry requires that the entry be copied to the dirty // map and unexpunged with mu held.</description>
+    </item>
     
     <item>
       <title>技术选型</title>
