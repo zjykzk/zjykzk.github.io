@@ -175,18 +175,12 @@ b. 在<code>Range</code>的时候，如果有数据不在<code>read</code>中同
 <h4 id="疑问">疑问</h4>
 
 <ol>
-<li><strong>为什么需要expunged状态？</strong><br />
-<br /></li>
+<li><p><strong>为什么需要expunged状态？</strong><br />
+&gt; 如果没有这个状态，更新已经删除的但是已经存在的数据就需要加锁了。</p></li>
+
+<li><p><strong>为什么newEntry的时候取的是参数interface{}的地址，这个地址不是栈上的么，会不会有问题？</strong><br />
+&gt; 参数<code>i</code>的地址被保存到<code>map</code>中时，变量<code>&amp;i</code>已经逃逸到堆上面去了。</p></li>
 </ol>
-
-<p>如果没有这个状态，更新已经删除的但是已经存在的数据就需要加锁了。</p>
-
-<ol>
-<li><strong>为什么newEntry的时候取的是参数interface{}的地址，这个地址不是栈上的么，会不会有问题？</strong><br />
-<br /></li>
-</ol>
-
-<p>参数<code>i</code>的地址被保存到<code>map</code>中时，变量<code>&amp;i</code>已经逃逸到堆上面去了。</p>
 
 <h3 id="总结">总结</h3>
 
