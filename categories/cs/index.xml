@@ -481,8 +481,8 @@ gg=G  把数字替换成原来的数字减一
 H // 把当前行的位置移到最上面 M // 把当前行的位置移到屏幕中间 L // 把当前的位置移到屏幕底部  全局操作g
 :{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果  移动窗口
 CTRL-W [K/J/H/L/T] // 把窗口移到最上面、下面、左边、右边、新标签  跳到某个字符的左（右）边
-  t{char} // 跳转到左边 T{char} // 跳转到右边   在vim8的终端滚动
-  Ctrl-w N  </description>
+t{char} // 跳转到左边 T{char} // 跳转到右边  在vim8的终端滚动
+Ctrl-w N   </description>
     </item>
     
     <item>

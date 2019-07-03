@@ -399,7 +399,7 @@ org.apache.rocketmq.store.ha.HAConnection
 +-------------------+--------------------+-------------+-------------------+------------------+
 </code></pre>
 
-<p>一个 <code>MappedFileQueue</code> 由多个 <code>MappedFile</code> 组成，每个 <code>MappedFile</code> 文件大小相等，文件名是32个字符，并且表示当前文件中第一个记录在 <code>MappedFileQueue</code>所代表的逻辑文件中的序号。</p>
+<p>一个 <code>MappedFileQueue</code> 由多个 <code>MappedFile</code> 组成，每个 <code>MappedFile</code> 文件大小相等，文件名是32个字符，并且表示当前文件中第一个记录在 <code>MappedFileQueue</code>所代表的逻辑文件中的偏移量。</p>
 
 <h3 id="引用计数">引用计数</h3>
 
