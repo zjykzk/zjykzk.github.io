@@ -3,67 +3,13 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://zjykzk.github.io/categories/</loc>
-    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/post/</loc>
-    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/</loc>
-    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/categories/cs/</loc>
-    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/program-language/</loc>
-    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://zjykzk.github.io/post/cs/language/learn/</loc>
     <lastmod>2019-06-04T16:50:10+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/</loc>
-    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/golang/</loc>
-    <lastmod>2019-05-29T14:44:31+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://zjykzk.github.io/post/cs/golang/sync.map/</loc>
     <lastmod>2019-05-29T14:44:31+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/method/</loc>
-    <lastmod>2019-04-19T16:19:31+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/program/</loc>
-    <lastmod>2019-04-19T16:19:31+08:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -74,18 +20,6 @@
   <url>
     <loc>http://zjykzk.github.io/post/cs/rocketmq/ha/</loc>
     <lastmod>2019-01-25T15:35:52+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/mq/</loc>
-    <lastmod>2019-01-25T15:35:52+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/rocketmq/</loc>
-    <lastmod>2019-01-25T15:35:52+08:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -104,26 +38,8 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/tags/arch/</loc>
-    <lastmod>2018-11-02T15:38:24+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/ha/</loc>
-    <lastmod>2018-11-02T15:38:24+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://zjykzk.github.io/post/cs/dist/ha/</loc>
     <lastmod>2018-11-02T15:38:24+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/linux/</loc>
-    <lastmod>2018-10-24T14:57:53+08:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -137,31 +53,13 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/tags/dist/</loc>
-    <lastmod>2018-10-12T14:23:18+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://zjykzk.github.io/post/cs/dist/circuit-breaker/</loc>
     <lastmod>2018-10-12T14:23:18+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/tags/design/</loc>
-    <lastmod>2018-10-11T15:33:32+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</loc>
     <lastmod>2018-10-11T15:33:32+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/algo/</loc>
-    <lastmod>2018-08-30T16:48:26+08:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -172,12 +70,6 @@
   <url>
     <loc>http://zjykzk.github.io/post/cs/dist/uuid/</loc>
     <lastmod>2018-08-22T11:08:28+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/mongodb/</loc>
-    <lastmod>2018-07-20T16:18:23+08:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -206,37 +98,13 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/categories/buddhism/</loc>
-    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/zazen/</loc>
-    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://zjykzk.github.io/post/buddhism/dazuo/</loc>
     <lastmod>2018-02-04T17:13:52+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/tags/vim/</loc>
-    <lastmod>2018-01-10T18:16:35+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://zjykzk.github.io/post/cs/vim-tips/</loc>
     <lastmod>2018-01-10T18:16:35+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://zjykzk.github.io/tags/jit/</loc>
-    <lastmod>2018-01-03T15:12:25+08:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -270,12 +138,6 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</loc>
-    <lastmod>2017-03-28T11:22:09+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://zjykzk.github.io/post/cs/str/</loc>
     <lastmod>2017-01-19T14:05:14+08:00</lastmod>
   </url>
@@ -303,6 +165,144 @@
   <url>
     <loc>http://zjykzk.github.io/post/about/</loc>
     <lastmod>2016-02-02T21:33:21+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/algo/</loc>
+    <lastmod>2018-08-30T16:48:26+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/arch/</loc>
+    <lastmod>2018-11-02T15:38:24+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/categories/buddhism/</loc>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/categories/</loc>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/categories/cs/</loc>
+    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/design/</loc>
+    <lastmod>2018-10-11T15:33:32+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/dist/</loc>
+    <lastmod>2018-10-12T14:23:18+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/golang/</loc>
+    <lastmod>2019-05-29T14:44:31+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/ha/</loc>
+    <lastmod>2018-11-02T15:38:24+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/jit/</loc>
+    <lastmod>2018-01-03T15:12:25+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/linux/</loc>
+    <lastmod>2018-10-24T14:57:53+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/method/</loc>
+    <lastmod>2019-04-19T16:19:31+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/mongodb/</loc>
+    <lastmod>2018-07-20T16:18:23+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/mq/</loc>
+    <lastmod>2019-01-25T15:35:52+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/post/</loc>
+    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/program/</loc>
+    <lastmod>2019-04-19T16:19:31+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/program-language/</loc>
+    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/rocketmq/</loc>
+    <lastmod>2019-01-25T15:35:52+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/</loc>
+    <lastmod>2018-08-30T16:48:26+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/vim/</loc>
+    <lastmod>2018-01-10T18:16:35+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/zazen/</loc>
+    <lastmod>2018-02-04T17:13:52+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</loc>
+    <lastmod>2017-03-28T11:22:09+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://zjykzk.github.io/</loc>
+    <lastmod>2019-06-04T16:50:10+08:00</lastmod>
+    <priority>0</priority>
   </url>
   
 </urlset>

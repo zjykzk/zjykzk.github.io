@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>program language on 老K随笔</title>
+    <title>Program Language on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/program-language/</link>
-    <description>Recent content in program language on 老K随笔</description>
+    <description>Recent content in Program Language on 老K随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
@@ -28,7 +28,7 @@
 数据结构一般有向量（不同于数组）、（优先级）列表、队列、堆、栈、哈希表等等。
 编程范式支持 常规的编程范式包括：命令式、函数式、面向对象。
 抽象方式 常规的抽象方式：函数、泛型、接口、类、结构体。
-领域支持 最常见的领域要数并发和网络了。一般会对他们做一个特别的支持，比如golang对并发。
+领域支持 最常见的领域要数错误处理、并发和网络了。一般会对他们做一个特别的支持，比如golang对并发。
 源代码 如果要深入语言的话，源代码的阅读是必不可少的。主要包括sdk和优秀框架。
 sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相关数据结构和算法。
 优秀框架。一门语言总会有很多优秀的框架，比较有代表性的方面包含：网络框架、并发框架、日志框架、测试框架、错误处理框架以及web框架。

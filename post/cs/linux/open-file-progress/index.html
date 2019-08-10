@@ -22,7 +22,7 @@ body{background:#faf9de;}
 
 <p>当打开一个文件<code>/bin/vim</code>，系统首先把路径分解成<code>/</code>、<code>bin</code>、<code>vim</code>，根据dentry查<code>vim</code>的inode，如果dentry还没有<code>bin</code>，会根据superblock中<strong>根目录</strong>的inode号得到它的子目录信息，其中就有<code>bin</code>和它的inode，并把它放到dentry中，然后根据<code>bin</code>的内容找到<code>vim</code>的inode。最终，返回一个文件描述符（file descriptor）。</p>
 
-<div class="np"><a href=/post/cs/dist/ha/>← 高可用</a> <a href=/post/cs/rocketmq/slave-sync-from-master-disconnect/>slave和master同步连接经常重连，导致发送消息失败 →</a></div>
+<div class="np"><a href=/post/cs/rocketmq/slave-sync-from-master-disconnect/>← slave和master同步连接经常重连，导致发送消息失败</a> <a href=/post/cs/dist/ha/>高可用 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>
