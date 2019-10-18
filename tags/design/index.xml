@@ -15,10 +15,10 @@
     
     <item>
       <title>guava中RateLimiter的设计</title>
-      <link>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</link>
       <pubDate>Thu, 11 Oct 2018 15:33:32 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</guid>
       <description>guava中的RateLimiter实现了比较有意思的功能：
  平滑。
  记录未使用的信息。
@@ -37,10 +37,10 @@ Warmup模式
     
     <item>
       <title>接口在哪里定义？</title>
-      <link>http://zjykzk.github.io/post/cs/design/interface-owner/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/interface-owner/</link>
       <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/interface-owner/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/interface-owner/</guid>
       <description>接口放在哪里决定了源代码依赖问题。因此，依赖是接口定义唯一考量，其他问题都可以归结为依赖问题，而定义的包永远是被依赖包。
 接口定义的位置有三种情况：
  使用者
@@ -62,10 +62,10 @@ Warmup模式
     
     <item>
       <title>常用面向对象设计原则</title>
-      <link>http://zjykzk.github.io/post/cs/design/soild/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/soild/</link>
       <pubDate>Wed, 04 Jul 2018 22:28:20 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/soild/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/soild/</guid>
       <description>设计 软件的复杂来源于需求的易变，意味着软件本身容易修改。好设计的目的就是提供软件的可修改能力，也就是可维护性、扩展性。SOILD原则就是在设计过程中达到这个目标的一些原则。
 单一职责原则 又名SRP（Single Responsibility Principle）。针对一个函数、类、组件、架构的修改有且只有一个理由，而理由的来自于使用者。
 这样的好处是把拥有相同修改理由的函数、类、组件组织在一起，不同的分开，达到修改的时候不会影响其他代码，增强了可维护性。

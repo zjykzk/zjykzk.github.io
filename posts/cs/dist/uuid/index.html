@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>分布式ID生成算法</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>分布式ID生成算法</strong>
+<hr> 
+
+<p>分布式Unique ID在分布式系统使用很广泛，常用的用途有：</p>
+
+<ol>
+<li>请求的ID，用于跟踪请求链路。<br /></li>
+<li>消息队列中的unique id。<br /></li>
+<li>业务对象的id。<br />
+<br /></li>
+</ol>
+
+<p>总结下生成分布式ID常用算法。</p>
+
+<h2 id="数据库自增id">数据库自增id</h2>
+
+<p>通过MySQL中的<code>auto_increment</code>特性来实现数据库唯一的ID。问题是扩展性差，性能受限于一台机器。可以做的优化是使用多个数据库实例，设置相同的步长和不同的起始值，避免重复产生ID。通过一个这种方式可以利用多台机器的资源。同时，还有一个优化是获取ID的时候可以批量获取ID，这样可以减少DB的操作，减少响应时间。</p>
+
+<p>基于Redis，Postgres，Oracle也有类似的方案。</p>
+
+<h2 id="uuid-http-www-ietf-org-rfc-rfc4122-txt"><a href="http://www.ietf.org/rfc/rfc4122.txt">UUID</a></h2>
+
+<p>UUID由<code>[0-9a-f-]</code>字符组成，总共16个字节，转换成16进制的格式为：<code>XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX</code>。</p>
+
+<p>数据由5个部分组成：</p>
+
+<ol>
+<li>时间戳，占60位。<br /></li>
+<li>时钟序列，占13位。<br /></li>
+<li>结点编号，占48位。<br /></li>
+<li>版本号，版本不同以上1-3个字段的数据来源也不一样，占4位。<br /></li>
+<li>UUID类型，用于解析UUID数据中的意义，占3位。<br />
+<br /></li>
+</ol>
+
+<p>每个数据的位置：</p>
+
+<pre><code>    0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                          time_low                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |       time_mid                |         time_hi_and_version   |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |clk_seq_hi_res |  clk_seq_low  |         node (0-1)            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                         node (2-5)                            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</code></pre>
+
+<p><code>time_hi_and_version</code>的第4-7位是版本号，<code>clk_seq_hi_res</code>的第5-7位是UUID类型编号。</p>
+
+<p>UUID类型常用的有是<strong>IETF</strong>和微软兼容的类型，UUID类型编号分别是<code>10x</code>和<code>110</code>，x是任意值。以下讨论的是IETF。</p>
+
+<p>UUID总共有5个版本，每个版本数据源和算法各有差异。</p>
+
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>时间戳</th>
+<th>时钟序列</th>
+<th>结点编号</th>
+<th>版本号</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>自1582年10月15号，100纳秒数</td>
+<td>随机数。<br />如果时间戳回退，这个值需要在上一个序列上面递增</td>
+<td>mac地址</td>
+<td>1</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>自1582年10月15号，100纳秒数，同时会把低4个字节替换成GID或者UID（根据domain值）</td>
+<td>随机数。但是最低位会被替换成domain</td>
+<td>mac地址</td>
+<td>2</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>给定命名空间和字符串通过MD5计算散列值</td>
+<td>散列值</td>
+<td>散列值</td>
+<td>3</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>随机数</td>
+<td>随机数</td>
+<td>随机数</td>
+<td>4</td>
+</tr>
+
+<tr>
+<td>5</td>
+<td>给定命名空间和字符串通过SHA-1计算散列值</td>
+<td>散列值</td>
+<td>散列值</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+<p>最常用的还是版本1和4。显然，两个版本都无法保证绝对唯一。版本1在100纳秒里面就会重复，而版本4就是概率问题了。</p>
+
+<h2 id="mongodb的objectid">mongodb的ObjectID</h2>
+
+<p>ObjectID是UUID版本1的变种。总共12个字节。</p>
+
+<ol>
+<li>4个字节时间戳，unix时间，秒。<br /></li>
+<li>3个字节机器标识。<br /></li>
+<li>2个字节进程id。<br /></li>
+<li>3个字节计数，起始值是一个随机数，过秒不归零。<br />
+<br /></li>
+</ol>
+
+<p>每秒能支持2^24-1个不同的id，千万级别。</p>
+
+<h2 id="twitter-snowflake派号器">twitter snowflake派号器</h2>
+
+<p>snowflake占8个字节。</p>
+
+<ol>
+<li>1个bit保留。<br /></li>
+<li>41个bit的时间戳，unix时间，毫秒。<br /></li>
+<li>10个bit机器标识，5 bit是data center标识，5 bit是work标识。<br /></li>
+<li>12个bit的序号，过毫秒归零，保证id的递增。<br />
+<br /></li>
+</ol>
+
+<p>没毫秒支持2^12=4096个不同的id。</p>
+
+<h2 id="uid要求">UID要求</h2>
+
+<p>文章<a href="http://ericliang.info/what-kind-of-id-generator-we-need-in-business-systems/">《业务系统需要什么样的ID生成器》</a>的提法很好： 唯一性，时间相关，粗略有序，可反解，可制造。</p>
+
+<h2 id="扩展阅读">扩展阅读</h2>
+
+<p><a href="http://calvin1978.blogcn.com/articles/uuid.html">《服务化框架－分布式Unique ID的生成方法一览》</a></p>
+
+<p><a href="http://calvin1978.blogcn.com/articles/%E2%80%9Chttp://chuansong.me/n/2459549%E2%80%9D">《细聊分布式ID生成方法》</a></p>
+
+<p><a href="http://mp.weixin.qq.com/s?__biz=MzA5Nzc4OTA1Mw==&amp;mid=2659598286&amp;idx=1&amp;sn=3172172ccea316b0ed83429ae718b54d&amp;chksm=8be9eadcbc9e63caa10d708274b4fa34ceffa416ef4527e10e6b7a1a2d2f32cf8592d65bf728">《生成全局唯一ID的3个思路，来自一个资深架构师的总结》</a></p>
+
+<div class="np"><a href=/posts/cs/dist/rate-limit/>← 限流</a> <a href=/posts/cs/mongodb/>mongodb索引 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

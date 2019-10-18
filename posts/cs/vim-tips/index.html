@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>vim常用操作</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>vim常用操作</strong>
+<hr> <ol>
+<li><p>在命令模式使用函数</p>
+
+<pre><code>:%s/ab(.*)c/\=submatch(1) . 'test'/gc
+</code></pre></li>
+
+<li><p>窗口间切换</p>
+
+<pre><code>跳转至某个窗口：窗口number + c-w + w：
+跳至当前位置的左边某个窗口：c-w &lt;number&gt;h
+跳至当前位置的右边某个窗口：c-w &lt;number&gt;l
+跳至当前位置的上边某个窗口：c-w &lt;number&gt;j
+跳至当前位置的下边某个窗口：c-w &lt;number&gt;k
+</code></pre></li>
+
+<li><p>全文缩进</p>
+
+<pre><code>gg=G
+</code></pre></li>
+
+<li><p>把数字替换成原来的数字减一</p>
+
+<pre><code>:%s/(\d+)/\=submatch(1)-1/gc
+</code></pre></li>
+
+<li><p>移动屏幕</p>
+
+<pre><code>H // 把当前行的位置移到最上面
+M // 把当前行的位置移到屏幕中间
+L // 把当前的位置移到屏幕底部
+</code></pre></li>
+
+<li><p>全局操作<code>g</code></p>
+
+<pre><code>:{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果
+</code></pre></li>
+
+<li><p>移动窗口</p>
+
+<pre><code>CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签
+</code></pre></li>
+
+<li><p>跳到某个字符的左（右）边</p>
+
+<pre><code>t{char} // 跳转到左边
+T{char} // 跳转到右边
+</code></pre></li>
+
+<li><p>在vim8的终端滚动</p>
+
+<pre><code>Ctrl-w N
+</code></pre></li>
+</ol>
+
+<div class="np"><a href=/posts/buddhism/dazuo/>← 打坐感悟</a> <a href=/posts/cs/jit/>jit的基本原理以及实现 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

@@ -15,10 +15,10 @@
     
     <item>
       <title>技术选型</title>
-      <link>http://zjykzk.github.io/post/cs/select-tech/</link>
+      <link>http://zjykzk.github.io/posts/cs/select-tech/</link>
       <pubDate>Fri, 19 Apr 2019 16:19:31 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/select-tech/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/select-tech/</guid>
       <description>因数 项目因数 规模 小：可以选用新技术
 大：使用成熟技术
 时间 紧：买商用的
@@ -36,10 +36,10 @@
     
     <item>
       <title>guava中RateLimiter的设计</title>
-      <link>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</link>
       <pubDate>Thu, 11 Oct 2018 15:33:32 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</guid>
       <description>guava中的RateLimiter实现了比较有意思的功能：
  平滑。
  记录未使用的信息。
@@ -58,10 +58,10 @@ Warmup模式
     
     <item>
       <title>接口在哪里定义？</title>
-      <link>http://zjykzk.github.io/post/cs/design/interface-owner/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/interface-owner/</link>
       <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/interface-owner/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/interface-owner/</guid>
       <description>接口放在哪里决定了源代码依赖问题。因此，依赖是接口定义唯一考量，其他问题都可以归结为依赖问题，而定义的包永远是被依赖包。
 接口定义的位置有三种情况：
  使用者
@@ -83,10 +83,10 @@ Warmup模式
     
     <item>
       <title>常用面向对象设计原则</title>
-      <link>http://zjykzk.github.io/post/cs/design/soild/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/soild/</link>
       <pubDate>Wed, 04 Jul 2018 22:28:20 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/soild/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/soild/</guid>
       <description>设计 软件的复杂来源于需求的易变，意味着软件本身容易修改。好设计的目的就是提供软件的可修改能力，也就是可维护性、扩展性。SOILD原则就是在设计过程中达到这个目标的一些原则。
 单一职责原则 又名SRP（Single Responsibility Principle）。针对一个函数、类、组件、架构的修改有且只有一个理由，而理由的来自于使用者。
 这样的好处是把拥有相同修改理由的函数、类、组件组织在一起，不同的分开，达到修改的时候不会影响其他代码，增强了可维护性。
@@ -122,10 +122,10 @@ OCP的实现需要使用抽象和多态，静态语言中继承是多态的一�
     
     <item>
       <title>记一次mongo数据库优化经历</title>
-      <link>http://zjykzk.github.io/post/cs/first-optimal/</link>
+      <link>http://zjykzk.github.io/posts/cs/first-optimal/</link>
       <pubDate>Tue, 24 Oct 2017 18:46:11 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/first-optimal/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/first-optimal/</guid>
       <description>缘起 table{border-collapse:collapse;}table,td,th{border:1px solid #000}td{text-align:center}
 最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：
    发送线程数量 消费线程数量 发送TPS 消费TPS     3 3 200-400 20-60    而且，随着消费线程的数量增加发送&amp;amp;消费的TPS都下降。
@@ -148,10 +148,10 @@ OCP的实现需要使用抽象和多态，静态语言中继承是多态的一�
     
     <item>
       <title>map 内部实现</title>
-      <link>http://zjykzk.github.io/post/cs/golang/map/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/map/</link>
       <pubDate>Thu, 15 Jun 2017 19:13:25 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/map/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/map/</guid>
       <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
 // file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap  显然，makemap 返回的是指针。
 数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用 count int // map标记: // 1. key和value是否包指针 // 2. 是否正在扩容 // 3. 是否是同样大小的扩容 // 4. 是否正在 `range`方式访问当前的buckets // 5. 是否有 `range`方式访问旧的bucket flags uint8 B uint8 // log_2(B) == bucket数量 noverflow uint16 // overflow bucket的数量，是个近似值 hash0 uint32 // hash种子 buckets unsafe.</description>
@@ -159,10 +159,10 @@ OCP的实现需要使用抽象和多态，静态语言中继承是多态的一�
     
     <item>
       <title>补码</title>
-      <link>http://zjykzk.github.io/post/cs/complement/</link>
+      <link>http://zjykzk.github.io/posts/cs/complement/</link>
       <pubDate>Tue, 30 May 2017 23:18:02 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/complement/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/complement/</guid>
       <description>加法 2个十进制数字的非正式算法：两个数字中相同位置的数相加，如果结果超过10产生进位，该进位在下一位数相加时加上。直到两个数字的所有位数都加完为止。
 考虑十进制的2位数加法，例如：16 + 26。
  1 6 + 2 6 ------- 4 2  上例中的加法过程是：
@@ -181,10 +181,10 @@ OCP的实现需要使用抽象和多态，静态语言中继承是多态的一�
     
     <item>
       <title>字符串</title>
-      <link>http://zjykzk.github.io/post/cs/str/</link>
+      <link>http://zjykzk.github.io/posts/cs/str/</link>
       <pubDate>Thu, 19 Jan 2017 14:05:14 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/str/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/str/</guid>
       <description>为什么要字符 人类发明了文字，同时想用计算机来处理文字。由此，就产生了字符。每个字符代码一个文字的图形。
 字符串的表示 在计算机内部，只有01的信息。因此，为了能让计算机能够认识字符串，每个字符就的被映射成01数据。这个映射功能就叫编码。
 ASCII ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如A的编码是01000001
@@ -198,10 +198,10 @@ utf8编码规则：
     
     <item>
       <title>prometheus</title>
-      <link>http://zjykzk.github.io/post/cs/prometheus/</link>
+      <link>http://zjykzk.github.io/posts/cs/prometheus/</link>
       <pubDate>Sun, 09 Oct 2016 14:45:21 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/prometheus/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/prometheus/</guid>
       <description>架构 基本概念 数据模型 prometheus把数据当作时间序列进行存储。
 每个时间序列通过 metric name和 key-value pairs(也叫做 label)标识。
 metric name表示需要进行测量的系统指标。

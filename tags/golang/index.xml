@@ -15,10 +15,10 @@
     
     <item>
       <title>sync.Map实现分析</title>
-      <link>http://zjykzk.github.io/post/cs/golang/sync.map/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/sync.map/</link>
       <pubDate>Wed, 29 May 2019 14:44:31 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/sync.map/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/sync.map/</guid>
       <description>golang的SDK中提供线程安全的map实现sync.Map。它是针对RWMutex+map的实现方案中存在cache line的false share提出来的。主要适用于两个场景：
  针对一个key一次写多次读。
  多个goroutine并发读写修改的key是没有交集。
@@ -28,10 +28,10 @@
     
     <item>
       <title>为什么main函数是终结者</title>
-      <link>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</link>
       <pubDate>Fri, 16 Nov 2018 14:13:32 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</guid>
       <description>来一个hello, world!。
 package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5  编译调试。
 # go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?</description>
@@ -39,10 +39,10 @@ package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 
     
     <item>
       <title>golang中的tls</title>
-      <link>http://zjykzk.github.io/post/cs/golang/tls/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/tls/</link>
       <pubDate>Tue, 27 Feb 2018 19:51:16 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/tls/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/tls/</guid>
       <description>在golang中，为了性能的目的，当前执行的g是保存在当前线程的TLS中的，而TLS的地址在结构体m里面。问题是怎么放进去的呢？
 可以从程序的启动入手，顺藤摸瓜。
 编写一个打印hello,world的程序
@@ -53,10 +53,10 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
     
     <item>
       <title>map 内部实现</title>
-      <link>http://zjykzk.github.io/post/cs/golang/map/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/map/</link>
       <pubDate>Thu, 15 Jun 2017 19:13:25 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/map/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/map/</guid>
       <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
 // file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap  显然，makemap 返回的是指针。
 数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用 count int // map标记: // 1. key和value是否包指针 // 2. 是否正在扩容 // 3. 是否是同样大小的扩容 // 4. 是否正在 `range`方式访问当前的buckets // 5. 是否有 `range`方式访问旧的bucket flags uint8 B uint8 // log_2(B) == bucket数量 noverflow uint16 // overflow bucket的数量，是个近似值 hash0 uint32 // hash种子 buckets unsafe.</description>
@@ -64,10 +64,10 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
     
     <item>
       <title>GO 内存模型</title>
-      <link>http://zjykzk.github.io/post/cs/golang/go-memory-model/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</link>
       <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/go-memory-model/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</guid>
       <description>内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
 Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
 int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：

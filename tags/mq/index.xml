@@ -15,10 +15,10 @@
     
     <item>
       <title>RocketMQ HA实现</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/ha/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/ha/</link>
       <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/ha/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/ha/</guid>
       <description> HA原理 RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：
  等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。
  大于0，从该值开始传输。
@@ -45,10 +45,10 @@
     
     <item>
       <title>slave和master同步连接经常重连，导致发送消息失败</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</link>
       <pubDate>Mon, 22 Oct 2018 17:07:02 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
       <description>缘起 封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。
 排查过程 查看boots-broker日志，发现问题日志：
 [TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0  说明，RocketMQ处理发送消息比较慢。可是，从size of queue可以看出，堆积的消息为0。
@@ -59,10 +59,10 @@
     
     <item>
       <title>rocketmq store模块</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/store/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/store/</link>
       <pubDate>Fri, 08 Dec 2017 17:59:56 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/store/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/store/</guid>
       <description>功能 store模块是rocketmq的核心模块。主要功能有：
  消息存储
  消息索引

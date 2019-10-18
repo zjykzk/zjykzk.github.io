@@ -15,10 +15,10 @@
     
     <item>
       <title>jit的基本原理以及实现</title>
-      <link>http://zjykzk.github.io/post/cs/jit/</link>
+      <link>http://zjykzk.github.io/posts/cs/jit/</link>
       <pubDate>Wed, 03 Jan 2018 15:12:25 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/jit/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/jit/</guid>
       <description>基本原理 JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：
 1. 生成可以执行的代码
 2. 执行代码

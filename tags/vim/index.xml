@@ -15,10 +15,10 @@
     
     <item>
       <title>vim常用操作</title>
-      <link>http://zjykzk.github.io/post/cs/vim-tips/</link>
+      <link>http://zjykzk.github.io/posts/cs/vim-tips/</link>
       <pubDate>Wed, 10 Jan 2018 18:16:35 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/vim-tips/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/vim-tips/</guid>
       <description> 在命令模式使用函数
 :%s/ab(.*)c/\=submatch(1) . &#39;test&#39;/gc  窗口间切换
 跳转至某个窗口：窗口number + c-w + w： 跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h 跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l 跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j 跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k  全文缩进

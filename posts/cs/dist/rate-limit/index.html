@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>限流</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>限流</strong>
+<hr> 
+
+<h2 id="缘起">缘起</h2>
+
+<p>为了保证API的可用性，以及系统的可靠性，需要为API限速。不然，API请求量大到系统无法处理时就会出现系统变慢，甚至宕机的情况。常见的限速场景：</p>
+
+<ul>
+<li>挡住某个用户的过多请求（用户激增或者恶意请求），确保正常处理其他用户请求。<br /></li>
+<li>挡住过多的低优先级的请求，确保核心请求得到处理。<br /></li>
+<li>由于系统内部错误，导致系统处理能力下降，调节系统的处理能力。<br /></li>
+<li>挡住过多某类请求，确保其他请求可以得到处理。<br />
+<br /></li>
+</ul>
+
+<h2 id="限速类型">限速类型</h2>
+
+<p><strong>请求限速</strong></p>
+
+<p>限制API在一秒中内能够处理的请求数量。如果超过这个数量，等待或者拒绝服务。通常情况下这个是首选。</p>
+
+<p><strong>并发限制</strong></p>
+
+<p>针对资源敏感的请求，比如CPU密集型API，进行并发限制，限制某一时刻最多只有有限个请求正在被处理。防止因为这些请求占用资源，导致其他请求得不到处理。</p>
+
+<p><strong>基于资源利用率限速</strong></p>
+
+<p>针对不同的请求分配了不同百分比的资源，当某一类请求超载时，对这类请求限速。</p>
+
+<p><strong>基于worker限速</strong></p>
+
+<p>这个是基于代码特征的限速。每类API通过不同的worker线程负责处理，当worker线程中出现请求堆积时进行限速。</p>
+
+<h2 id="限速结果">限速结果</h2>
+
+<p>http服务的话按照场景返回429或者503。</p>
+
+<h2 id="常用算法">常用算法</h2>
+
+<p><strong>计数</strong></p>
+
+<p>单位时间内计数，超过这个数量时，拒绝服务，每个单位时间开始后计数清零。缺点是在时间边界处，会超过上限。比如，每秒限速100，在0.9s的时候来了100个请求全部得到处理，在下一秒0.1s来了100个请求。在0.9s到1.1s这个范围小于1s，但是请求达到了200。</p>
+
+<pre><code> 0.1s 0.2s 0.3s 0.4s 0.5s 0.6s 0.7s 0.8s 0.9s 0.1s 0.2s
++----+----+----+----+----+----+----+----+----+----+----+---
+| 0  | 0  | 0  | 0  | 0  | 0  | 0  | 0  | 100| 100| 0  | 0 
++----+----+----+----+----+----+----+----+----+----+----+---
+</code></pre>
+
+<p><strong>队列</strong></p>
+
+<p>请求过来的时候，先如队列，处理逻辑处理队列中的请求。</p>
+
+<ul>
+<li>基于大小的队列：当队列大小超过一个阀值的时候，拒绝新来的请求。<br /></li>
+<li>基于时间的队列：请求在队列里面的时间超过多长时间没有被处理，立即返回。RocketMQ就是采用这种方式。<br /></li>
+<li>优先级队列：对请求做优先级分类，不同优先级的请求进入不同的队列。为了避免低优先级请求被饿死，需要对不同优先级队列分配不同的处理时间。<br />
+<br /></li>
+</ul>
+
+<p><strong><a href="https://en.wikipedia.org/wiki/Leaky_bucket">漏桶</a></strong></p>
+
+<p><img src="/imgs/leaky-bucket.jpeg" alt="" /></p>
+
+<p>有一个容量固定的桶，桶中的请求以恒定的速率被处理。请求过来的时候，尝试进入桶，当桶满时被丢弃。本质上是队列后面加一个速率限制器。</p>
+
+<p>漏桶还有一个变形，在漏桶前面加一个队列。当桶满的时候，先放入队列，这样可以保留一部分请求。</p>
+
+<p><strong><a href="https://en.wikipedia.org/wiki/Token_bucket">令牌桶</a></strong></p>
+
+<p><img src="/imgs/token-bucket.png" alt="" /></p>
+
+<p>以恒定的速率向桶中加入token，当请求过来的时候从桶中获取token。如果桶空了，请求等待或者丢弃。相比漏桶令牌桶还可以做蓄水，当桶满的时候可以预留一部分token，可以做到突发(burst)的请求。</p>
+
+<h2 id="实现">实现</h2>
+
+<p>Guava中的<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131">RateLimter</a>是一个平滑的基于令牌桶的实现，同时还实现了warm up特点的一个<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L161">Ratelimiter</a>。</p>
+
+<div class="np"><a href=/posts/cs/design/guava-ratelimiter/>← guava中RateLimiter的设计</a> <a href=/posts/cs/dist/uuid/>分布式ID生成算法 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

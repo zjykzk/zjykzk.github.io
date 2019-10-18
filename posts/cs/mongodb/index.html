@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>mongodb索引</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>mongodb索引</strong>
+<hr> 
+
+<h2 id="默认索引">默认索引</h2>
+
+<p>每个文档默认都有一个字段<code>_id</code>，这个字段会自动生成唯一索引，这个索引无法删除。这个字段的值可以是用户指定，如果不指定mongodb会自动生成。</p>
+
+<p>生成的规则：</p>
+
+<pre><code>|&lt;-- 4 --&gt;|&lt;- 3 -&gt;|&lt;-2-&gt;|&lt;-- 3 --&gt;|
++---------+-------+-----+---------+
+|unix time| mid   | pid | counter |
++---------+-------+-----+---------+
+</code></pre>
+
+<p>包含四个字段：</p>
+
+<ol>
+<li>unix时间戳，4个字节<br /></li>
+<li>机器id，3个字节<br /></li>
+<li>进程id，2个字节<br /></li>
+<li>计数器，3个字节，自增，从一个随机数开始<br />
+<br /></li>
+</ol>
+
+<h2 id="索引类型">索引类型</h2>
+
+<h3 id="单字段索引">单字段索引</h3>
+
+<p>文档中的任何字段或者子文档的字段都可以当作索引，字段的值也可以是一个文档。</p>
+
+<h3 id="复合索引-compound-index">复合索引（compound index）</h3>
+
+<p>一个文档中的多个字段组成一个索引。最多支持31个字段。</p>
+
+<h4 id="prefixes">Prefixes</h4>
+
+<p>当查询的条件是索引的前面几个字段时会使用复合索引。</p>
+
+<p>比如：有索引<code>{a:1,b:1,c:1}</code>，查询条件<code>{a:&quot;a&quot;,b:&quot;b&quot;}</code>就会使用这个索引，但是<code>{b:&quot;b&quot;}</code>这样的查询条件就无法使用。</p>
+
+<h4 id="排序">排序</h4>
+
+<p>索引的顺序先按第一个字段排序，如果第一个字段相等，按照第二个字段排序，依次类推后面的字段顺序。因此，</p>
+
+<ol>
+<li>如果有以下索引<code>{a:1,b:1}</code>，支持排序<code>{a:-1,b:-1}/{a:1:b:1}</code>，不支持排序<code>{a:-1:b:1}/{a:1:b:-1}</code>。<br /></li>
+<li>只支持<strong>Prefixes</strong>的排序。<br />
+<br /></li>
+</ol>
+
+<h3 id="多值索引-multikey-index">多值索引（multikey index）</h3>
+
+<p>字段的值是一个数组，就会自动把这个索引变成多值索引，支持范围查询。</p>
+
+<h3 id="地理空间索引-geospatial-index">地理空间索引（geospatial index）</h3>
+
+<p>包含两种索引：2d/2dsphere index</p>
+
+<h3 id="文本索引-text-indexes">文本索引（text indexes）</h3>
+
+<p>作用于值是字符串或者是字符串数组的字段，查询字段中是否包含查询字符串。</p>
+
+<h3 id="哈希索引-hashed-indexes">哈希索引（hashed indexes）</h3>
+
+<p>用于基于hash的sharding。</p>
+
+<h3 id="交集索引-index-intersection">交集索引（index intersection）</h3>
+
+<p>如果查询条件中出现使用了多个索引，包括<strong>Prefixes</strong>索引。mongodb可能会使用多个索引进行查询，然后取交集。是否使用了这个索引，可以通过<code>explain</code>来确定。</p>
+
+<p>当查询需要排序，同时排序的字段需要的索引和查询条件无法组成一个或者部分<code>query predicate</code>，那就无法使用这个索引了。</p>
+
+<p>比如：有索引<code>{a:1}/{b:1,c:1}</code>，查询<code>db.col.find({a:'a'}).sort({b:1})</code>无法使用，虽然排序中包含字段<code>b</code>，但是查询条件中无法使用这个索引；而查询<code>db.col.find({a:'a',b:'b'}).sort({c:1})</code>却可以使用两个索引，这是因为查询条件中有<code>{b:'b'}</code>和排序字段<code>{c:1}</code>，索引<code>{b:1,c:1}</code>组成部分查询条件。</p>
+
+<h2 id="索引的属性">索引的属性</h2>
+
+<h3 id="唯一性">唯一性</h3>
+
+<p>可以指定一个索引唯一。</p>
+
+<h3 id="部分索引-partial-indexes">部分索引（partial indexes）</h3>
+
+<p>只索引满足条件的文档，它是稀疏索引的超集，相比稀疏索引采用部分索引。</p>
+
+<h3 id="稀疏索引-sparse-indexes">稀疏索引（sparse indexes）</h3>
+
+<p>只索引存在该字段值的文档。</p>
+
+<h4 id="ttl-time-to-live-索引">TTL（time to live）索引</h4>
+
+<p>过期索引，针对值为日期或者日期数组的字段。如果字段值超过了过期日期，就会自动删除。过期时间可以动态修改的，有两种方式指定过期行为：</p>
+
+<ol>
+<li>指定字段日期和过期时长。<br /></li>
+<li>指定过期日期，同时过期时长为0。<br />
+<br /></li>
+</ol>
+
+<h2 id="优化">优化</h2>
+
+<ol>
+<li>如果查询的内容和条件都只引用索引时，那么只需要扫描索引数据，不需要查询文档内容。<br /></li>
+<li>background构建，增量式构建索引。构建时，可以处理其他请求，但是构建索引的请求会被阻塞。<br />
+<br /></li>
+</ol>
+
+<h2 id="限制">限制</h2>
+
+<ol>
+<li>每个index entry的大小不能超过1024字节，超过这个大小的文档会无法插入。<br /></li>
+<li>每个collection最多拥有64个索引。<br /></li>
+<li>索引名字长度 最多128字符，名字规范：<database name>.<collection name>.$<index name> ，其中index name，默认是字段名字+类型，这个名字可以在创建索引的时候指定。<br /></li>
+<li>复合索引最多允许使用31个字段。<br /></li>
+<li>查询条件不能同时使用文本索引和地理空间索引。<br /></li>
+<li>2dsphere index的值只能是几何数据。<br /></li>
+<li>多值索引无法做cover query优化，比如：字段<code>{a:[{b:1},{b:2}]}</code>。<br /></li>
+<li>地理空间索引无法做cover query优化。<br /></li>
+<li>构建索引的请求执行时构建会有一个内存限制，超过这个限制会使用临时文件。可以阀值可以修改。<br /></li>
+<li>text/2d/geoHaystack索引无法使用collation。<br /></li>
+</ol>
+
+<div class="np"><a href=/posts/cs/dist/uuid/>← 分布式ID生成算法</a> <a href=/posts/cs/design/interface-owner/>接口在哪里定义？ →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

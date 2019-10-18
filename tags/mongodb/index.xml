@@ -15,10 +15,10 @@
     
     <item>
       <title>mongodb索引</title>
-      <link>http://zjykzk.github.io/post/cs/mongodb/</link>
+      <link>http://zjykzk.github.io/posts/cs/mongodb/</link>
       <pubDate>Fri, 20 Jul 2018 16:18:23 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/mongodb/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/mongodb/</guid>
       <description>默认索引 每个文档默认都有一个字段_id，这个字段会自动生成唯一索引，这个索引无法删除。这个字段的值可以是用户指定，如果不指定mongodb会自动生成。
 生成的规则：
 |&amp;lt;-- 4 --&amp;gt;|&amp;lt;- 3 -&amp;gt;|&amp;lt;-2-&amp;gt;|&amp;lt;-- 3 --&amp;gt;| +---------+-------+-----+---------+ |unix time| mid | pid | counter | +---------+-------+-----+---------+  包含四个字段：

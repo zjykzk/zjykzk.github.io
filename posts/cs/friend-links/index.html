@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>价值博客</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>价值博客</strong>
+<hr> 
+
+<h3 id="有趣的一些项目">有趣的一些项目</h3>
+
+<p><a href="https://hackaday.com/"><strong>hackaday</strong></a></p>
+
+<h3 id="python">Python</h3>
+
+<p><a href="http://www.dabeaz.com/"><strong>David Beazley</strong></a></p>
+
+<h3 id="golang">Golang</h3>
+
+<p><a href="https://rakyll.org/"><strong>Rakyll</strong></a> | <a href="https://peter.bourgon.org/"><strong>Peter Bourgon</strong></a> | <a href="https://dave.cheney.net"><strong>Dave Cheney</strong></a> | <a href="https://github.com/golang/go/wiki"><strong>Golang Wiki</strong></a></p>
+
+<h3 id="java">Java</h3>
+
+<p><a href="https://howtodoinjava.com/">HowToDoInJava</a> | <a href="http://tutorials.jenkov.com/">Software Development &amp; Entrepreneurship Tutorials</a> | <a href="https://java-design-patterns.com/patterns/">java design patterns</a></p>
+
+<h3 id="others">Others</h3>
+
+<p><a href="http://stackshare.io/">技术栈</a></p>
+
+<p><a href="http://www.tuicool.com/mags">编程狂人周刊</a> | <a href="http://weekly.manong.io/issues/">码农周刊</a></p>
+
+<p><a href="http://mindhacks.cn/"><strong>刘未鹏 | MIND HACKS</strong></a> | <a href="http://blog.csdn.net/lxwde">lxwde</a> | <a href="http://www.matrix67.com/blog/"><strong>Matrix67</strong></a> | <a href="http://blog.codingnow.com/"><strong>云风</strong></a> | <a href="http://www.luanxiang.org/"><strong>余晟</strong></a> | <a href="http://blog.youxu.info/"><strong>徐宥|4G Spaces</strong></a> | <a href="http://blog.csdn.net/program_think"><strong>编程随想</strong></a> | <a href="http://uicom.net/blog/"><strong>白鸦</strong></a> | <a href="http://www.ruanyifeng.com/blog/"><strong>阮一峰</strong></a> | <a href="https://www.yinwang.org/">王垠</a></p>
+
+<p><a href="https://medium.com/netflix-techblog">Netflix技术博客</a> | <a href="https://www.techiedelight.com/">Techie Delight</a> | <a href="https://engineering.linkedin.com/blog">Linkedin技术博客</a> | <a href="https://blogs.dropbox.com/tech/">Dropbox技术博客</a> | <a href="https://code.fb.com/">Facebook技术博客</a> | <a href="http://jm.taobao.org/">淘宝中间件团队</a> | <a href="https://tech.meituan.com/">美团技术博客</a> | <a href="http://blogs.360.cn/">360技术博客</a> | <a href="http://www.infoq.com/">infoq</a></p>
+
+<div class="np"><a href=/posts/cs/flume/>← flume</a> <a href=/posts/about/>About →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

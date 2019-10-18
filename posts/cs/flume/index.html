@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>flume</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>flume</strong>
+<hr> 
+
+<h1 id="架构">架构</h1>
+
+<p><img src="/imgs/flume.dot.png" alt="" /></p>
+
+<h1 id="概念">概念</h1>
+
+<h2 id="source">source</h2>
+
+<p>数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个<strong>event</strong>。</p>
+
+<h3 id="event">event</h3>
+
+<p>数据单元，从<strong>source</strong>产生，直到被序列化到存储中。<strong>event</strong>包含*header*，*body*两个部分：</p>
+
+<ul>
+<li>header: 一个map数据，可以被<strong>interceptor</strong>引用<br /></li>
+<li>body: 一个字节序列，具体日志数据<br />
+<br /></li>
+</ul>
+
+<h3 id="interceptor">interceptor</h3>
+
+<p><strong>source</strong>读取一个<strong>event</strong>在放到<strong>channel</strong>中之前，<strong>event</strong>可以被添加数据。比如说：采集机器的主机名称，时间戳。</p>
+
+<h2 id="channel">channel</h2>
+
+<p>数据队列，高可用的保障。<strong>source</strong>产生的数据先放到这里，<strong>sink</strong>接着从这里取出来放到存储当中。</p>
+
+<h3 id="channel-selector">channel selector</h3>
+
+<p>两个作用：</p>
+
+<ol>
+<li>复制：把一个<strong>event</strong>写到一个或者多个<strong>channel</strong>中<br /></li>
+<li>路由：根据<strong>event</strong>中的某个属性值，把数据写到指定的<strong>channel</strong>中<br />
+<br /></li>
+</ol>
+
+<h2 id="sink">sink</h2>
+
+<p>负责把<strong>channel</strong>中的数据写入目标存储。</p>
+
+<h3 id="sink-processor">sink processor</h3>
+
+<p>选择<strong>sink</strong>，在这里可以完成负载均衡和容错处理。</p>
+
+<h3 id="event-serializer">event serializer</h3>
+
+<p>把<strong>event</strong>中的数据，转换成存储需要的格式。</p>
+
+<div class="np"><a href=/posts/cs/bug-op/>← 增加bug的编程实践</a> <a href=/posts/cs/friend-links/>价值博客 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

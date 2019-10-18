@@ -15,10 +15,10 @@
     
     <item>
       <title>RocketMQ HA实现</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/ha/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/ha/</link>
       <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/ha/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/ha/</guid>
       <description> HA原理 RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：
  等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。
  大于0，从该值开始传输。
@@ -45,10 +45,10 @@
     
     <item>
       <title>RocketMQ push模式的实现细节</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/push-consumer/</link>
       <pubDate>Wed, 16 Jan 2019 16:54:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/push-consumer/</guid>
       <description>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：
  DefaultMQPushConsumerImpl：拉消息的类型。
  ProcessQueue：保存拉出来的消息。
@@ -85,10 +85,10 @@ ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别�
     
     <item>
       <title>RocketMQ offset管理</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/offset/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/offset/</link>
       <pubDate>Fri, 28 Dec 2018 16:03:51 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/offset/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/offset/</guid>
       <description> 作用 记录每个消费队列的消费进度。以topic，group为单位。
 类型 根据保存的位置可以分为本地和远程两种类型。本地类型就是以文本文件的形式保存在客户端，内容是非正式的json数据，而远程类型是指数据保存在broker服务器上面，内容同样是非正式的json数据。
 代码
@@ -125,10 +125,10 @@ updateConsumeOffsetToBroker
     
     <item>
       <title>slave和master同步连接经常重连，导致发送消息失败</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</link>
       <pubDate>Mon, 22 Oct 2018 17:07:02 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
       <description>缘起 封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。
 排查过程 查看boots-broker日志，发现问题日志：
 [TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0  说明，RocketMQ处理发送消息比较慢。可是，从size of queue可以看出，堆积的消息为0。
@@ -139,10 +139,10 @@ updateConsumeOffsetToBroker
     
     <item>
       <title>rocketmq store模块</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/store/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/store/</link>
       <pubDate>Fri, 08 Dec 2017 17:59:56 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/store/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/store/</guid>
       <description>功能 store模块是rocketmq的核心模块。主要功能有：
  消息存储
  消息索引

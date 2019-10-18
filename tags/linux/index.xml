@@ -15,10 +15,10 @@
     
     <item>
       <title>如何定位一个文件</title>
-      <link>http://zjykzk.github.io/post/cs/linux/open-file-progress/</link>
+      <link>http://zjykzk.github.io/posts/cs/linux/open-file-progress/</link>
       <pubDate>Wed, 24 Oct 2018 14:57:53 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/linux/open-file-progress/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/linux/open-file-progress/</guid>
       <description>linux的VFS包含4个重要概念：
 1. superblock，包含文件系统的信息，管理整个文件系统。
 2. inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。

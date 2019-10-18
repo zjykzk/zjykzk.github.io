@@ -15,10 +15,10 @@
     
     <item>
       <title>如何学习一门编程语言</title>
-      <link>http://zjykzk.github.io/post/cs/language/learn/</link>
+      <link>http://zjykzk.github.io/posts/cs/language/learn/</link>
       <pubDate>Tue, 04 Jun 2019 16:50:10 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/language/learn/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/language/learn/</guid>
       <description>类型系统 常用的数据类型，包括：数值、字符串、数组、函数。以及自定义类型，比如说java中的class，C++中的泛型，C中的struct等等。很多语言也把函数当作基本类型，典型的如动态类型语言语言，静态类型如golang。
 语法 主要分表达式、语句。
 表达式主要表达计算，计算出一个值，用于下面逻辑。这个计算可能是数学运算，也可能是数据引用。
@@ -37,10 +37,10 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
     
     <item>
       <title>sync.Map实现分析</title>
-      <link>http://zjykzk.github.io/post/cs/golang/sync.map/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/sync.map/</link>
       <pubDate>Wed, 29 May 2019 14:44:31 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/sync.map/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/sync.map/</guid>
       <description>golang的SDK中提供线程安全的map实现sync.Map。它是针对RWMutex+map的实现方案中存在cache line的false share提出来的。主要适用于两个场景：
  针对一个key一次写多次读。
  多个goroutine并发读写修改的key是没有交集。
@@ -50,10 +50,10 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
     
     <item>
       <title>技术选型</title>
-      <link>http://zjykzk.github.io/post/cs/select-tech/</link>
+      <link>http://zjykzk.github.io/posts/cs/select-tech/</link>
       <pubDate>Fri, 19 Apr 2019 16:19:31 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/select-tech/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/select-tech/</guid>
       <description>因数 项目因数 规模 小：可以选用新技术
 大：使用成熟技术
 时间 紧：买商用的
@@ -71,10 +71,10 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
     
     <item>
       <title>RocketMQ HA实现</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/ha/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/ha/</link>
       <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/ha/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/ha/</guid>
       <description> HA原理 RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：
  等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。
  大于0，从该值开始传输。
@@ -101,10 +101,10 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
     
     <item>
       <title>RocketMQ push模式的实现细节</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/push-consumer/</link>
       <pubDate>Wed, 16 Jan 2019 16:54:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/push-consumer/</guid>
       <description>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：
  DefaultMQPushConsumerImpl：拉消息的类型。
  ProcessQueue：保存拉出来的消息。
@@ -141,10 +141,10 @@ ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别�
     
     <item>
       <title>RocketMQ offset管理</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/offset/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/offset/</link>
       <pubDate>Fri, 28 Dec 2018 16:03:51 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/offset/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/offset/</guid>
       <description> 作用 记录每个消费队列的消费进度。以topic，group为单位。
 类型 根据保存的位置可以分为本地和远程两种类型。本地类型就是以文本文件的形式保存在客户端，内容是非正式的json数据，而远程类型是指数据保存在broker服务器上面，内容同样是非正式的json数据。
 代码
@@ -181,10 +181,10 @@ updateConsumeOffsetToBroker
     
     <item>
       <title>为什么main函数是终结者</title>
-      <link>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</link>
       <pubDate>Fri, 16 Nov 2018 14:13:32 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</guid>
       <description>来一个hello, world!。
 package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5  编译调试。
 # go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?</description>
@@ -192,10 +192,10 @@ package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 
     
     <item>
       <title>高可用</title>
-      <link>http://zjykzk.github.io/post/cs/dist/ha/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/ha/</link>
       <pubDate>Fri, 02 Nov 2018 15:38:24 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/ha/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/ha/</guid>
       <description>什么是高可用 平时经常提到一个服务可用性4个9，5个9，其实说的就是高可用。一个服务服务的时间越久可用性越高。因此，在设计时候需要考虑各种失败的情况，尽量减少服务不可用的时间。
 实现高可用原则 实现高可用的大法就是多副本，或者叫冗余，或者叫集群。一个服务有多个结点，一个结点挂了，其他结点照样能够提供服务。另外，还需要一个故障转移大法，不然请求都打向那个挂的结点，照样是失败。最后，还需要伸缩大法，能够动态调整资源应付请求量的变化。
 伸缩方案 DNS
@@ -229,10 +229,10 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
     
     <item>
       <title>如何定位一个文件</title>
-      <link>http://zjykzk.github.io/post/cs/linux/open-file-progress/</link>
+      <link>http://zjykzk.github.io/posts/cs/linux/open-file-progress/</link>
       <pubDate>Wed, 24 Oct 2018 14:57:53 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/linux/open-file-progress/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/linux/open-file-progress/</guid>
       <description>linux的VFS包含4个重要概念：
 1. superblock，包含文件系统的信息，管理整个文件系统。
 2. inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。
@@ -244,10 +244,10 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
     
     <item>
       <title>slave和master同步连接经常重连，导致发送消息失败</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</link>
       <pubDate>Mon, 22 Oct 2018 17:07:02 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
       <description>缘起 封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。
 排查过程 查看boots-broker日志，发现问题日志：
 [TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0  说明，RocketMQ处理发送消息比较慢。可是，从size of queue可以看出，堆积的消息为0。
@@ -258,10 +258,10 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
     
     <item>
       <title>熔断</title>
-      <link>http://zjykzk.github.io/post/cs/dist/circuit-breaker/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/circuit-breaker/</link>
       <pubDate>Fri, 12 Oct 2018 14:23:18 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/circuit-breaker/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/circuit-breaker/</guid>
       <description>缘起 在分布式系统中，会有很多的RPC调用，当某个服务超载时候，继续接收请求只会让系统变得不可用，甚至会导致多个系统的连锁反应。因此在这样的情况下，最好是把后续的请求挡住，直接返回错误。等到系统恢复正常以后再处理请求。熔断借鉴了电闸中的保险丝功能，当因为某个意外原因（比如插座进水导致短路）导致线路中的电流过大而产生大量热量，保险丝就会被融化掉，从而中断线路中的电流，防止事故发生。
 设计 通俗来说，它是一个服务代理（逻辑上说），监测服务的状态，决定是否处理当前的请求，如果不处理返回错误。
 服务状态
@@ -293,10 +293,10 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
     
     <item>
       <title>guava中RateLimiter的设计</title>
-      <link>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</link>
       <pubDate>Thu, 11 Oct 2018 15:33:32 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</guid>
       <description>guava中的RateLimiter实现了比较有意思的功能：
  平滑。
  记录未使用的信息。
@@ -315,10 +315,10 @@ Warmup模式
     
     <item>
       <title>限流</title>
-      <link>http://zjykzk.github.io/post/cs/dist/rate-limit/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/rate-limit/</link>
       <pubDate>Thu, 30 Aug 2018 16:48:26 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/rate-limit/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/rate-limit/</guid>
       <description>缘起 为了保证API的可用性，以及系统的可靠性，需要为API限速。不然，API请求量大到系统无法处理时就会出现系统变慢，甚至宕机的情况。常见的限速场景：
  挡住某个用户的过多请求（用户激增或者恶意请求），确保正常处理其他用户请求。
  挡住过多的低优先级的请求，确保核心请求得到处理。
@@ -343,10 +343,10 @@ Warmup模式
     
     <item>
       <title>分布式ID生成算法</title>
-      <link>http://zjykzk.github.io/post/cs/dist/uuid/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/uuid/</link>
       <pubDate>Wed, 22 Aug 2018 11:08:28 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/uuid/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/uuid/</guid>
       <description>分布式Unique ID在分布式系统使用很广泛，常用的用途有：
  请求的ID，用于跟踪请求链路。
  消息队列中的unique id。
@@ -367,10 +367,10 @@ UUID UUID由[0-9a-f-]字符组成，总共16个字节，转换成16进制的格�
     
     <item>
       <title>mongodb索引</title>
-      <link>http://zjykzk.github.io/post/cs/mongodb/</link>
+      <link>http://zjykzk.github.io/posts/cs/mongodb/</link>
       <pubDate>Fri, 20 Jul 2018 16:18:23 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/mongodb/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/mongodb/</guid>
       <description>默认索引 每个文档默认都有一个字段_id，这个字段会自动生成唯一索引，这个索引无法删除。这个字段的值可以是用户指定，如果不指定mongodb会自动生成。
 生成的规则：
 |&amp;lt;-- 4 --&amp;gt;|&amp;lt;- 3 -&amp;gt;|&amp;lt;-2-&amp;gt;|&amp;lt;-- 3 --&amp;gt;| +---------+-------+-----+---------+ |unix time| mid | pid | counter | +---------+-------+-----+---------+  包含四个字段：
@@ -397,10 +397,10 @@ Prefixes 当查询的条件是索引的前面几个字段时会使用复合索�
     
     <item>
       <title>接口在哪里定义？</title>
-      <link>http://zjykzk.github.io/post/cs/design/interface-owner/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/interface-owner/</link>
       <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/interface-owner/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/interface-owner/</guid>
       <description>接口放在哪里决定了源代码依赖问题。因此，依赖是接口定义唯一考量，其他问题都可以归结为依赖问题，而定义的包永远是被依赖包。
 接口定义的位置有三种情况：
  使用者
@@ -422,10 +422,10 @@ Prefixes 当查询的条件是索引的前面几个字段时会使用复合索�
     
     <item>
       <title>常用面向对象设计原则</title>
-      <link>http://zjykzk.github.io/post/cs/design/soild/</link>
+      <link>http://zjykzk.github.io/posts/cs/design/soild/</link>
       <pubDate>Wed, 04 Jul 2018 22:28:20 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/design/soild/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/design/soild/</guid>
       <description>设计 软件的复杂来源于需求的易变，意味着软件本身容易修改。好设计的目的就是提供软件的可修改能力，也就是可维护性、扩展性。SOILD原则就是在设计过程中达到这个目标的一些原则。
 单一职责原则 又名SRP（Single Responsibility Principle）。针对一个函数、类、组件、架构的修改有且只有一个理由，而理由的来自于使用者。
 这样的好处是把拥有相同修改理由的函数、类、组件组织在一起，不同的分开，达到修改的时候不会影响其他代码，增强了可维护性。
@@ -461,10 +461,10 @@ OCP的实现需要使用抽象和多态，静态语言中继承是多态的一�
     
     <item>
       <title>一致性hash算法</title>
-      <link>http://zjykzk.github.io/post/cs/dist/cons-hash/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/cons-hash/</link>
       <pubDate>Sat, 28 Apr 2018 13:58:46 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/cons-hash/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/cons-hash/</guid>
       <description>一致性hash 目标 缓存的机器扩容、缩容时，尽量保持数据的命中率。常规的hash算法，hash(key)mod N （N表示缓存结点），当N变化时同一个key查询的缓存结点都会变化，导致缓存没有命中，造成很大的数据库压力。
 原理 hash函数值大小32位，因此输出的范围是0~2^32-1。把这个范围形成一个环，同时对数据进行hash计算以外，对缓存的机器也做hash计算。这些计算出来的值在这个环上都有对应的一个点。
 假设数据的hash值分别为K1,K2,K3,K4,K5,K6，以及缓存结点的hash值H1,H2,H3,大小关系为H1&amp;lt;K3&amp;lt;K4&amp;lt;K5&amp;lt;H2&amp;lt;K6&amp;lt;H3&amp;lt;K1&amp;lt;K2。
@@ -477,10 +477,10 @@ OCP的实现需要使用抽象和多态，静态语言中继承是多态的一�
     
     <item>
       <title>golang中的tls</title>
-      <link>http://zjykzk.github.io/post/cs/golang/tls/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/tls/</link>
       <pubDate>Tue, 27 Feb 2018 19:51:16 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/tls/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/tls/</guid>
       <description>在golang中，为了性能的目的，当前执行的g是保存在当前线程的TLS中的，而TLS的地址在结构体m里面。问题是怎么放进去的呢？
 可以从程序的启动入手，顺藤摸瓜。
 编写一个打印hello,world的程序
@@ -491,10 +491,10 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
     
     <item>
       <title>打坐感悟</title>
-      <link>http://zjykzk.github.io/post/buddhism/dazuo/</link>
+      <link>http://zjykzk.github.io/posts/buddhism/dazuo/</link>
       <pubDate>Sun, 04 Feb 2018 17:13:52 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/buddhism/dazuo/</guid>
+      <guid>http://zjykzk.github.io/posts/buddhism/dazuo/</guid>
       <description>自从老师教打坐已经7年了。在腿疼这一点上一直无法完全克服，经常被想去除腿疼的念头带走，然后起坐。今天趁儿子午睡入座，结果50分钟起坐了，原因照旧。但是，打坐腿疼时并没有忘记观照：腿疼的境，以及想起坐的念头无非都是自己的心念而已，如何对待依然由“自己”做主。
 起坐以后，接着打坐时的思路继续思维，在境来时不是恰好我练习的关照的最好时刻么，趁儿子未醒，接着下座。这次，入座腿疼的境以及起坐的念头如期而至，有了上次的思维，我把心专注在大明咒上，尽量保持不让腿疼的境和起坐的念头所带走，一直到心中有把握任他们起落而不被他们带走，起坐，心中法喜充满。至此，腿疼的问题可以告一段落。
 在坐中居然还冒出一句：心念出现，心不随念转，它就上伤不到你；心念本伤不到你，心也就不会随境所转。当然，这是对负面的念头而言，其实正面的念头何尝不是如此。感恩老师教诲！</description>
@@ -502,10 +502,10 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
     
     <item>
       <title>vim常用操作</title>
-      <link>http://zjykzk.github.io/post/cs/vim-tips/</link>
+      <link>http://zjykzk.github.io/posts/cs/vim-tips/</link>
       <pubDate>Wed, 10 Jan 2018 18:16:35 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/vim-tips/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/vim-tips/</guid>
       <description> 在命令模式使用函数
 :%s/ab(.*)c/\=submatch(1) . &#39;test&#39;/gc  窗口间切换
 跳转至某个窗口：窗口number + c-w + w： 跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h 跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l 跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j 跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k  全文缩进
@@ -520,10 +520,10 @@ Ctrl-w N   </description>
     
     <item>
       <title>jit的基本原理以及实现</title>
-      <link>http://zjykzk.github.io/post/cs/jit/</link>
+      <link>http://zjykzk.github.io/posts/cs/jit/</link>
       <pubDate>Wed, 03 Jan 2018 15:12:25 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/jit/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/jit/</guid>
       <description>基本原理 JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：
 1. 生成可以执行的代码
 2. 执行代码
@@ -541,10 +541,10 @@ Hello，World 一个基于x86_64平台的JIT代码， 通过系统调用write实
     
     <item>
       <title>rocketmq store模块</title>
-      <link>http://zjykzk.github.io/post/cs/rocketmq/store/</link>
+      <link>http://zjykzk.github.io/posts/cs/rocketmq/store/</link>
       <pubDate>Fri, 08 Dec 2017 17:59:56 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/rocketmq/store/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/rocketmq/store/</guid>
       <description>功能 store模块是rocketmq的核心模块。主要功能有：
  消息存储
  消息索引
@@ -570,10 +570,10 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
     
     <item>
       <title>记一次mongo数据库优化经历</title>
-      <link>http://zjykzk.github.io/post/cs/first-optimal/</link>
+      <link>http://zjykzk.github.io/posts/cs/first-optimal/</link>
       <pubDate>Tue, 24 Oct 2017 18:46:11 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/first-optimal/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/first-optimal/</guid>
       <description>缘起 table{border-collapse:collapse;}table,td,th{border:1px solid #000}td{text-align:center}
 最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：
    发送线程数量 消费线程数量 发送TPS 消费TPS     3 3 200-400 20-60    而且，随着消费线程的数量增加发送&amp;amp;消费的TPS都下降。
@@ -596,10 +596,10 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
     
     <item>
       <title>map 内部实现</title>
-      <link>http://zjykzk.github.io/post/cs/golang/map/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/map/</link>
       <pubDate>Thu, 15 Jun 2017 19:13:25 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/map/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/map/</guid>
       <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
 // file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap  显然，makemap 返回的是指针。
 数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用 count int // map标记: // 1. key和value是否包指针 // 2. 是否正在扩容 // 3. 是否是同样大小的扩容 // 4. 是否正在 `range`方式访问当前的buckets // 5. 是否有 `range`方式访问旧的bucket flags uint8 B uint8 // log_2(B) == bucket数量 noverflow uint16 // overflow bucket的数量，是个近似值 hash0 uint32 // hash种子 buckets unsafe.</description>
@@ -607,10 +607,10 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
     
     <item>
       <title>补码</title>
-      <link>http://zjykzk.github.io/post/cs/complement/</link>
+      <link>http://zjykzk.github.io/posts/cs/complement/</link>
       <pubDate>Tue, 30 May 2017 23:18:02 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/complement/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/complement/</guid>
       <description>加法 2个十进制数字的非正式算法：两个数字中相同位置的数相加，如果结果超过10产生进位，该进位在下一位数相加时加上。直到两个数字的所有位数都加完为止。
 考虑十进制的2位数加法，例如：16 + 26。
  1 6 + 2 6 ------- 4 2  上例中的加法过程是：
@@ -629,10 +629,10 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
     
     <item>
       <title>GO 内存模型</title>
-      <link>http://zjykzk.github.io/post/cs/golang/go-memory-model/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</link>
       <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/go-memory-model/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</guid>
       <description>内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
 Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
 int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
@@ -646,10 +646,10 @@ happens before定义了内存操作的顺序，它是一种偏序。e1 happens b
     
     <item>
       <title>字符串</title>
-      <link>http://zjykzk.github.io/post/cs/str/</link>
+      <link>http://zjykzk.github.io/posts/cs/str/</link>
       <pubDate>Thu, 19 Jan 2017 14:05:14 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/str/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/str/</guid>
       <description>为什么要字符 人类发明了文字，同时想用计算机来处理文字。由此，就产生了字符。每个字符代码一个文字的图形。
 字符串的表示 在计算机内部，只有01的信息。因此，为了能让计算机能够认识字符串，每个字符就的被映射成01数据。这个映射功能就叫编码。
 ASCII ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如A的编码是01000001
@@ -663,10 +663,10 @@ utf8编码规则：
     
     <item>
       <title>prometheus</title>
-      <link>http://zjykzk.github.io/post/cs/prometheus/</link>
+      <link>http://zjykzk.github.io/posts/cs/prometheus/</link>
       <pubDate>Sun, 09 Oct 2016 14:45:21 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/prometheus/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/prometheus/</guid>
       <description>架构 基本概念 数据模型 prometheus把数据当作时间序列进行存储。
 每个时间序列通过 metric name和 key-value pairs(也叫做 label)标识。
 metric name表示需要进行测量的系统指标。
@@ -700,10 +700,10 @@ Histogram 统计度量事件发生的次数以及度量值的和。还支持统�
     
     <item>
       <title>增加bug的编程实践</title>
-      <link>http://zjykzk.github.io/post/cs/bug-op/</link>
+      <link>http://zjykzk.github.io/posts/cs/bug-op/</link>
       <pubDate>Sat, 04 Jun 2016 11:12:13 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/bug-op/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/bug-op/</guid>
       <description>思路不清晰 思路没有完全确定情况下写代码。造成不确定的情况有多方面：
 1. 求快，把相似的需求当做一样的需求 2. 缺少设计，大体明白实现方案，就开始编码 3. 知识不充分，集中在前端的css、布局  怎么办？
 快是可以做到，心里不要慌就是。
@@ -712,10 +712,10 @@ Histogram 统计度量事件发生的次数以及度量值的和。还支持统�
     
     <item>
       <title>flume</title>
-      <link>http://zjykzk.github.io/post/cs/flume/</link>
+      <link>http://zjykzk.github.io/posts/cs/flume/</link>
       <pubDate>Sun, 27 Mar 2016 22:17:17 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/flume/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/flume/</guid>
       <description>架构 概念 source 数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个event。
 event 数据单元，从source产生，直到被序列化到存储中。event包含*header*，*body*两个部分：
  header: 一个map数据，可以被interceptor引用
@@ -732,10 +732,10 @@ event serializer 把event中的数据，转换成存储需要的格式。</descr
     
     <item>
       <title>价值博客</title>
-      <link>http://zjykzk.github.io/post/cs/friend-links/</link>
+      <link>http://zjykzk.github.io/posts/cs/friend-links/</link>
       <pubDate>Mon, 15 Feb 2016 11:19:35 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/friend-links/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/friend-links/</guid>
       <description>有趣的一些项目 hackaday
 Python David Beazley
 Golang Rakyll | Peter Bourgon | Dave Cheney | Golang Wiki
@@ -748,10 +748,10 @@ Netflix技术博客 | Techie Delight | Linkedin技术博客 | Dropbox技术博�
     
     <item>
       <title>About</title>
-      <link>http://zjykzk.github.io/post/about/</link>
+      <link>http://zjykzk.github.io/posts/about/</link>
       <pubDate>Tue, 02 Feb 2016 21:33:21 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/about/</guid>
+      <guid>http://zjykzk.github.io/posts/about/</guid>
       <description>还在努力学习思考。。。</description>
     </item>
     

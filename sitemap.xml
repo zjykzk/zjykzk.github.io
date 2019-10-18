@@ -13,7 +13,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/</loc>
+    <loc>http://zjykzk.github.io/posts/</loc>
     <lastmod>2019-06-04T16:50:10+08:00</lastmod>
   </url>
   
@@ -28,7 +28,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/language/learn/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/language/learn/</loc>
     <lastmod>2019-06-04T16:50:10+08:00</lastmod>
   </url>
   
@@ -43,7 +43,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/golang/sync.map/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/golang/sync.map/</loc>
     <lastmod>2019-05-29T14:44:31+08:00</lastmod>
   </url>
   
@@ -58,7 +58,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/select-tech/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/select-tech/</loc>
     <lastmod>2019-04-19T16:19:31+08:00</lastmod>
   </url>
   
@@ -73,22 +73,22 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/rocketmq/ha/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/rocketmq/ha/</loc>
     <lastmod>2019-01-25T15:35:52+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/rocketmq/push-consumer/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/rocketmq/push-consumer/</loc>
     <lastmod>2019-01-16T16:54:09+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/rocketmq/offset/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/rocketmq/offset/</loc>
     <lastmod>2018-12-28T16:03:51+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/golang/how-main-goroutine-is-terminator/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</loc>
     <lastmod>2018-11-16T14:13:32+08:00</lastmod>
   </url>
   
@@ -103,7 +103,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/dist/ha/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/dist/ha/</loc>
     <lastmod>2018-11-02T15:38:24+08:00</lastmod>
   </url>
   
@@ -113,12 +113,12 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/linux/open-file-progress/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/linux/open-file-progress/</loc>
     <lastmod>2018-10-24T14:57:53+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/rocketmq/slave-sync-from-master-disconnect/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</loc>
     <lastmod>2018-10-22T17:07:02+08:00</lastmod>
   </url>
   
@@ -128,7 +128,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/dist/circuit-breaker/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/dist/circuit-breaker/</loc>
     <lastmod>2018-10-12T14:23:18+08:00</lastmod>
   </url>
   
@@ -138,7 +138,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/design/guava-ratelimiter/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</loc>
     <lastmod>2018-10-11T15:33:32+08:00</lastmod>
   </url>
   
@@ -148,12 +148,12 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/dist/rate-limit/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/dist/rate-limit/</loc>
     <lastmod>2018-08-30T16:48:26+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/dist/uuid/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/dist/uuid/</loc>
     <lastmod>2018-08-22T11:08:28+08:00</lastmod>
   </url>
   
@@ -163,27 +163,27 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/mongodb/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/mongodb/</loc>
     <lastmod>2018-07-20T16:18:23+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/design/interface-owner/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/design/interface-owner/</loc>
     <lastmod>2018-07-15T15:11:11+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/design/soild/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/design/soild/</loc>
     <lastmod>2018-07-04T22:28:20+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/dist/cons-hash/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/dist/cons-hash/</loc>
     <lastmod>2018-04-28T13:58:46+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/golang/tls/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/golang/tls/</loc>
     <lastmod>2018-02-27T19:51:16+08:00</lastmod>
   </url>
   
@@ -198,7 +198,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/buddhism/dazuo/</loc>
+    <loc>http://zjykzk.github.io/posts/buddhism/dazuo/</loc>
     <lastmod>2018-02-04T17:13:52+08:00</lastmod>
   </url>
   
@@ -208,7 +208,7 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/vim-tips/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/vim-tips/</loc>
     <lastmod>2018-01-10T18:16:35+08:00</lastmod>
   </url>
   
@@ -218,32 +218,32 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/jit/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/jit/</loc>
     <lastmod>2018-01-03T15:12:25+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/rocketmq/store/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/rocketmq/store/</loc>
     <lastmod>2017-12-08T17:59:56+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/first-optimal/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/first-optimal/</loc>
     <lastmod>2017-10-24T18:46:11+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/golang/map/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/golang/map/</loc>
     <lastmod>2017-06-15T19:13:25+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/complement/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/complement/</loc>
     <lastmod>2017-05-30T23:18:02+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/golang/go-memory-model/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</loc>
     <lastmod>2017-03-28T11:22:09+08:00</lastmod>
   </url>
   
@@ -253,32 +253,32 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/str/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/str/</loc>
     <lastmod>2017-01-19T14:05:14+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/prometheus/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/prometheus/</loc>
     <lastmod>2016-10-09T14:45:21+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/bug-op/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/bug-op/</loc>
     <lastmod>2016-06-04T11:12:13+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/flume/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/flume/</loc>
     <lastmod>2016-03-27T22:17:17+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/cs/friend-links/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/friend-links/</loc>
     <lastmod>2016-02-15T11:19:35+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/post/about/</loc>
+    <loc>http://zjykzk.github.io/posts/about/</loc>
     <lastmod>2016-02-02T21:33:21+08:00</lastmod>
   </url>
   

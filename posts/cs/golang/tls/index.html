@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>golang中的tls</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>golang中的tls</strong>
+<hr> <p>在golang中，为了性能的目的，当前执行的<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332"><code>g</code></a>是保存在当前线程的TLS中的，而TLS的地址在结构体<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412"><code>m</code></a>里面。问题是怎么放进去的呢？</p>
+
+<p>可以从程序的启动入手，顺藤摸瓜。</p>
+
+<p>编写一个打印<code>hello,world</code>的程序</p>
+
+<pre><code>// hello.go
+
+package main
+
+func main() {
+        print(&quot;hello, world&quot;)
+}
+</code></pre>
+
+<p>编译生成可执行文件</p>
+
+<pre><code>go build -o hello hello.go
+</code></pre>
+
+<p>用gdb进行调试，找到程序的入口 <a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L7"><code>_rt0_amd64_linux</code></a></p>
+
+<pre><code>gdb hello
+(gdb) info files
+...
+Entry point: 0x448f20
+...
+(gdb) list *0x448f20
+0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8)
+3       // license that can be found in the LICENSE file.
+4
+5       #include &quot;textflag.h&quot;
+6
+7       TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8
+8               LEAQ    8(SP), SI // argv
+9               MOVQ    0(SP), DI // argc
+10              MOVQ    $main(SB), AX
+11              JMP     AX
+12
+</code></pre>
+
+<p>发现<code>_rt0_amd64_linux</code>调用了<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L72"><code>main</code></a>函数，后者调用了<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/asm_amd64.s#L10"><code>runtime.rt0_go</code></a>。而在函数<code>runtime.rt0_go</code>中</p>
+
+<pre><code>127 	LEAQ	runtime·m0+m_tls(SB), DI
+128 	CALL	runtime·settls(SB)
+</code></pre>
+
+<p>把<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/proc.go#L79"><code>m0.tls</code></a>的地址放到寄存器<code>DI</code>，并调用了函数<code>runtime.settls</code>，查看<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/sys_linux_amd64.s#L496"><code>runtime.settls</code></a>核心代码</p>
+
+<pre><code>503 	ADDQ	$8, DI	// ELF wants to use -8(FS)
+504 #endif
+505 	MOVQ	DI, SI
+506 	MOVQ	$0x1002, DI	// ARCH_SET_FS
+507 	MOVQ	$158, AX	// arch_prctl
+508 	SYSCALL
+</code></pre>
+
+<p>可以看到，这里调用了系统调用<a href="http://man7.org/linux/man-pages/man2/arch_prctl.2.html"><code>arch_prctl</code></a>，在linux下把<code>m0.tls+8</code>的地址保存到<code>fs</code>寄存器。到此，完成TLS的设置。</p>
+
+<div class="np"><a href=/posts/cs/dist/cons-hash/>← 一致性hash算法</a> <a href=/posts/buddhism/dazuo/>打坐感悟 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

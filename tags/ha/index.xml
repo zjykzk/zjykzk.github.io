@@ -15,10 +15,10 @@
     
     <item>
       <title>高可用</title>
-      <link>http://zjykzk.github.io/post/cs/dist/ha/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/ha/</link>
       <pubDate>Fri, 02 Nov 2018 15:38:24 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/ha/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/ha/</guid>
       <description>什么是高可用 平时经常提到一个服务可用性4个9，5个9，其实说的就是高可用。一个服务服务的时间越久可用性越高。因此，在设计时候需要考虑各种失败的情况，尽量减少服务不可用的时间。
 实现高可用原则 实现高可用的大法就是多副本，或者叫冗余，或者叫集群。一个服务有多个结点，一个结点挂了，其他结点照样能够提供服务。另外，还需要一个故障转移大法，不然请求都打向那个挂的结点，照样是失败。最后，还需要伸缩大法，能够动态调整资源应付请求量的变化。
 伸缩方案 DNS

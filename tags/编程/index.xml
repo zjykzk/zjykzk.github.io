@@ -15,10 +15,10 @@
     
     <item>
       <title>GO 内存模型</title>
-      <link>http://zjykzk.github.io/post/cs/golang/go-memory-model/</link>
+      <link>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</link>
       <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/golang/go-memory-model/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</guid>
       <description>内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
 Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
 int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
@@ -32,10 +32,10 @@ happens before定义了内存操作的顺序，它是一种偏序。e1 happens b
     
     <item>
       <title>增加bug的编程实践</title>
-      <link>http://zjykzk.github.io/post/cs/bug-op/</link>
+      <link>http://zjykzk.github.io/posts/cs/bug-op/</link>
       <pubDate>Sat, 04 Jun 2016 11:12:13 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/bug-op/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/bug-op/</guid>
       <description>思路不清晰 思路没有完全确定情况下写代码。造成不确定的情况有多方面：
 1. 求快，把相似的需求当做一样的需求 2. 缺少设计，大体明白实现方案，就开始编码 3. 知识不充分，集中在前端的css、布局  怎么办？
 快是可以做到，心里不要慌就是。
@@ -44,10 +44,10 @@ happens before定义了内存操作的顺序，它是一种偏序。e1 happens b
     
     <item>
       <title>flume</title>
-      <link>http://zjykzk.github.io/post/cs/flume/</link>
+      <link>http://zjykzk.github.io/posts/cs/flume/</link>
       <pubDate>Sun, 27 Mar 2016 22:17:17 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/flume/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/flume/</guid>
       <description>架构 概念 source 数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个event。
 event 数据单元，从source产生，直到被序列化到存储中。event包含*header*，*body*两个部分：
  header: 一个map数据，可以被interceptor引用

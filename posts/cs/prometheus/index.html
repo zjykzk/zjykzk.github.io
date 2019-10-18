@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>prometheus</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>prometheus</strong>
+<hr> 
+
+<h2 id="架构">架构</h2>
+
+<p><img src="/imgs/promutheus.arch.svg" alt="" /></p>
+
+<h2 id="基本概念">基本概念</h2>
+
+<h3 id="数据模型">数据模型</h3>
+
+<p>prometheus把数据当作时间序列进行存储。<br />
+每个时间序列通过 <strong>metric name</strong>和 <strong>key-value pairs</strong>(也叫做 <strong>label</strong>)标识。</p>
+
+<p><strong>metric name</strong>表示需要进行测量的系统指标。<br />
+它允许包含ASCII字母，数字，下划线和分号。<br />
+正则表示为：[a-zA-Z<em>:][a-zA-Z0-9</em>:]*。</p>
+
+<p><strong>label</strong>表示一个系统指标的维度，可以按照这个维度进行查询统计。<br />
+Label名字允许包含ASCII字母，数字以及下划线。<br />
+正则表示为：[a-zA-Z<em>][a-zA-Z0-9</em>]*。同时，“__”开头的名字系统保留的。<br />
+Label值允许任意的Unicode字符</p>
+
+<h3 id="度量类型">度量类型</h3>
+
+<h4 id="counter">Counter</h4>
+
+<p>累计统计度量的单个值。适用于只增不减度量，比如累计请求数量。</p>
+
+<h4 id="gauge">Gauge</h4>
+
+<p>统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。</p>
+
+<h4 id="histogram">Histogram</h4>
+
+<p>统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。</p>
+
+<p>这个度量类型有三个时间序列统计：</p>
+
+<ul>
+<li>&lt;base_name&gt;_bucket{le=&laquo;upper inclusive bound&raquo;}：小于某个阀值的度量事件发生的次数<br /></li>
+<li>&lt;base_name&gt;_sum：度量值的和<br /></li>
+<li>&lt;base_name&gt;_count：度量事件发生的次数<br />
+<br /></li>
+</ul>
+
+<h4 id="summary">Summary</h4>
+
+<p>统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。</p>
+
+<p>这个度量类型有三个时间序列统计：</p>
+
+<ul>
+<li>&lt;base_name&gt;{quantile=&raquo;&lt;p&gt;&laquo;}：度量值在前百分之p的度量事件发生的次数<br /></li>
+<li>&lt;base_name&gt;_sum：度量值的和<br /></li>
+<li>&lt;base_name&gt;_count：度量事件发生的次数<br />
+<br /></li>
+</ul>
+
+<h3 id="job-instance">Job &amp; Instance</h3>
+
+<p>在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如<br />
+一个支付进程。Job代表一个监控的逻辑单位。<br />
+比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。</p>
+
+<ul>
+<li>job: payment-server<br />
+
+<ul>
+<li>instance 1: 1.2.3.4:5678<br /></li>
+<li>instance 2: 1.2.3.5:5689<br /></li>
+<li>instance 3: 1.2.3.6:5689<br />
+<br /></li>
+</ul></li>
+</ul>
+
+<h4 id="自动生成的label和时间序列">自动生成的label和时间序列</h4>
+
+<p>当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。</p>
+
+<p>label:</p>
+
+<ul>
+<li>job: 配置好的job名字<br /></li>
+<li>instance:&lt;host&gt;:&lt;port&gt;格式的url<br />
+<br /></li>
+</ul>
+
+<p>时间序列：</p>
+
+<ul>
+<li>up{job=&raquo;&lt;job-name&gt;&laquo;, instance=&raquo;&lt;host:port&gt;&laquo;}：1 表示监控目标活着，0表示挂了<br /></li>
+<li>scrape_duration_seconds{job=&raquo;&lt;job-name&gt;&laquo;, instance=&raquo;&lt;host:port&gt;&laquo;}：抓取日志的时间<br /></li>
+</ul>
+
+<div class="np"><a href=/posts/cs/str/>← 字符串</a> <a href=/posts/cs/bug-op/>增加bug的编程实践 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

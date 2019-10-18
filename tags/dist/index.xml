@@ -15,10 +15,10 @@
     
     <item>
       <title>熔断</title>
-      <link>http://zjykzk.github.io/post/cs/dist/circuit-breaker/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/circuit-breaker/</link>
       <pubDate>Fri, 12 Oct 2018 14:23:18 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/circuit-breaker/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/circuit-breaker/</guid>
       <description>缘起 在分布式系统中，会有很多的RPC调用，当某个服务超载时候，继续接收请求只会让系统变得不可用，甚至会导致多个系统的连锁反应。因此在这样的情况下，最好是把后续的请求挡住，直接返回错误。等到系统恢复正常以后再处理请求。熔断借鉴了电闸中的保险丝功能，当因为某个意外原因（比如插座进水导致短路）导致线路中的电流过大而产生大量热量，保险丝就会被融化掉，从而中断线路中的电流，防止事故发生。
 设计 通俗来说，它是一个服务代理（逻辑上说），监测服务的状态，决定是否处理当前的请求，如果不处理返回错误。
 服务状态
@@ -50,10 +50,10 @@
     
     <item>
       <title>限流</title>
-      <link>http://zjykzk.github.io/post/cs/dist/rate-limit/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/rate-limit/</link>
       <pubDate>Thu, 30 Aug 2018 16:48:26 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/rate-limit/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/rate-limit/</guid>
       <description>缘起 为了保证API的可用性，以及系统的可靠性，需要为API限速。不然，API请求量大到系统无法处理时就会出现系统变慢，甚至宕机的情况。常见的限速场景：
  挡住某个用户的过多请求（用户激增或者恶意请求），确保正常处理其他用户请求。
  挡住过多的低优先级的请求，确保核心请求得到处理。
@@ -78,10 +78,10 @@
     
     <item>
       <title>分布式ID生成算法</title>
-      <link>http://zjykzk.github.io/post/cs/dist/uuid/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/uuid/</link>
       <pubDate>Wed, 22 Aug 2018 11:08:28 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/uuid/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/uuid/</guid>
       <description>分布式Unique ID在分布式系统使用很广泛，常用的用途有：
  请求的ID，用于跟踪请求链路。
  消息队列中的unique id。
@@ -102,10 +102,10 @@ UUID UUID由[0-9a-f-]字符组成，总共16个字节，转换成16进制的格�
     
     <item>
       <title>一致性hash算法</title>
-      <link>http://zjykzk.github.io/post/cs/dist/cons-hash/</link>
+      <link>http://zjykzk.github.io/posts/cs/dist/cons-hash/</link>
       <pubDate>Sat, 28 Apr 2018 13:58:46 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/post/cs/dist/cons-hash/</guid>
+      <guid>http://zjykzk.github.io/posts/cs/dist/cons-hash/</guid>
       <description>一致性hash 目标 缓存的机器扩容、缩容时，尽量保持数据的命中率。常规的hash算法，hash(key)mod N （N表示缓存结点），当N变化时同一个key查询的缓存结点都会变化，导致缓存没有命中，造成很大的数据库压力。
 原理 hash函数值大小32位，因此输出的范围是0~2^32-1。把这个范围形成一个环，同时对数据进行hash计算以外，对缓存的机器也做hash计算。这些计算出来的值在这个环上都有对应的一个点。
 假设数据的hash值分别为K1,K2,K3,K4,K5,K6，以及缓存结点的hash值H1,H2,H3,大小关系为H1&amp;lt;K3&amp;lt;K4&amp;lt;K5&amp;lt;H2&amp;lt;K6&amp;lt;H3&amp;lt;K1&amp;lt;K2。
