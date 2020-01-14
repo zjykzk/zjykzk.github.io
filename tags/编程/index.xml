@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>编程 on 老K随笔</title>
@@ -21,13 +21,12 @@
       <guid>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</guid>
       <description>内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
 Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
-int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
-int a = 0; print(a); int b = 1; print(b);  但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.
+int a = 0; int b = 1; print(a); print(b); 在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
+int a = 0; print(a); int b = 1; print(b); 但是，多个goroutine执行时，就无法保证打印a的时候，b的值一定是1.
 happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 e2 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
 在一个goroutine中，happens before的顺序就是代码表达的顺序。
 共享变量 v 的读操作 r ，能够读到是另一个对变量 v 写操作 w 写入的值的条件是：
- w happens before r
- 没有其他的对变量 v 写操作happens before r 并且happens after w</description>
+ w happens before r 没有其他的对变量 v 写操作happens before r 并且happens after w  这两个条件并不能保证有一个与 r&amp;amp;w 没有任何happens before关系的对共享变量 v 写操作 w&amp;rsquo; 的存在，导致 r 读到的是 w&amp;rsquo; 的结果。所以，保证 r 的结果是 w 的值的条件是：</description>
     </item>
     
     <item>
@@ -49,15 +48,11 @@ happens before定义了内存操作的顺序，它是一种偏序。e1 happens b
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/flume/</guid>
       <description>架构 概念 source 数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个event。
-event 数据单元，从source产生，直到被序列化到存储中。event包含*header*，*body*两个部分：
- header: 一个map数据，可以被interceptor引用
- body: 一个字节序列，具体日志数据
-  interceptor source读取一个event在放到channel中之前，event可以被添加数据。比如说：采集机器的主机名称，时间戳。
+event 数据单元，从source产生，直到被序列化到存储中。event包含header，body两个部分：
+ header: 一个map数据，可以被interceptor引用 body: 一个字节序列，具体日志数据  interceptor source读取一个event在放到channel中之前，event可以被添加数据。比如说：采集机器的主机名称，时间戳。
 channel 数据队列，高可用的保障。source产生的数据先放到这里，sink接着从这里取出来放到存储当中。
 channel selector 两个作用：
- 复制：把一个event写到一个或者多个channel中
- 路由：根据event中的某个属性值，把数据写到指定的channel中
-  sink 负责把channel中的数据写入目标存储。
+ 复制：把一个event写到一个或者多个channel中 路由：根据event中的某个属性值，把数据写到指定的channel中  sink 负责把channel中的数据写入目标存储。
 sink processor 选择sink，在这里可以完成负载均衡和容错处理。
 event serializer 把event中的数据，转换成存储需要的格式。</description>
     </item>

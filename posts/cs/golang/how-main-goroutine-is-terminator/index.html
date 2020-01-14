@@ -13,16 +13,12 @@ body{background:#faf9de;}
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>为什么main函数是终结者</strong>
 <hr> <p>来一个<code>hello, world!</code>。</p>
-
 <pre><code>package main
 
 func main() {
     println(&quot;hello, world!&quot;)
 } // line 5
-</code></pre>
-
-<p>编译调试。</p>
-
+</code></pre><p>编译调试。</p>
 <pre><code># go build -o debug_main main.go // 编译
 # gdb debug_main                 // 开始调试
 (gdb) b 5 // 在第5行打断点
@@ -41,32 +37,22 @@ runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207
 (gdb) s
 runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
 52              MOVL    code+0(FP), DI
-</code></pre>
-
-<p>从上面的结果可以知道，自己写的<code>main</code>函数被编译成<code>main_main</code>，然后被<code>runtime.main</code>所调用。通过查看<code>runtime.main</code>可以看到以下代码，说明它执行结束以后会调用<code>exit(0)</code>。</p>
-
+</code></pre><p>从上面的结果可以知道，自己写的<code>main</code>函数被编译成<code>main_main</code>，然后被<code>runtime.main</code>所调用。通过查看<code>runtime.main</code>可以看到以下代码，说明它执行结束以后会调用<code>exit(0)</code>。</p>
 <pre><code>   // file: goroot/src/runtime/proc.go: main()
    220   exit(0)
    221   for {
    222     var x *int32
    223     *x = 0
    224   }
-</code></pre>
-
-<p>查看<code>exit</code>函数代码，它调用了系统调用<code>exit_group</code>，退出所有线程。</p>
-
+</code></pre><p>查看<code>exit</code>函数代码，它调用了系统调用<code>exit_group</code>，退出所有线程。</p>
 <pre><code>// file: goroot/src/runtime/sys_linux_amd64.s:52
  51 TEXT runtime·exit(SB),NOSPLIT,$0-4
  52     MOVL    code+0(FP), DI
  53     MOVL    $SYS_exit_group, AX
  54     SYSCALL
  55     RET
-</code></pre>
-
-<p>还有一个比较有意思的事情是当查看调用栈的时候，显示<code>runtime.main</code>是通过<code>runtime.goexit()</code>调用的。其实这是因为创建goroutine的时候会把<code>goexit</code>的地址加1这个值放到它的栈顶，这样goroutine的函数执行完毕就会接着执行<code>goexit</code>而<code>goexit</code>又会调用<code>schedule</code>这个函数，继续寻找goroutine并执行。</p>
-
+</code></pre><p>还有一个比较有意思的事情是当查看调用栈的时候，显示<code>runtime.main</code>是通过<code>runtime.goexit()</code>调用的。其实这是因为创建goroutine的时候会把<code>goexit</code>的地址加1这个值放到它的栈顶，这样goroutine的函数执行完毕就会接着执行<code>goexit</code>而<code>goexit</code>又会调用<code>schedule</code>这个函数，继续寻找goroutine并执行。</p>
 <p>把<code>goexit</code>放到goroutine的栈顶代码：</p>
-
 <pre><code>// file: goroot/src/runtime/proc.go:newproc1(fn *funcval, argp *uint8, narg int32, callerpc uintptr)
 
 3315   newg.sched.pc = funcPC(goexit) + sys.PCQuantum // +PCQuantum so that previous instruction is in same function
@@ -81,19 +67,14 @@ runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
 // file: goroot/src/runtime/sys_x86.go:func gostartcall(buf *gobuf, fn, ctxt unsafe.Pointer)
 22   sp -= sys.PtrSize
 23   *(*uintptr)(unsafe.Pointer(sp)) = buf.pc // 这里的pc就是 funcPC(goexit) + sys.PCQuantum
-</code></pre>
-
-<p>再看<code>runtime.goexit</code>代码：</p>
-
+</code></pre><p>再看<code>runtime.goexit</code>代码：</p>
 <pre><code>// file: goroot/src/runtime/asm_amd64.s
 2360 TEXT runtime·goexit(SB),NOSPLIT,$0-0
 2361     BYTE    $0x90   // NOP
 2362     CALL    runtime·goexit1(SB) // does not return
 2363     // traceback from goexit1 must hit code range of goexit
 2364     BYTE    $0x90   // NOP
-</code></pre>
-
-<p>因为压入goroutine栈的值是<code>runtime.goexit+sys.PCQuantum(=1)</code>，因此goroutine函数返回的时候会执行第<code>2361</code>行代码。</p>
+</code></pre><p>因为压入goroutine栈的值是<code>runtime.goexit+sys.PCQuantum(=1)</code>，因此goroutine函数返回的时候会执行第<code>2361</code>行代码。</p>
 
 <div class="np"><a href=/posts/cs/rocketmq/offset/>← RocketMQ offset管理</a> <a href=/posts/cs/dist/ha/>高可用 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>

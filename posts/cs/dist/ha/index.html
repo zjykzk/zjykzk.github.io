@@ -12,72 +12,42 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>高可用</strong>
-<hr> 
-
-<h2 id="什么是高可用">什么是高可用</h2>
-
+<hr> <h2 id="什么是高可用">什么是高可用</h2>
 <p>平时经常提到一个服务可用性4个9，5个9，其实说的就是高可用。一个服务服务的时间越久可用性越高。因此，在设计时候需要考虑各种失败的情况，尽量减少服务不可用的时间。</p>
-
 <h2 id="实现高可用原则">实现高可用原则</h2>
-
 <p>实现高可用的大法就是<strong>多副本</strong>，或者叫<strong>冗余</strong>，或者叫<strong>集群</strong>。一个服务有多个结点，一个结点挂了，其他结点照样能够提供服务。另外，还需要一个<strong>故障转移</strong>大法，不然请求都打向那个挂的结点，照样是失败。最后，还需要<strong>伸缩</strong>大法，能够动态调整资源应付请求量的变化。</p>
-
 <h2 id="伸缩方案">伸缩方案</h2>
-
 <p><strong>DNS</strong></p>
-
 <p>使用方使用服务域名，动态添加删除DNS绑定的IP。</p>
-
 <p><strong>服务发现机制</strong></p>
-
 <p>提供服务注册中心，服务提供者向注册中心注册服务地址，服务使用者从注册中心同步服务地址。</p>
-
 <p><strong>配置文件</strong></p>
-
 <p>服务使用方通过配置控制可以使用的服务，并提供动态加载功能。</p>
-
 <h2 id="常见服务的多副本实践">常见服务的多副本实践</h2>
-
 <p><strong>接入层</strong></p>
-
 <p>比如向nginx、apache这样的反向代理服务。通过keeplived+virtual ip实现故障转移，通过DNS实现可伸缩性。</p>
-
 <p><strong>业务层</strong></p>
-
 <p>实现业务逻辑的服务。通过使用方探测服务是否可用实现故障转移，通过服务发现机制或者配置文件的方式实现可伸缩。这一层的服务要求是无状态的，不然伸缩的时候会对用户造成影响。比如，保存了用户session，如果删除一个服务，势必会导致用户重新登入。</p>
-
 <p><strong>缓存层</strong></p>
-
 <p>高可用，有两种方案：1. 多个缓存服务，使用方多写多读方式做到故障转移； 2. 主从同步，主服务挂了从服务接管。缓存的目的是为了减少数据库的压力，因此这里缓存的细粒度化，可以使得缓存服务器挂了以后只会有一小部分数据失效，从而保护数据库。</p>
-
 <p>伸缩性，通过一致性hash实现。还需要考虑数据一致性问题，不同的一致性要求扩展的姿势不一样，尤其是强一致性情况下需要考虑：1. 读到过期数据，因为客户端更新配置有时间间隔，在这个间隔中会读到过期数据； 2. 读到脏数据：扩容然后缩容，就会出现扩容后结点缓存了新内容，新结点被缩容以后请求又回到了老结点。</p>
-
 <p>常用的缓存服务：memcached、redis。</p>
-
 <p><strong>数据库层</strong></p>
-
 <p>高可用，主主方案，需要确保数据双向复制，使用方探测做故障转移；主从；主备。通过分表、分库（水平、垂直拆分）、定期滚动实现扩展性。</p>
-
 <h2 id="影响可用性的几个地方">影响可用性的几个地方</h2>
-
 <p><strong>发布</strong></p>
-
 <p>灰度发布，同时支持回滚。</p>
-
 <p><strong>服务</strong></p>
-
 <p>数量上N+2，N表示需要正常服务的数量，多出两个的原因是考虑热备容灾下，如果发布会失败就会失去热备容灾的功能。而发布失败概率不小。</p>
-
 <p>互备的服务必须对等，避免一大一小，或者互相依赖。</p>
-
-<p>流量控制：<br />
-1. 隔离互相冲突的请求。<br />
-2. 把消耗资源的请求限制在固定几个结点，避免这类请求把资源都占住影响其他请求。<br />
-3. 防止一些导致服务挂掉的请求，打到全部结点，就是挂了几台服务以后，把这个请求给屏蔽掉，这个比较难。</p>
-
+<p>流量控制：</p>
+<ol>
+<li>隔离互相冲突的请求。</li>
+<li>把消耗资源的请求限制在固定几个结点，避免这类请求把资源都占住影响其他请求。</li>
+<li>防止一些导致服务挂掉的请求，打到全部结点，就是挂了几台服务以后，把这个请求给屏蔽掉，这个比较难。</li>
+</ol>
 <h2 id="参考">参考</h2>
-
-<p><a href="https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw">https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw</a><br />
+<p><a href="https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw">https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw</a>
 <a href="https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31.png">https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31.png</a></p>
 
 <div class="np"><a href=/posts/cs/golang/how-main-goroutine-is-terminator/>← 为什么main函数是终结者</a> <a href=/posts/cs/linux/open-file-progress/>如何定位一个文件 →</a></div>

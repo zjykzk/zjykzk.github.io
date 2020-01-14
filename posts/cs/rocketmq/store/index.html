@@ -12,73 +12,41 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>rocketmq store模块</strong>
-<hr> 
-
-<h2 id="功能">功能</h2>
-
+<hr> <h2 id="功能">功能</h2>
 <p>store模块是rocketmq的核心模块。主要功能有：</p>
-
 <ol>
-<li>消息存储<br /></li>
-<li>消息索引<br /></li>
-<li>消费队列<br /></li>
-<li>主从同步<br /></li>
-<li>延迟消息<br /></li>
-<li>清理过期的消息和消费队列<br />
-<br /></li>
+<li>消息存储</li>
+<li>消息索引</li>
+<li>消费队列</li>
+<li>主从同步</li>
+<li>延迟消息</li>
+<li>清理过期的消息和消费队列</li>
 </ol>
-
 <h2 id="消息存储">消息存储</h2>
-
 <p>负责消息存储，包括写消息，刷盘。</p>
-
 <h3 id="消息文件">消息文件</h3>
-
 <p>消息保存在默认值为<code>${user.home}\store\commitlog</code>文件夹下，可以通过配置项<code>storePathCommitLog</code>修改。所有的消息都写入一个逻辑文件，每个逻辑文件包含大小相等的物理文件。</p>
-
 <h3 id="写消息">写消息</h3>
-
 <p>写消息在不同的场景下面会有不同的逻辑。</p>
-
 <h4 id="同步刷盘">同步刷盘</h4>
-
 <p>每条消息要写到磁盘以后才算完成。</p>
-
 <p>在同步刷盘的场景下，会有一个定期检查消息是否已经写入磁盘的线程：<code>GroupCommitService</code>，除了检查还会进行刷盘的操作 。写消息的时候会生成一个<code>GroupCommitRequest</code>提交到<code>GroupCommitService</code>，并等待被唤醒或者超时。当<code>GroupCommitService</code>发现已经刷盘的最后一个消息的索引大于等于本消息的索引时就会唤醒<code>GroupCommitRequest</code>。</p>
-
 <p><strong>备注</strong>：以上的场景还依赖于消息的属性<code>WAIT</code>，只有该属性为空或者为<code>true</code>才会执行同步刷盘逻辑，默认是空的。</p>
-
 <h4 id="异步刷盘">异步刷盘</h4>
-
 <p>在异步刷盘的场景下，会有一个把数据刷到磁盘的辅助线程：<code>FlushRealTimeService</code>。写消息仅仅唤醒该线程就结束了写盘操作。</p>
-
 <h4 id="主从同步">主从同步</h4>
-
 <p>每条消息要等一个从broker同步完才算完成。</p>
-
 <p>在主从同步的场景下，会有一个定期检查消息是否已经被从broker同步的辅助线程：<code>GroupTransferService</code>。写消息的时候会生成一个<code>GroupCommitRequest</code>提交给<code>GroupTransferService</code>，并等待被唤醒或者超时。当<code>GroupTransferService</code>发现从broker已经同步的最后一个消息的索引大于本次消息的索引时就会唤醒<code>GroupCommitRequest</code>。</p>
-
 <h4 id="写buffer">写buffer</h4>
-
 <p>使用了写buffer以后，写消息的全部逻辑就是把消息写入buffer。同时，系统会有一个线程<code>CommitRealTimeService</code>定期把消息写入文件。</p>
-
 <h3 id="核心代码">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.CommitLog
-</code></pre>
-
-<h2 id="消费队列">消费队列</h2>
-
+</code></pre><h2 id="消费队列">消费队列</h2>
 <p>每个topic对应多个消费队列，这个是提高消费并发度的前提。</p>
-
 <h3 id="结构">结构</h3>
-
 <p>每个消费队列对应一个逻辑文件，文件中对应每个消息的内容大小是固定的20个字节，包含消息的偏移量，大小以及tag哈希值。</p>
-
 <h4 id="文件目录">文件目录</h4>
-
 <p>数据保存在目录<code>${rootpath}/consumequeue</code>下面，<code>rootpath</code> 通过配置项<code>storePathRootDir</code>指定，默认的是<code>${user.home}/store</code>。</p>
-
 <pre><code>${rootpath}/consumequeue
 └── 0%default                     // topic
     ├── 0                         // queue 0
@@ -89,125 +57,78 @@ body{background:#faf9de;}
     │   └── 00000000000000000000
     └── 3                         // queue 3
         └── 00000000000000000000
-</code></pre>
-
-<h4 id="队列元素">队列元素</h4>
-
+</code></pre><h4 id="队列元素">队列元素</h4>
 <pre><code>|&lt;----- 8 byte -----&gt;|&lt;- 4 byte -&gt;|&lt;------ 8 byte ------&gt;|
 +--------------------+------------+----------------------+
 |   commitlog offset |   size     | message tag hash code|
 +--------------------+------------+----------------------+
-</code></pre>
-
-<h3 id="执行">执行</h3>
-
+</code></pre><h3 id="执行">执行</h3>
 <p>通过线程<code>ReputMessageService</code>的分派消息的逻辑执行。</p>
-
 <h3 id="写盘">写盘</h3>
-
 <p>系统每隔1000ms（可配置）进行一次消费队列的写盘操作。</p>
-
 <h4 id="核心代码-1">核心代码</h4>
-
 <pre><code>org.apache.rocketmq.store.DefaultMessageStore.FlushConsumeQueueService
-</code></pre>
-
-<h2 id="清理消息">清理消息</h2>
-
+</code></pre><h2 id="清理消息">清理消息</h2>
 <p>系统每隔10s（可以配置）执行尝试删除过期的消息。</p>
-
 <h3 id="清理条件">清理条件</h3>
-
 <ol>
-<li>清理时间到达，默认是凌晨4点。<br /></li>
-<li>消息所在的磁盘使用率或者其他数据所在磁盘使用率操作告警阀值和强制删除阀值。<br />
-
+<li>清理时间到达，默认是凌晨4点。</li>
+<li>消息所在的磁盘使用率或者其他数据所在磁盘使用率操作告警阀值和强制删除阀值。
 <ul>
-<li>保存消息的目录通过配置项 <code>storePathCommitLog</code> 指定，默认是 <code>$HOME/store/commitlog</code>。<br /></li>
-<li>保存其他数据的目录通过配置项 <code>storePathRootDir</code> 指定，默认是 <code>$HOME/store</code>。<br /></li>
-<li>告警的磁盘使用率阀值通过系统变量 <code>rocketmq.broker.diskSpaceWarningLevelRatio</code>指定，默认是 0.9。<br /></li>
-<li>强制删除的磁盘使用率阀值通过系统变量 <code>rocketmq.broker.diskSpaceCleanForciblyRatio</code>指定，默认是 0.75。<br /></li>
-</ul></li>
-<li>手动触发清理，这里提供了一个接口暴露给外面调用，调用以后会在连续执行20次删除。<br />
-<br /></li>
+<li>保存消息的目录通过配置项 <code>storePathCommitLog</code> 指定，默认是 <code>$HOME/store/commitlog</code>。</li>
+<li>保存其他数据的目录通过配置项 <code>storePathRootDir</code> 指定，默认是 <code>$HOME/store</code>。</li>
+<li>告警的磁盘使用率阀值通过系统变量 <code>rocketmq.broker.diskSpaceWarningLevelRatio</code>指定，默认是 0.9。</li>
+<li>强制删除的磁盘使用率阀值通过系统变量 <code>rocketmq.broker.diskSpaceCleanForciblyRatio</code>指定，默认是 0.75。</li>
+</ul>
+</li>
+<li>手动触发清理，这里提供了一个接口暴露给外面调用，调用以后会在连续执行20次删除。</li>
 </ol>
-
 <h3 id="清理逻辑">清理逻辑</h3>
-
 <ol>
-<li><p>正常清理过期的消息，过期时间可以通过配置项 <code>fileReservedTime</code> 指定，默认是72小时。</p></li>
-
-<li><p>清理上次没有清理成功的消息，这是因为消息被清理时，其他地方正在使用。每隔一段时间执行一次，同时如果距离上次被清理时间超过了一段时间会被强制清理。</p>
-
+<li>
+<p>正常清理过期的消息，过期时间可以通过配置项 <code>fileReservedTime</code> 指定，默认是72小时。</p>
+</li>
+<li>
+<p>清理上次没有清理成功的消息，这是因为消息被清理时，其他地方正在使用。每隔一段时间执行一次，同时如果距离上次被清理时间超过了一段时间会被强制清理。</p>
 <ul>
-<li>通过配置项 <code>redeleteHangedFileInterval</code>指定执行周期，默认120s。<br /></li>
-<li>通过配置项 <code>destroyMapedFileIntervalForcibly</code>指定强制清理的时间，默认120s。<br />
-<br /></li>
-</ul></li>
+<li>通过配置项 <code>redeleteHangedFileInterval</code>指定执行周期，默认120s。</li>
+<li>通过配置项 <code>destroyMapedFileIntervalForcibly</code>指定强制清理的时间，默认120s。</li>
+</ul>
+</li>
 </ol>
-
 <h3 id="核心代码-2">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.DefaultMessageStore.CleanCommitLogService
-</code></pre>
-
-<h2 id="清理消费队列以及索引">清理消费队列以及索引</h2>
-
+</code></pre><h2 id="清理消费队列以及索引">清理消费队列以及索引</h2>
 <p>随着消息的清理，包含已经清理掉消息的消费队列以及索引就变得没有用处了，所以系统每隔100ms（可以配置）执行清理消费队列和索引。</p>
-
 <h3 id="清理逻辑-1">清理逻辑</h3>
-
 <p>获取当前消息的最小偏移量，这个偏移量随着消息的清理会不停的变化。</p>
-
 <ol>
-<li>消费队列：如果队列的最大消息偏移量都比当前最小的消息偏移量小，那么就可以清理本队列。<br /></li>
-<li>消息索引：如果索引中最大的消息偏移量都比当前最小的消息偏移量小，那么就可以清理本索引。<br />
-<br /></li>
+<li>消费队列：如果队列的最大消息偏移量都比当前最小的消息偏移量小，那么就可以清理本队列。</li>
+<li>消息索引：如果索引中最大的消息偏移量都比当前最小的消息偏移量小，那么就可以清理本索引。</li>
 </ol>
-
 <h3 id="核心代码-3">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.DefaultMessageStore.CleanConsumeQueueService
-</code></pre>
-
-<h2 id="消息索引">消息索引</h2>
-
+</code></pre><h2 id="消息索引">消息索引</h2>
 <p>消息索引是方便用户查询消息的一个结构。系统可以通过配置项<code>messageIndexEnable</code>开关消息索引，默认是打开的。索引允许重复构建，通过配置项<code>duplicationEnable</code>指定。系统启动的时候，如果允许重复索引会重头构建，不然就从当前文件大小开始。</p>
-
 <h3 id="索引内容">索引内容</h3>
-
 <p>索引的key包含消息的两个属性：</p>
-
 <ol>
-<li><code>KEYS</code>，支持多个值，每个值之间通过空格分割。<br /></li>
-<li><code>UNIQ_KEY</code>。<br />
-<br /></li>
+<li><code>KEYS</code>，支持多个值，每个值之间通过空格分割。</li>
+<li><code>UNIQ_KEY</code>。</li>
 </ol>
-
 <p>索引的内容是消息的偏移量和时间（秒的精度）。</p>
-
 <h3 id="结构-1">结构</h3>
-
 <h4 id="目录结构">目录结构</h4>
-
 <p>数据保存在目录<code>${rootpath}/index</code>下面，<code>rootpath</code> 通过配置项<code>storePathRootDir</code>指定，默认的是<code>${user.home}/store</code>。</p>
-
 <pre><code>index/
 └── 20171225143756745
-</code></pre>
-
-<h4 id="文件内容">文件内容</h4>
-
+</code></pre><h4 id="文件内容">文件内容</h4>
 <p>每个文件内容分成3部分，header, slot table和index linked list。组织如下：</p>
-
 <pre><code>|&lt;-- 40 byte --&gt;|&lt;---   500w   ---&gt;|&lt;---   2000w   ---&gt;|
 +---------------+------------------+-------------------+
 |    header     |   slot table     | index linked list |
 +---------------+------------------+-------------------+
-</code></pre>
-
-<h5 id="header">header</h5>
-
+</code></pre><h5 id="header">header</h5>
 <pre><code>+---------------------+--0
 | beginTimestampIndex | ----&gt; 第一条消息的保存时间
 +---------------------+--8
@@ -221,14 +142,9 @@ body{background:#faf9de;}
 +---------------------+--36
 | indexCountIndex     | ----&gt; 索引数量，具体索引数据
 +---------------------+--40
-</code></pre>
-
-<h5 id="slot-table-和-index-linked-list">slot table 和 index linked list</h5>
-
+</code></pre><h5 id="slot-table-和-index-linked-list">slot table 和 index linked list</h5>
 <p><strong>slot table</strong>总共有500w个位置，每个位置保存的是在这个slot上的索引列表中最新的那个索引。</p>
-
 <p><strong>index linked list</strong>保存每个消息的索引数据</p>
-
 <pre><code>   
    -  +-----+ &lt;==== [slot table]
    ^  |  10 |
@@ -243,197 +159,111 @@ body{background:#faf9de;}
    |  +-----+    +------------+-------------------|------------+------------------+ &lt;= [index]
    v  | 100 |    | key hash   | commit log offset | timestamp  | next index offset|
    -  +-----+    +------------+-------------------|------------+------------------+
-</code></pre>
-
-<h3 id="执行-1">执行</h3>
-
+</code></pre><h3 id="执行-1">执行</h3>
 <p>通过线程<code>ReputMessageService</code>的分派消息的逻辑执行。</p>
-
 <h3 id="核心代码-4">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.index
-</code></pre>
-
-<h2 id="预分配mappedfile">预分配MappedFile</h2>
-
+</code></pre><h2 id="预分配mappedfile">预分配MappedFile</h2>
 <p>写消息写到内存映射的文件，每次去新建一个文件同时会做内存映射操作，新建过程当中根据配置会执行比较耗时的预热操作。为了加快这个操作。系统通过一个线程预分配需要的<code>MappedFile</code>。具体逻辑就是在获取新的文件的时候发送两个请求，分别对应当前的需要的文件以及这个文件写满以后需要的下一个文件，然后等待直到预分配线程分配完当前需要的文件，或者超时。</p>
-
 <h3 id="核心代码-5">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.AllocateMappedFileService
-</code></pre>
-
-<h2 id="消息后续逻辑">消息后续逻辑</h2>
-
+</code></pre><h2 id="消息后续逻辑">消息后续逻辑</h2>
 <p>当消息写入完成以后，系统有一个线程对消息可以做其他一些逻辑。比如：构建索引，消费队列，通知long pull的客户端请求。线程会维护一个消息索引，根据这个索引跟当前最大已经写入的消息的最大偏移量进行比较得到是否有消息需要处理。</p>
-
 <p>当系统重启的时候，会根据<code>duplicationEnable</code>来决定是否从头开始处理消息还是只处理新来的消息。在<code>duplicationEnable</code>是<code>true</code>的情况下，还需要设置<code>CommitLog.confirmOffset</code>才能从头开始处理消息，因为默认情况下系统启动以后<code>CommitLog.confirmOffset</code>和<code>ReputMessageService.reputFromOffset</code>是相等的，详见代码<code>ReputMessageService.doReput</code>。</p>
-
 <h3 id="具体逻辑">具体逻辑</h3>
-
 <ol>
-<li>分派消息：构建消费队列，消息索引。<br /></li>
-<li>同时long pull的客户端请求。<br />
-<br /></li>
+<li>分派消息：构建消费队列，消息索引。</li>
+<li>同时long pull的客户端请求。</li>
 </ol>
-
 <h3 id="核心代码-6">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.DefaultMessageStore.ReputMessageService
-</code></pre>
-
-<h2 id="ha">HA</h2>
-
+</code></pre><h2 id="ha">HA</h2>
 <p>RocketMQ的HA是最朴素的一主多从同步，主broker挂了从broker可以读数据，但是不能写，也不会自动主从切换。</p>
-
-<p><img src="/imgs/rocketmq/ha.png" alt="ha" /></p>
-
+<p><img src="/imgs/rocketmq/ha.png" alt="ha"></p>
 <h3 id="消息同步逻辑">消息同步逻辑</h3>
-
 <ol>
-<li>启动的时候，MASTER会启动监听线程<code>AcceptSocketService</code>，SLAVE会启动同步线程 <code>HAClient</code>。<br /></li>
-<li>建立连接<code>HAConnection</code>之后，MASTER会为连接建立两个线程<code>WriteSocketService</code>和<code>ReadSocketService</code>分别负责这条连接的写和读。<br /></li>
-<li>SLAVE向MASTER报告，当前同步的位置，具体是到目前为止同步到的偏移量。<br /></li>
-<li>MASTER根据SLAVE报告的偏移量，发送消息数据。<br />
-<br /></li>
+<li>启动的时候，MASTER会启动监听线程<code>AcceptSocketService</code>，SLAVE会启动同步线程 <code>HAClient</code>。</li>
+<li>建立连接<code>HAConnection</code>之后，MASTER会为连接建立两个线程<code>WriteSocketService</code>和<code>ReadSocketService</code>分别负责这条连接的写和读。</li>
+<li>SLAVE向MASTER报告，当前同步的位置，具体是到目前为止同步到的偏移量。</li>
+<li>MASTER根据SLAVE报告的偏移量，发送消息数据。</li>
 </ol>
-
 <p><strong>WriteSocketService</strong>线程</p>
-
 <p>主结点向从结点推送消息线程。线程会记录当前同步的位置确保同步的数据不会重复。当线程启动的时候会等待从结点上报同步进度，如果上报的结果是0，从当前新消息文件中的第一个消息偏移量开始同步（不理解* V *）。消息写完主结点之后，会通知本线程进行写消息。另外，写完消息以后会主动向从结点发送已经同步的位置，像是一个保活机制。</p>
-
 <p><strong>ReadSocketService</strong>线程</p>
-
 <p>接收从结点的同步进度。它的任务就是接收从结点同步进度，然后通知等待从结点写完的消息。</p>
-
 <p><strong>HAClient</strong>线程</p>
-
 <p>从结点和主结点同步线程。主要工作</p>
-
 <ol>
-<li>和主结点建立同步连接。<br /></li>
-<li>周期性的向主结点发送同步进度。<br /></li>
-<li>接收主结点推送过来的数据，并把数据写入磁盘。<br /></li>
-<li>检查是否有数据同步过来，有的话也会向主结点发送同步进度。<br />
-<br /></li>
+<li>和主结点建立同步连接。</li>
+<li>周期性的向主结点发送同步进度。</li>
+<li>接收主结点推送过来的数据，并把数据写入磁盘。</li>
+<li>检查是否有数据同步过来，有的话也会向主结点发送同步进度。</li>
 </ol>
-
 <h4 id="写buffer的影响">写buffer的影响</h4>
-
 <p>当开启写buffer的时候，主从同步的逻辑中使用到的当前消息的最大索引计算逻辑是不一样的。在这种情况下，系统会有一个线程<code>CommitRealTimeService</code>负责把写buffer中的数据写入文件。只有写入以后数据，才会被同步到从broker。也就是说主从同步的实时性还会受到这个线程的影响。</p>
-
 <h3 id="主从同步发送消息过程">主从同步发送消息过程</h3>
-
 <p>当我们使用主从同步模式的时候，消息要等到主、从都写完才能返回。在这个过程中，除了主从同步逻辑以外还有消息等待从结点写完成的逻辑。这个逻辑是通过<code>GroupTransferService</code>完成的。大致流程如下：消息写完主结点后向<code>GroupTransferService</code>发送等待从结点写完请求，<code>GroupTransferService</code>只做一件事情，就是不断对比当前从结点同步进度与当前接收到的消息物理偏移量，如果从结点的同步进度大，说明消息已经写入从结点，随即通知消息已经写完。另外，从结点的同步进度是通过<code>ReadSocketService</code>接收到从结点主动发过来的；当消息写完主结点之后会通知主结点往从结点写消息服务<code>WriteSocketService</code>。</p>
-
 <h3 id="核心代码-7">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.ha.HAService
 org.apache.rocketmq.store.ha.HAConnection
-</code></pre>
-
-<h2 id="定时任务">定时任务</h2>
-
+</code></pre><h2 id="定时任务">定时任务</h2>
 <p>实现了定时调度某个消息的功能。用户通过给消息设置<code>DELAY</code>属性值来实现。</p>
-
 <p>系统包含了一个名字为<code>SCHEDULE_TOPIC_XXXX</code>的topic，当消息指定了<code>DELALY</code>属性时，消息就会被发送到topic <code>SCHEDULE_TOPIC_XXXX</code> 中，同时会保存原来的topic、消费队列、以及其他属性值。这些值都作为消息的属性来保存。</p>
-
 <p>系统通过配置项<code>messageDelayLevel</code>预定义可以延迟多长时间，同时每个延迟的级别对应着的消费队列。</p>
-
 <p>系统通过一个定时器，周期性从每个延迟级别对应的消费队列中拿取消息，并检查是否到期，如果到期就会把消息放入到原来的topic和队列中，同时会把先前用于保存原来消息的属性值删除，并设置投递时间。</p>
-
 <h3 id="核心代码-8">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.schedule.ScheduleMessageService
-</code></pre>
-
-<h2 id="统计">统计</h2>
-
+</code></pre><h2 id="统计">统计</h2>
 <p>消息的统计。包含：</p>
-
 <ol>
-<li>发送消息的总数<code>putMessageTimesTotal</code><br /></li>
-<li>发送消息时，不同响应时间级别的消息数量<code>putMessageDistributeTime</code><br /></li>
-<li>发送消息请求的最长响应时间<code>putMessageEntireTimeMax</code><br /></li>
-<li>发送消息的总大小<code>putMessageSizeTotal</code>、平均大小<code>putMessageAverageSize</code><br /></li>
-<li>发消息的TPS<code>putTps</code><br /></li>
-<li>拉取消息请求的最长响应时间<code>getMessageEntireTimeMax</code><br /></li>
-<li>拉取消息请求命中TPS<code>getFoundTps</code>、没有命中TPS <code>getMissTps</code>以及总的请求TPS<code>getTotalTps</code><br /></li>
-<li>拉取消息的TPS，拉取消息请求，并返回消息的TPS <code>getTransferedTps</code><br />
-<br /></li>
+<li>发送消息的总数<code>putMessageTimesTotal</code></li>
+<li>发送消息时，不同响应时间级别的消息数量<code>putMessageDistributeTime</code></li>
+<li>发送消息请求的最长响应时间<code>putMessageEntireTimeMax</code></li>
+<li>发送消息的总大小<code>putMessageSizeTotal</code>、平均大小<code>putMessageAverageSize</code></li>
+<li>发消息的TPS<code>putTps</code></li>
+<li>拉取消息请求的最长响应时间<code>getMessageEntireTimeMax</code></li>
+<li>拉取消息请求命中TPS<code>getFoundTps</code>、没有命中TPS <code>getMissTps</code>以及总的请求TPS<code>getTotalTps</code></li>
+<li>拉取消息的TPS，拉取消息请求，并返回消息的TPS <code>getTransferedTps</code></li>
 </ol>
-
 <h3 id="核心代码-9">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.StoreStatsService
-</code></pre>
-
-<h2 id="写buffer-1">写buffer</h2>
-
+</code></pre><h2 id="写buffer-1">写buffer</h2>
 <p>如果开启了这个功能，系统启动时会向系统申请多块写buffer。每块buffer都会被锁在内存中。这个buffer只会被commitlog使用,写消息的时候写到这些buffer。</p>
-
 <h3 id="核心代码-10">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.TransientStorePool
-</code></pre>
-
-<h2 id="内存映射的文件管理">内存映射的文件管理</h2>
-
+</code></pre><h2 id="内存映射的文件管理">内存映射的文件管理</h2>
 <p>rocketmq中的索引、消费队列、消息这些数据都通过内存映射进行读写。</p>
-
 <h3 id="映射文件">映射文件</h3>
-
 <ol>
-<li>逻辑文件：数据按照顺序写入，由类<code>org.apache.rocketmq.store.MappedFileQueue</code> 表示<br /></li>
-<li>物理文件：具体写数据的文件，由类<code>org.apache.rocketmq.store.MappedFile</code> 表示<br />
-<br /></li>
+<li>逻辑文件：数据按照顺序写入，由类<code>org.apache.rocketmq.store.MappedFileQueue</code> 表示</li>
+<li>物理文件：具体写数据的文件，由类<code>org.apache.rocketmq.store.MappedFile</code> 表示</li>
 </ol>
-
 <p>它们之间的关系：</p>
-
 <pre><code>|&lt;-                                  MappedFileQueue                                        -&gt;|
 +-------------------+--------------------+-------------+-------------------+------------------+
 |000000000000000000 | 000000000000000100 |   ...       |000000000000010000 |000000000000020000|
 +-------------------+--------------------+-------------+-------------------+------------------+
 |&lt;- MappedFile-0  -&gt;|&lt;-  MappedFile-1  -&gt;|   ...       |&lt;- MappedFile-n-1-&gt;|&lt;- MappedFile-n -&gt;|
 +-------------------+--------------------+-------------+-------------------+------------------+
-</code></pre>
-
-<p>一个 <code>MappedFileQueue</code> 由多个 <code>MappedFile</code> 组成，每个 <code>MappedFile</code> 文件大小相等，文件名是32个字符，并且表示当前文件中第一个记录在 <code>MappedFileQueue</code>所代表的逻辑文件中的偏移量。</p>
-
+</code></pre><p>一个 <code>MappedFileQueue</code> 由多个 <code>MappedFile</code> 组成，每个 <code>MappedFile</code> 文件大小相等，文件名是32个字符，并且表示当前文件中第一个记录在 <code>MappedFileQueue</code>所代表的逻辑文件中的偏移量。</p>
 <h3 id="引用计数">引用计数</h3>
-
 <p><code>MappedFile</code>在一个多线程环境里面，在使用的时候有可能已经被执行了删除操作，通过引用计数的方式进行安全管理<code>MappedFile</code>的生命周期。</p>
-
 <h3 id="优化">优化</h3>
-
 <h4 id="预热">预热</h4>
-
 <ol>
-<li>新建<code>MappedFile</code>时通过先把文件映射的内存都写一遍，内核为文件分配物理页。<br /></li>
-<li>使用<code>mlock</code>锁住文件映射的物理内存，确保这部分内存不被交换出去。<br /></li>
-<li>使用<code>madvise</code>通知内核这部分数据将来会读到。<br />
-<br /></li>
+<li>新建<code>MappedFile</code>时通过先把文件映射的内存都写一遍，内核为文件分配物理页。</li>
+<li>使用<code>mlock</code>锁住文件映射的物理内存，确保这部分内存不被交换出去。</li>
+<li>使用<code>madvise</code>通知内核这部分数据将来会读到。</li>
 </ol>
-
 <h4 id="写buffer-2">写buffer</h4>
-
 <p>建立一个buffer池，这些buffer是堆外内存。buffer所占用的内存是不会被交换出去的，同时也会通知内核这部分数据将来会读到。<code>MappedFile</code>新建的时候可以通过这个池子获得buffer作为写的buffer。</p>
-
 <h3 id="核心代码-11">核心代码</h3>
-
 <pre><code>org.apache.rocketmq.store.MappedFileQueue
 org.apache.rocketmq.store.MappedFile
-</code></pre>
-
-<h2 id="备注">备注</h2>
-
+</code></pre><h2 id="备注">备注</h2>
 <h3 id="代码版本">代码版本</h3>
-
 <p>4.1.0</p>
-
 <h3 id="参考文档">参考文档</h3>
-
 <p>RocketMQ design</p>
 
 <div class="np"><a href=/posts/cs/jit/>← jit的基本原理以及实现</a> <a href=/posts/cs/first-optimal/>记一次mongo数据库优化经历 →</a></div>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>rocketmq on 老K随笔</title>
@@ -19,28 +19,14 @@
       <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/ha/</guid>
-      <description> HA原理 RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：
- 等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。
- 大于0，从该值开始传输。
- 小于0，这种情况不存在。
-  所以，这里我们可以知道如果从结点已经就有数据情况，如果数据不是从主结点同步过来的，那么同步之后就会有问题了。比如说：从结点已经有10000条数据，同时某个topic，暂时就叫OLD_TOPIC的*消费队列0*长度1000。这个时候，主结点就会从第10000条数据开始同步，可能会发送几种情况：
- 主结点没有10000数据，那么就不会同步数据，造成从结点上面数据丢失。
- 主结点有超过10000数据，但是它的OLD_TOPIC的*消费队列0*的长度小于1000，那么同步过来的数据就会覆盖原来的数据。
-  所以，从结点的初始状态需要从0开始或者本来就是和主同步过的状态。因此，在删除topic的时候从结点要保证删除干净，不然从结点就会脏数据，影响消费。
+      <description>HA原理 RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：
+ 等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。 大于0，从该值开始传输。 小于0，这种情况不存在。  所以，这里我们可以知道如果从结点已经就有数据情况，如果数据不是从主结点同步过来的，那么同步之后就会有问题了。比如说：从结点已经有10000条数据，同时某个topic，暂时就叫OLD_TOPIC的消费队列0长度1000。这个时候，主结点就会从第10000条数据开始同步，可能会发送几种情况：
+ 主结点没有10000数据，那么就不会同步数据，造成从结点上面数据丢失。 主结点有超过10000数据，但是它的OLD_TOPIC的消费队列0的长度小于1000，那么同步过来的数据就会覆盖原来的数据。  所以，从结点的初始状态需要从0开始或者本来就是和主同步过的状态。因此，在删除topic的时候从结点要保证删除干净，不然从结点就会脏数据，影响消费。
 为什么这样同步不会有问题呢？
 那是因为同步的数据里面包含了具体消费队列ID，队列中的偏移量以及消息的偏移量，所以同步的时候能够写到同一个位置。
 主结点同步逻辑 发送一条消息的时候，在开启SYNC_MASTER情况下，需要四个线程合作才能完成消息的发送。
- SendMessageProcessor负责处理接收发送消息的请求并落盘（异步或者同步），接着向GroupTransferService发送等待同步完成的请求，然后等待知道超时或者GroupTransferService通知同步完成。同时，还会同时WriteSocketService有数据可以写了。
- WriteSocketService负责根据从结点上报的位置（变量slaveRequestOffset），不断的向从结点传输数据。同时会维护和从结点的一个心跳，如果一段时间没有通不过数据，就会发送一个消息头，包含当前同步的起始位置。
- GroupTransferService不断的轮询比较当前已经被从结点同步的最大偏移（变量push2SlaveMaxOffset）和SendMessageProcessor发送过来的请求中包含的偏移量，如果大于或者等于就会通知SendMessageProcessor。
- ReadSocketService负责读取从结点上报上来的同步偏移量。更新变量push2SlaveMaxOffset和slaveRequestOffset并通知GroupTransferService。从而，它也会影响WriteSocketService的行为。同时，它还维护着和从结点连接的过期工作，如果超过指定时间没有收到消息就会断开连接，同时会停止WriteSocketService。
-  从结点同步逻辑 从结点的同步逻辑相对简单主要做几件事情：
- 管理和主结点的连接，如果超过一段时间没有收到主点结点的数据，就会断开连接。这个时间戳保存在变量lastWriteTimestamp中，刚刚连接上主结点和从主结点读到数据都会更新该变量。
- 上报当前commitlog的最大偏移量，该行为会发生三个地方：a.写完一个消息；b.处理完当前收到的所有数据；c.一段时间内没有收到主结点的数据。
- 维护收到的数据。这里有两个接收数据的buffer，主要方便处理当一个buffer的空间用完以后处理剩余的消息。一个buffer的情况下，先拷贝到一个临时byte数据，然后再拷贝回去，需要两次内存拷贝。如果两个buffer只需要一次拷贝。
- 写消息。把从主结点同步过来的数据写到磁盘。收到数据的时候会判断主结点发过来的偏移量是否等于自己当前的偏移量如果不一样就会断开和主结点的连接。
- 任何从连接中读数据的时候如果有错误就会断开连接。
-  </description>
+ SendMessageProcessor负责处理接收发送消息的请求并落盘（异步或者同步），接着向GroupTransferService发送等待同步完成的请求，然后等待知道超时或者GroupTransferService通知同步完成。同时，还会同时WriteSocketService有数据可以写了。 WriteSocketService负责根据从结点上报的位置（变量slaveRequestOffset），不断的向从结点传输数据。同时会维护和从结点的一个心跳，如果一段时间没有通不过数据，就会发送一个消息头，包含当前同步的起始位置。 GroupTransferService不断的轮询比较当前已经被从结点同步的最大偏移（变量push2SlaveMaxOffset）和SendMessageProcessor发送过来的请求中包含的偏移量，如果大于或者等于就会通知SendMessageProcessor。 ReadSocketService负责读取从结点上报上来的同步偏移量。更新变量push2SlaveMaxOffset和slaveRequestOffset并通知GroupTransferService。从而，它也会影响WriteSocketService的行为。同时，它还维护着和从结点连接的过期工作，如果超过指定时间没有收到消息就会断开连接，同时会停止WriteSocketService。  从结点同步逻辑 从结点的同步逻辑相对简单主要做几件事情：
+ 管理和主结点的连接，如果超过一段时间没有收到主点结点的数据，就会断开连接。这个时间戳保存在变量lastWriteTimestamp中，刚刚连接上主结点和从主结点读到数据都会更新该变量。 上报当前commitlog的最大偏移量，该行为会发生三个地方：a.写完一个消息；b.处理完当前收到的所有数据；c.一段时间内没有收到主结点的数据。 维护收到的数据。这里有两个接收数据的buffer，主要方便处理当一个buffer的空间用完以后处理剩余的消息。一个buffer的情况下，先拷贝到一个临时byte数据，然后再拷贝回去，需要两次内存拷贝。如果两个buffer只需要一次拷贝。 写消息。把从主结点同步过来的数据写到磁盘。收到数据的时候会判断主结点发过来的偏移量是否等于自己当前的偏移量如果不一样就会断开和主结点的连接。 任何从连接中读数据的时候如果有错误就会断开连接。  </description>
     </item>
     
     <item>
@@ -50,37 +36,33 @@
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/push-consumer/</guid>
       <description>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：
- DefaultMQPushConsumerImpl：拉消息的类型。
- ProcessQueue：保存拉出来的消息。
- PullMessageService：执行拉消息服务。
- ConsumeMessageService：消费消息服务。
- ReblanceService：负载均衡服务。
-  类关系
+ DefaultMQPushConsumerImpl：拉消息的类型。 ProcessQueue：保存拉出来的消息。 PullMessageService：执行拉消息服务。 ConsumeMessageService：消费消息服务。 ReblanceService：负载均衡服务。  类关系
 （真想吐槽！）
 执行过程
 DefaultMQPushConsumerImpl DefaultMQPushConsumerImpl实现了消费者的接口。同时是个启动者，通过它直接或间接启动了拉消息服务，消费消息服务。
 其中提供了一个重要的接口pullMessage。该接口的流程如下：
 在拉消息过程中，做了流控，防止拉的太快，消费的太慢。主要从三个方面检测：
- 从某个消费队列拉取的等待消费的消息数量。如果超过阀值，延迟50ms后再次拉取消息。阀值默认是1000。如果设置了topic级别的阀值（默认没有限制），在队列负载均衡以后会重新计算，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdForQueue和DefaultMQPushConsumerImpl.pullThresholdForTopic。
- 从某个消费队列拉取的等待消费的消息大小（只考虑body）。同样，超过阀值就会延迟50ms后再次拉取消息。阀值默认是100M。如果topic设置了级别（默认没有限制），队列负载均衡以后会重新计算队列的限制，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdSizeForQueue和DefaultMQPushConsumerImpl.pullThresholdSizeForTopic。
- 在并发消费模式下，从某个消费队列拉取的等待消费的消息中，在消费队列中的最大位置和最小位置之间差别。如果超过阀值，也会延迟50ms后再拉取消息。默认是2000，这里可能会存在误判。因为，有条件拉取消息的时候，是有可能出现同一个消费队列中拉到的两个消息在队列中的位置距离很远。
-  几个考虑：
- NO_NEW_MSG/NO_MATCHED_MSG情况下，correctTagsOffset的逻辑为什么需要考虑有没有消息？如果还有消息说明本地还没有消息没被消费，此时更新的offset是服务端返回的，存在比没有被消费的消息偏移量大的情况。
- OFFSET_ILLEAGL的情况下为什么要过10s以后才去更新offsetstore，保存offset，在reblance中移除process queue？出现这个问题是因为NO_MATCHED_LOGIC_QUEUE/NO_MESSAGE_IN_QUEUE/OFFSET_OVERFLOW_BADLY/OFFSET_TOO_SMALL这四种情况，而这些情况可能发生在服务端在恢复数据的时候，因此考虑是暂停消费这个队列。如果drop之后不延迟，就会有可能又去拉取消息了。
+ 从某个消费队列拉取的等待消费的消息数量。如果超过阀值，延迟50ms后再次拉取消息。阀值默认是1000。如果设置了topic级别的阀值（默认没有限制），在队列负载均衡以后会重新计算，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdForQueue和DefaultMQPushConsumerImpl.pullThresholdForTopic。 从某个消费队列拉取的等待消费的消息大小（只考虑body）。同样，超过阀值就会延迟50ms后再次拉取消息。阀值默认是100M。如果topic设置了级别（默认没有限制），队列负载均衡以后会重新计算队列的限制，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdSizeForQueue和DefaultMQPushConsumerImpl.pullThresholdSizeForTopic。 在并发消费模式下，从某个消费队列拉取的等待消费的消息中，在消费队列中的最大位置和最小位置之间差别。如果超过阀值，也会延迟50ms后再拉取消息。默认是2000，这里可能会存在误判。因为，有条件拉取消息的时候，是有可能出现同一个消费队列中拉到的两个消息在队列中的位置距离很远。  几个考虑：
+  NO_NEW_MSG/NO_MATCHED_MSG情况下，correctTagsOffset的逻辑为什么需要考虑有没有消息？如果还有消息说明本地还没有消息没被消费，此时更新的offset是服务端返回的，存在比没有被消费的消息偏移量大的情况。
+  OFFSET_ILLEAGL的情况下为什么要过10s以后才去更新offsetstore，保存offset，在reblance中移除process queue？出现这个问题是因为NO_MATCHED_LOGIC_QUEUE/NO_MESSAGE_IN_QUEUE/OFFSET_OVERFLOW_BADLY/OFFSET_TOO_SMALL这四种情况，而这些情况可能发生在服务端在恢复数据的时候，因此考虑是暂停消费这个队列。如果drop之后不延迟，就会有可能又去拉取消息了。
   ProcessQueue 保存push的消费者拉到的消息。同时，有序消费模式还记录了情况下正在消费的消息。
 PullMessageService PullMessageService只负责拉取消息，它会调用DefaultMQPushConsumerImpl.pullMessage。
 当ReblanceService执行负载均衡的时候如果发现被分配了新的消息队列就会最终调用PullMessage.executePullRequestImmediately执行拉取消息。代码执行路径：
-ReblanceService.run -&amp;gt;MQClientInstance.doReblance -&amp;gt;MQConsumerInnter.doReblance[DefaultMQPushConsumerImpl.doReblance] -&amp;gt;ReblanceImpl.doReblance -&amp;gt;ReblanceImpl.dispatchPullRequest[ReblancePushImpl.dispatchPullRequest] -&amp;gt;DefaultMQPushConsumerImpl.executePullRequestImmediately -&amp;gt;PullMessage.executePullRequestImmediately  另外，在DefaultMQPushConsumerImpl.pullMessage执行时，也会根据条件调用PullMessageService.executePullRequestImmediately、PullMessageService.executeTaskLater或者PullMessageService.executePullRequestLater触发拉取消息。
+ReblanceService.run -&amp;gt;MQClientInstance.doReblance -&amp;gt;MQConsumerInnter.doReblance[DefaultMQPushConsumerImpl.doReblance] -&amp;gt;ReblanceImpl.doReblance -&amp;gt;ReblanceImpl.dispatchPullRequest[ReblancePushImpl.dispatchPullRequest] -&amp;gt;DefaultMQPushConsumerImpl.executePullRequestImmediately -&amp;gt;PullMessage.executePullRequestImmediately 另外，在DefaultMQPushConsumerImpl.pullMessage执行时，也会根据条件调用PullMessageService.executePullRequestImmediately、PullMessageService.executeTaskLater或者PullMessageService.executePullRequestLater触发拉取消息。
 ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别在于提交消费任务逻辑，消费逻辑和处理消费结果的逻辑，以及对message queue的处理逻辑。另外，顺序消费是指在同一个消费队列里面的消息顺序消费。
 提交消费任务 并发消费：把消息分成多个批次并发处理，一批多少个消息是自定义的，默认是1。如果提交异常，则延迟5s后提交。
 顺序消费：依赖于process queue是否正在被消费，这样避免同时消费多个不同的消息，不然就没法保证有序了。
-消费逻辑 下图中左边是*并发消费*，右边是*顺序消费*。
+消费逻辑 下图中左边是并发消费，右边是顺序消费。
 消费消息的时候，在可能停顿的执行点上面都加上了process queue是否已经drop的检查。
 因为提交任务的方式不一样导致了不同模式下面消费逻辑的差别。
 并发消费：只考虑当前的消息即可。
 顺序消费：从process queue中取消息。消费的时候需要确保：
- 每个消费队列某一时候只有一个消费请求被执行。
- 每个消费队列某一时刻只有一个地方在执行用户的消费逻辑。</description>
+ 每个消费队列某一时候只有一个消费请求被执行。 每个消费队列某一时刻只有一个地方在执行用户的消费逻辑。  以上两个条件中只要一个条件不满足，就没法保证消息顺序消费。另外，第一个逻辑需要的锁，是因为消费慢，同时队列被分配别的消费者，在消费结束之前又分配回来了，就有可能导致1条件不满足，所以需要加锁。在代码层面第一个逻辑需要的锁已经确保了第二个逻辑。消费之前需要锁的原因是为了避免，用户还在消费的时候向broker解锁。
+锁的逻辑
+只有message queue被锁住了才能消费。客户端向服务端发送锁的请求成功以后才算锁成功。同时锁会有一个过期时间。在客户端这边定时向broker发送锁的请求，所得粒度是group+clientID，过期时间是30s。在服务端这边，锁了的过期时间是60s，这个时间以后能够接收其他锁的请求。
+在负载均衡的时候，检查一个消费队列发现不属于自己或者长时间没有拉的时候就会把这个消费队列移除掉。移除的逻辑比较有意思，为了确保这个消费队列正在被消费不会被移除，这里使用了一个消费锁。移除的时候尝试获得这个锁，如果超过1s还没有获得就会等待下一次负载均衡的检查，如果获得了锁就会延迟20s再向broker发送解锁请求。这里的延迟，有个效果就是可能这时候已经向broker发送了拉消息的请求，如果在它返回之前又把队列分配给自己了，那么就有可能两个触发一个拉消息的请求，这个时候就会同时有两个拉消息的请求，那么拉出来重复的消息。
+处理消费结果 下图中左边是并发消费，右边是顺序消费。
+处理消费结果的逻辑主要是处理消费失败的消息。</description>
     </item>
     
     <item>
@@ -89,19 +71,18 @@ ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别�
       <pubDate>Fri, 28 Dec 2018 16:03:51 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/offset/</guid>
-      <description> 作用 记录每个消费队列的消费进度。以topic，group为单位。
+      <description>作用 记录每个消费队列的消费进度。以topic，group为单位。
 类型 根据保存的位置可以分为本地和远程两种类型。本地类型就是以文本文件的形式保存在客户端，内容是非正式的json数据，而远程类型是指数据保存在broker服务器上面，内容同样是非正式的json数据。
 代码
-本地类型：org.apache.rocketmq.client.consumer.store.LocalFileOffsetStore。
-远程类型：org.apache.rocketmq.client.consumer.store.RemoteBrokerOffsetStore。
+本地类型：org.apache.rocketmq.client.consumer.store.LocalFileOffsetStore。 远程类型：org.apache.rocketmq.client.consumer.store.RemoteBrokerOffsetStore。
 使用
-默认情况，当消费模式是*广播*的时候使用*本地类型*，因为每个消费者管理自己的进度，而且是所有消费队列的进度，各个消费者之间也不会有消费进度的交集。当消费模式是*集群*的时候使用*远程类型*，因为消息被多个消费者消费，每个消费者只负责消费其中部分消费队列，在添加、删除消费者的时候，原来消费者负责的消费队列会动态变化，因此需要集中管理消费进度，不然就冲突了。
+默认情况，当消费模式是广播的时候使用本地类型，因为每个消费者管理自己的进度，而且是所有消费队列的进度，各个消费者之间也不会有消费进度的交集。当消费模式是集群的时候使用远程类型，因为消息被多个消费者消费，每个消费者只负责消费其中部分消费队列，在添加、删除消费者的时候，原来消费者负责的消费队列会动态变化，因此需要集中管理消费进度，不然就冲突了。
 但是，代码中依然提供了接口，让用户自己指定类型，比如可以保存数据到monogodb。
 存储 本地类型
 数据保存在$storeDir/.rocketmq_offsets/$clientID/$group/offsets.json中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。其中$storeDir是可以通过系统变量rocketmq.client.localOffsetStoreDir配置，如果没有指定参数就使用HOME目录。$clientID和$group分别表示消费者的id和分组。
-// example {&amp;quot;offsetTable&amp;quot;:{{&amp;quot;brokerName&amp;quot;:&amp;quot;topic&amp;quot;,&amp;quot;queueId&amp;quot;:1,&amp;quot;topic&amp;quot;:&amp;quot;broker&amp;quot;}:0}}  远程类型
+// example {&amp;quot;offsetTable&amp;quot;:{{&amp;quot;brokerName&amp;quot;:&amp;quot;topic&amp;quot;,&amp;quot;queueId&amp;quot;:1,&amp;quot;topic&amp;quot;:&amp;quot;broker&amp;quot;}:0}} 远程类型
 数据保存在$rootPath/config/consumerOffset.json文件中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。offsetTable中的key格式是topic@group，value格式queueID:offset。
-// example { &amp;quot;offsetTable&amp;quot;:{ &amp;quot;test@benchmark_consumer_61&amp;quot;:{ 0:5280,1:5312,2:5312,3:5312 } } }  接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
+// example { &amp;quot;offsetTable&amp;quot;:{ &amp;quot;test@benchmark_consumer_61&amp;quot;:{ 0:5280,1:5312,2:5312,3:5312 } } } 接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
 load
 在消费者启动的时候，需要把消费进度载入内存。只有本地类型会载入数据。
 updateOffset
@@ -117,10 +98,7 @@ removeOffset
 updateConsumeOffsetToBroker
 更新消费队列到broker服务，只有远程类型实现了该接口。（这个设计好尴尬，本地类型需要么。。。）
 管理 org.apache.rocketmq.client.impl.consumer.RebalanceImpl.updateProcessQueueTableInRebalance做消费的负载均衡时，会对消费进度做管理。这个过程通过对比新分配的消费队列（简称新队列）和org.apache.rocketmq.client.impl.consumer.RebalanceImpl.processQueueTable维护的消费队列（简称旧队列），有几种情况：
- 如果旧队列的消费队列不在新队列中，那么就会先持久化该队列的消费进度，再做删除操作。push模式同时优势有序的集群消费还需要做外的事情。
- 如果如果旧队列的消费队列在新队列中，push模式下检查是否过期，过期的化先持久化，再删除进度。
- 如果新队列的消费队列不在旧队列中，删除消费进度。本地模式不会做删除操作，远程模式会把内存中的消费进度删除掉。同时，push模式下面会从存储中拉取消费进度并保存到内存。
-  </description>
+ 如果旧队列的消费队列不在新队列中，那么就会先持久化该队列的消费进度，再做删除操作。push模式同时优势有序的集群消费还需要做外的事情。 如果如果旧队列的消费队列在新队列中，push模式下检查是否过期，过期的化先持久化，再删除进度。 如果新队列的消费队列不在旧队列中，删除消费进度。本地模式不会做删除操作，远程模式会把内存中的消费进度删除掉。同时，push模式下面会从存储中拉取消费进度并保存到内存。  </description>
     </item>
     
     <item>
@@ -131,7 +109,7 @@ updateConsumeOffsetToBroker
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
       <description>缘起 封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。
 排查过程 查看boots-broker日志，发现问题日志：
-[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0  说明，RocketMQ处理发送消息比较慢。可是，从size of queue可以看出，堆积的消息为0。
+[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0 说明，RocketMQ处理发送消息比较慢。可是，从size of queue可以看出，堆积的消息为0。
 查看机器资源消耗情况，发现资源都是充裕的。
 查看RocketMQ日志，发现store.log中有异常，master中的store.log周期性的发生以下日志：
 2018-10-22 15:44:07 INFO AcceptSocketService - HAService receive new connection, /10.38.34.27:54052 2018-10-22 15:44:07 INFO ReadSocketService - ReadSocketService service started 2018-10-22 15:44:07 INFO WriteSocketService - WriteSocketService service started 2018-10-22 15:44:08 INFO WriteSocketService - WriteSocketService service end 2018-10-22 15:44:12 INFO ReadSocketService - slave[/10.38.34.27:54052] request offset 157843228 2018-10-22 15:44:12 INFO WriteSocketService - master transfer data from 157843228 to slave[/10.</description>
@@ -144,13 +122,7 @@ updateConsumeOffsetToBroker
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/store/</guid>
       <description>功能 store模块是rocketmq的核心模块。主要功能有：
- 消息存储
- 消息索引
- 消费队列
- 主从同步
- 延迟消息
- 清理过期的消息和消费队列
-  消息存储 负责消息存储，包括写消息，刷盘。
+ 消息存储 消息索引 消费队列 主从同步 延迟消息 清理过期的消息和消费队列  消息存储 负责消息存储，包括写消息，刷盘。
 消息文件 消息保存在默认值为${user.home}\store\commitlog文件夹下，可以通过配置项storePathCommitLog修改。所有的消息都写入一个逻辑文件，每个逻辑文件包含大小相等的物理文件。
 写消息 写消息在不同的场景下面会有不同的逻辑。
 同步刷盘 每条消息要写到磁盘以后才算完成。
@@ -160,10 +132,10 @@ updateConsumeOffsetToBroker
 主从同步 每条消息要等一个从broker同步完才算完成。
 在主从同步的场景下，会有一个定期检查消息是否已经被从broker同步的辅助线程：GroupTransferService。写消息的时候会生成一个GroupCommitRequest提交给GroupTransferService，并等待被唤醒或者超时。当GroupTransferService发现从broker已经同步的最后一个消息的索引大于本次消息的索引时就会唤醒GroupCommitRequest。
 写buffer 使用了写buffer以后，写消息的全部逻辑就是把消息写入buffer。同时，系统会有一个线程CommitRealTimeService定期把消息写入文件。
-核心代码 org.apache.rocketmq.store.CommitLog  消费队列 每个topic对应多个消费队列，这个是提高消费并发度的前提。
+核心代码 org.apache.rocketmq.store.CommitLog 消费队列 每个topic对应多个消费队列，这个是提高消费并发度的前提。
 结构 每个消费队列对应一个逻辑文件，文件中对应每个消息的内容大小是固定的20个字节，包含消息的偏移量，大小以及tag哈希值。
 文件目录 数据保存在目录${rootpath}/consumequeue下面，rootpath 通过配置项storePathRootDir指定，默认的是${user.home}/store。
-${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │ └── 00000000000000000000 ├── 1 // queue 1 │ └── 00000000000000000000 ├── 2 // queue 2 │ └── 00000000000000000000 └── 3 // queue 3 └── 00000000000000000000  队列元素 |&amp;lt;----- 8 byte -----&amp;gt;|&amp;lt;- 4 byte -&amp;gt;|&amp;lt;------ 8 byte ------&amp;gt;| +--------------------+------------+----------------------+ | commitlog offset | size | message tag hash code| +--------------------+------------+----------------------+  执行 通过线程ReputMessageService的分派消息的逻辑执行。</description>
+${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │ └── 00000000000000000000 ├── 1 // queue 1 │ └── 00000000000000000000 ├── 2 // queue 2 │ └── 00000000000000000000 └── 3 // queue 3 └── 00000000000000000000 队列元素 |&amp;lt;----- 8 byte -----&amp;gt;|&amp;lt;- 4 byte -&amp;gt;|&amp;lt;------ 8 byte ------&amp;gt;| +--------------------+------------+----------------------+ | commitlog offset | size | message tag hash code| +--------------------+------------+----------------------+ 执行 通过线程ReputMessageService的分派消息的逻辑执行。</description>
     </item>
     
   </channel>

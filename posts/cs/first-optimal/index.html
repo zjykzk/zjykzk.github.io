@@ -12,13 +12,9 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>记一次mongo数据库优化经历</strong>
-<hr> 
-
-<h1 id="缘起">缘起</h1>
-
-<p><style>table{border-collapse:collapse;}table,td,th{border:1px solid #000}td{text-align:center}</style><br />
-最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：</p>
-
+<hr> <h1 id="缘起">缘起</h1>
+<!-- raw HTML omitted -->
+<p>最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：</p>
 <table>
 <thead>
 <tr>
@@ -28,7 +24,6 @@ body{background:#faf9de;}
 <th align="center">消费TPS</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="center">3</td>
@@ -38,94 +33,55 @@ body{background:#faf9de;}
 </tr>
 </tbody>
 </table>
-
 <p>而且，随着消费线程的数量增加发送&amp;消费的TPS都下降。</p>
-
 <h1 id="排查">排查</h1>
-
 <h2 id="接口">接口</h2>
-
 <p>一次发送涉及的数据库操作：</p>
-
 <ol>
-<li>一次topic查询<br /></li>
-<li>一次跟MQ之间的RPC<br /></li>
-<li>一次写统计数据<br />
-<br /></li>
+<li>一次topic查询</li>
+<li>一次跟MQ之间的RPC</li>
+<li>一次写统计数据</li>
 </ol>
-
 <p>一次消费涉及的数据库操作：</p>
-
 <ol>
-<li>两次cas操作<br /></li>
-<li>两次写统计操作<br />
-<br /></li>
+<li>两次cas操作</li>
+<li>两次写统计操作</li>
 </ol>
-
 <h2 id="系统状态">系统状态</h2>
-
 <h3 id="磁盘io">磁盘IO</h3>
-
 <p>通过命令 <code>iotop</code> 发现：mongodb写磁盘速度最大2M/s。</p>
-
 <h3 id="网络">网络</h3>
-
 <p>通过命令 <code>nethogs</code> 发现：mongodb的通信速度最大200+KB/s。</p>
-
 <h3 id="系统总体情况">系统总体情况</h3>
-
 <p>通过命令<code>vmstat</code>发现：</p>
-
 <ol>
-<li>系统和用户的CPU使用率都超低，两者加起来不到5%，系统的中断和上下文切换非常高，特别是上下文切换，达到了十几万/s<br /></li>
-<li>从缓存写到磁盘的io比较高好几百/s<br /></li>
-<li>内存使用率非常低<br />
-<br /></li>
+<li>系统和用户的CPU使用率都超低，两者加起来不到5%，系统的中断和上下文切换非常高，特别是上下文切换，达到了十几万/s</li>
+<li>从缓存写到磁盘的io比较高好几百/s</li>
+<li>内存使用率非常低</li>
 </ol>
-
 <h3 id="结论">结论</h3>
-
 <p>问题一定是使用mongodb上面。</p>
-
 <h2 id="排查-1">排查</h2>
-
 <h3 id="profile程序">profile程序</h3>
-
 <p>通过golang自带的profile功能，在程序里面添加profile代码，通过<code>go tool pprof</code>对程序做profile，用 <code>go-torch</code>生成火焰图。发现果不其然，一个请求过程中，数据操作耗时占整体的40%以上。</p>
-
 <p>发送消息火焰图</p>
-
-<p><img src="/imgs/create.job.png" alt="" /></p>
-
+<p><img src="/imgs/create.job.png" alt=""></p>
 <p>拉取消息火焰图</p>
-
-<p><img src="/imgs/pull.job.png" alt="" /></p>
-
+<p><img src="/imgs/pull.job.png" alt=""></p>
 <p>确认消息火焰图</p>
-
-<p><img src="/imgs/finish.job.png" alt="" /></p>
-
+<p><img src="/imgs/finish.job.png" alt=""></p>
 <p>通过看程序以及对需求的分析，程序可以做优化：</p>
-
 <ol>
-<li>统计数据可以不用每次都去写数据库，把它放在内存或者写本地磁盘，定期刷到数据库<br /></li>
-<li>去重以后的消息，可以放在内存，减少拉取消息时候一次cas操作<br />
-<br /></li>
+<li>统计数据可以不用每次都去写数据库，把它放在内存或者写本地磁盘，定期刷到数据库</li>
+<li>去重以后的消息，可以放在内存，减少拉取消息时候一次cas操作</li>
 </ol>
-
 <h3 id="mongodb">mongodb</h3>
-
 <p>通过命令 <code>mongostat</code> 查看mongodb的运行状态，发现随着消费线程并发的提高锁的百分比越来越高最后超过的90%。查看mongodb的版本是2.4.9，它用的数据库锁。换个mongodb版本，避免锁的开销，通过了解公司线上使用的版本3.0.15，并使用wireTiger存储引擎。果断按照这个环境进行benchmark，结果仍然不尽任意。查看<strong>profiler</strong>，一个类似mysql的慢查询的命令。通过以下命令加上专家的讲解，从<strong>信息 nscannedObjects : 71040</strong>，发现扫描对象比较多，从代码确认是缺少了一个索引。</p>
-
 <pre><code>&gt; db.setProfilingLevel(2);
 {&quot;was&quot; : 0 , &quot;slowms&quot; : 100, &quot;ok&quot; : 1}       // &quot;was&quot; 表示旧的设置
 &gt; db.system.profile.find().sort({millis:-1}) // 列出耗时的操作，按照操作耗时排序，这条语句会列出扫描的对象数量，锁等关键信息
-</code></pre>
-
-<p>在程序里面加上索引，再次benchmark达到预期。</p>
-
+</code></pre><p>在程序里面加上索引，再次benchmark达到预期。</p>
 <h2 id="总结">总结</h2>
-
 <p>本次调优最大问题是思维盲区，由于自己对mongodb不熟悉，就没有想到去profile mongodb，把精力放在了优化代码层面的数据库操作，中间还做过把消息放在缓存中虽然达到预期，但是有数据不一致的问题。其实，方法没对，<strong>优化的首要原则是做profile，profile一切。</strong></p>
 
 <div class="np"><a href=/posts/cs/rocketmq/store/>← rocketmq store模块</a> <a href=/posts/cs/golang/map/>map 内部实现 →</a></div>
