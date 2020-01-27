@@ -12,12 +12,20 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>bolt源码分析</strong>
-<hr> <p><a href="https://github.com/boltdb/bolt">bolt</a>数据库是golang开发的简单的kv数据库。代码十分精简，总共3000+行，学习数据库一个比较好的起点。</p>
+<hr> 
+
+<p><a href="https://github.com/boltdb/bolt">bolt</a>数据库是golang开发的简单的kv数据库。代码十分精简，总共3000+行，学习数据库一个比较好的起点。</p>
+
 <h2 id="数据结构">数据结构</h2>
+
 <p>bolt使用的数据结构按照数据保存的位置划分两类：内存和磁盘。</p>
+
 <p>内存中的数据结构核心是B+树，它根据key组织在一起。B+树中的每个结点，对应数据结构<a href="#node">node</a>，其中的内部信息通过数据结构<a href="#inode">inode</a>来描述。内存中其他主要数据结构还包括<a href="#meta">meta</a>和<a href="#freelist">freelist</a>。</p>
+
 <p>描述磁盘中的数据结构是<a href="#page">page</a>，它的数据来自于<a href="#node">node</a>、<a href="#meta">meta</a>或者<a href="#freelist">freelist</a>。对应者一块内存，大小为os的page size的倍数。</p>
+
 <h3 id="node">node</h3>
+
 <pre><code>type node struct {
   bucket     *Bucket      // 这个结点所在的的bucket
   isLeaf     bool         // 是否是叶子结点
@@ -29,16 +37,24 @@ body{background:#faf9de;}
   children   nodes        // 子结点
   inodes     inodes       // 结点中key或者key&amp;value，如果是分支结点只有key，叶子结点还有value
 }
-</code></pre><h4 id="inode">inode</h4>
+</code></pre>
+
+<h4 id="inode">inode</h4>
+
 <p>通过<a href="#branchPageElement">branchPageElement</a>或者<a href="#leafPageElement">leafPageElement</a>来获取数据。</p>
+
 <pre><code>type inode struct {
   flags uint32            // 标记，用来区分支结点和叶子结点
   pgid  pgid              // 所在页的id
   key   []byte
   value []byte
 }
-</code></pre><h3 id="page">page</h3>
+</code></pre>
+
+<h3 id="page">page</h3>
+
 <p>代表一个页或者连续的几个页。</p>
+
 <pre><code>type page struct {
   id       pgid           // 64位的id
   flags    uint16         // 页的标记，表示存储的数据类型，包括分支、叶子，元数据和描述空闲页的数据
@@ -46,38 +62,61 @@ body{background:#faf9de;}
   overflow uint32         // 后面还有的页数
   ptr      uintptr        // 只是一个标记字段，标记数据的起始位置
 }
-</code></pre><h4 id="bucketpageelement">bucketPageElement</h4>
+</code></pre>
+
+<h4 id="bucketpageelement">bucketPageElement</h4>
+
 <p>B+树中分支结点保存的数据元信息。</p>
+
 <pre><code>type branchPageElement struct {
   pos   uint32            // 本元素的地址到key的起始地址的距离
   ksize uint32            // key的大小
   pgid  pgid              // 页id
 }
-</code></pre><h4 id="leafpageelement">leafPageElement</h4>
+</code></pre>
+
+<h4 id="leafpageelement">leafPageElement</h4>
+
 <p>B+树中叶子结点保存的数据元信息。</p>
+
 <pre><code>type leafPageElement struct {
   flags uint32            // 标识这里主要用于区分是bucket还是一个普通的value
   pos   uint32            // 本元素的地址到key的起始地址的距离
   ksize uint32            // key的大小
   vsize uint32            // value的大小
 }
-</code></pre><p>以上三者之间的关系如下图</p>
-<p><img src="/imgs/bolt/page-branch-leaf.jpg" alt="page-branch-leaf"></p>
+</code></pre>
+
+<p>以上三者之间的关系如下图</p>
+
+<p><img src="/imgs/bolt/page-branch-leaf.jpg" alt="page-branch-leaf" /></p>
+
 <h3 id="freelist">freelist</h3>
+
 <pre><code>type freelist struct {
   ids     []pgid          // 空闲页的id数组
   pending map[txid][]pgid // 每个写事务spill的时候释放的页，这些页在commit的时候会被释放掉
   cache   map[pgid]bool   // 帮助快速查询空闲页和等待释放页的一个cache，仅仅是用来检查是否重复释放的bug
 }
 
-</code></pre><p>bolt数据库采用了<a href="https://github.com/boltdb/bolt/blob/master/node.go#L359-L362">写时复制</a>的策略，因此数据更新的时候，会新建一个页保存更新以后的数据，那么原来的页就可以重复利用了。这些页通过freelist管理。因为<a href="#page">page</a>数据结构count地址的限制，它能保存的最大值是0xFFFF，所以空闲页数量大于0xFFFF的时候，需要添加一个长度头来表示有多少空闲页。</p>
+</code></pre>
+
+<p>bolt数据库采用了<a href="https://github.com/boltdb/bolt/blob/master/node.go#L359-L362">写时复制</a>的策略，因此数据更新的时候，会新建一个页保存更新以后的数据，那么原来的页就可以重复利用了。这些页通过freelist管理。因为<a href="#page">page</a>数据结构count地址的限制，它能保存的最大值是0xFFFF，所以空闲页数量大于0xFFFF的时候，需要添加一个长度头来表示有多少空闲页。</p>
+
 <p>pending的page需要确保没有被其他事务引用时才能释放被重新使用。所以，bolt的处理方式是在开始<a href="https://github.com/boltdb/bolt/blob/master/db.go#L537">写事务的时候</a>找到最小的事务id，然后把小于该事务id引用的page给释放掉。</p>
+
 <p>它和page的存储关系如下：</p>
-<p><img src="/imgs/bolt/page-freelist.jpg" alt=""></p>
+
+<p><img src="/imgs/bolt/page-freelist.jpg" alt="" /></p>
+
 <h3 id="bucket">Bucket</h3>
+
 <p>类似关系型数据库中的表。它可以包含子bucket。bolt中有一个根bucket，所有的数据和bucket都保存在这个根bucket中。每个bucket对应一棵B+树。</p>
+
 <p>bucket的数据很少时会做一个优化。这个条件是bucket对应的根数据页是叶子结点，同时它的数量(pageHeaderSize+leafPageElementSize+key size+value size)小于page size的1/4。</p>
+
 <p>通过bucket可以设置在B+树中与它相对应结点的分裂阀值。如果写操作几乎是追加操作可以提高这个值，否则还是不要太大了。这是因为，如果更新很频繁化，阀值很大情况下就会有更多脏的page。这会增加写的压力。</p>
+
 <pre><code>type Bucket struct {
   *bucket                     // 保存在文件中的数据信息
   tx       *Tx                // 事务
@@ -96,11 +135,18 @@ type bucket struct {
   root     pgid   // 根数据页的id
   sequence uint64 // 单调递增序号，被NextSequence调用
 }
-</code></pre><p>它和page的关系如下：</p>
-<p><img src="/imgs/bolt/page-bucket.jpg" alt=""></p>
+</code></pre>
+
+<p>它和page的关系如下：</p>
+
+<p><img src="/imgs/bolt/page-bucket.jpg" alt="" /></p>
+
 <h3 id="cursor">Cursor</h3>
+
 <p>有序遍历的游标，读写的时候用。只在一个事务中有效。遍历的时候如果修改了数据，它返回的数据是不确定的。</p>
+
 <p>通过栈的方式记录遍历的每层结点，栈顶是叶子结点。每次访问数据的时候需要遍历到叶子结点。因为叶子之间没有指针，所以需要回溯分支结点。</p>
+
 <pre><code>type Cursor struct {
   bucket *Bucket                  // 当前的bucket
   stack  []elemRef                // 遍历的堆栈
@@ -112,7 +158,10 @@ type elemRef struct {
   node  *node
   index int                       // 分支结点或者叶子结点中inodes的下标
 }
-</code></pre><h3 id="tx">Tx</h3>
+</code></pre>
+
+<h3 id="tx">Tx</h3>
+
 <pre><code>type Tx struct {
   writable       bool             // 是否是包含写操作事务
   managed        bool             // 一个标志，防止事务被提交或者回滚
@@ -127,8 +176,12 @@ type elemRef struct {
   // 比如：当文件大小比内存大的多的时候，设置syscall.O_DIRECT可以避免page cache的失效
   WriteFlag int
 }
-</code></pre><h3 id="meta">meta</h3>
+</code></pre>
+
+<h3 id="meta">meta</h3>
+
 <p>数据库的元信息。</p>
+
 <pre><code>type meta struct {
   magic    uint32                 // 魔数0xED0CDAED
   version  uint32                 // 版本
@@ -140,36 +193,64 @@ type elemRef struct {
   txid     txid                   // 事务id
   checksum uint64                 // 元数据的校验和
 }
-</code></pre><p>它和page的关系如下：</p>
-<p><img src="/imgs/bolt/page-meta.jpg" alt=""></p>
+</code></pre>
+
+<p>它和page的关系如下：</p>
+
+<p><img src="/imgs/bolt/page-meta.jpg" alt="" /></p>
+
 <h2 id="设计">设计</h2>
+
 <h3 id="存储">存储</h3>
+
 <p>单文件存储。读写单位是os的page size。通过多棵B+树组织在一起，不过这个B+树的叶子结点没有指向兄弟叶子结点的指针。每棵B+树和<a href="#bucket">Bucket</a>一一对应。</p>
+
 <p>通过内存映射读取数据。</p>
-<h3 id="写时复制httpsgithubcomboltdbboltissues308issuecomment-74811638"><a href="https://github.com/boltdb/bolt/issues/308#issuecomment-74811638">写时复制</a></h3>
-<p>当发生添加数据或者修改时，整个bucket引用的数据都会被写到新的page。这样的好处就是事务隔离实现比较简单。</p>
-<h3 id="元数据meta"><a href="#meta">元数据</a></h3>
+
+<p>同时,需要管理空闲的磁盘空间,重复利用。</p>
+
+<h3 id="写时复制-https-github-com-boltdb-bolt-issues-308-issuecomment-74811638"><a href="https://github.com/boltdb/bolt/issues/308#issuecomment-74811638">写时复制</a></h3>
+
+<p>当发生添加数据或者修改时，被修改的数据所在的page都会被写到新的page。这样的好处就是事务隔离实现比较简单。</p>
+
+<h3 id="元数据-meta"><a href="#meta">元数据</a></h3>
+
 <p>元数据描述了数据文件的结构，主要是B+树的结构。它保存在第0和1个page。</p>
+
 <p>两个meta数据，这是为了解决只有一个meta并且如果写meta数据时进程挂情况下，整个数据库就没法读取了。参考这个<a href="https://github.com/boltdb/bolt/issues/548#issuecomment-206414220">issue</a>。</p>
+
 <p>每个写事务都会关联一个meta，交替使用两个meta。事务0使用meta0，事务1使用meat1等等。按照txid大小、数据是否有效两个维度的优先级选择meta。commit的时候会把meta的txid写到page中去。page的选择也是交替的，根据<code>txid%2</code>选择page id。</p>
+
 <p>由于，写事务是互斥的，如果一个meta数据失效了，另外一个是正常的可以使用。之前关联这个失效meta的事务生成的数据都会丢失。当然，如果两个写事务写meta的时候都写失败了，那数据就真坏了。</p>
+
 <h3 id="事务">事务</h3>
+
 <h4 id="原子性">原子性</h4>
+
 <p>以下几个条件满足的原子性：</p>
+
 <ol>
-<li>只有一个写事务。</li>
-<li>写时复制，每次写提交的时候都会分配一个新的page。</li>
-<li>如果meta写失败了，这次事务的操作也就相当于回滚了。</li>
+<li>只有一个写事务。<br /></li>
+<li>写时复制，每次写提交的时候都会分配一个新的page。<br /></li>
+<li>如果meta写失败了，这次事务的操作也就相当于回滚了。<br />
+<br /></li>
 </ol>
+
 <h4 id="隔离性">隔离性</h4>
+
 <p>它的持久性和并发模型决定隔离级别属于重复可读。</p>
+
 <h4 id="持久性">持久性</h4>
+
 <p>每次写事务提交的时候，都会把数据刷到磁盘。</p>
+
 <p>写数据的顺序是freelist、数据、meta数据。只有meta数据写成功以后才算数据写成功。否则，整个事务的操作就会被回滚。</p>
+
 <h4 id="并发性">并发性</h4>
+
 <p>bolt数据库支持多个读事务和一个写事务同时进行。由于写事务分配数据的时候，因为超过文件大小，就需要重新做内存映射。为了避免读事务会读取这些数据，因此读事务开始的时候会获得内存映射的读锁。所以，因为这个锁有可能把写事务给阻塞。</p>
 
-<div class="np"><a/> <a href=/posts/cs/linux/fix-bad-init/>initramfs中的init进程系统启动失败 →</a></div>
+<div class="np"><a href=/posts/cs/linux/fix-bad-init/>← initramfs中的init进程系统启动失败</a> <a></a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

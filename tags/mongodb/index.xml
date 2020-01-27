@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>mongodb on 老K随笔</title>
+    <title>Mongodb on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/mongodb/</link>
-    <description>Recent content in mongodb on 老K随笔</description>
+    <description>Recent content in Mongodb on 老K随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
@@ -21,22 +21,26 @@
       <guid>http://zjykzk.github.io/posts/cs/mongodb/</guid>
       <description>默认索引 每个文档默认都有一个字段_id，这个字段会自动生成唯一索引，这个索引无法删除。这个字段的值可以是用户指定，如果不指定mongodb会自动生成。
 生成的规则：
-|&amp;lt;-- 4 --&amp;gt;|&amp;lt;- 3 -&amp;gt;|&amp;lt;-2-&amp;gt;|&amp;lt;-- 3 --&amp;gt;| +---------+-------+-----+---------+ |unix time| mid | pid | counter | +---------+-------+-----+---------+ 包含四个字段：
- unix时间戳，4个字节 机器id，3个字节 进程id，2个字节 计数器，3个字节，自增，从一个随机数开始  索引类型 单字段索引 文档中的任何字段或者子文档的字段都可以当作索引，字段的值也可以是一个文档。
+|&amp;lt;-- 4 --&amp;gt;|&amp;lt;- 3 -&amp;gt;|&amp;lt;-2-&amp;gt;|&amp;lt;-- 3 --&amp;gt;| +---------+-------+-----+---------+ |unix time| mid | pid | counter | +---------+-------+-----+---------+  包含四个字段：
+ unix时间戳，4个字节
+ 机器id，3个字节
+ 进程id，2个字节
+ 计数器，3个字节，自增，从一个随机数开始
+  索引类型 单字段索引 文档中的任何字段或者子文档的字段都可以当作索引，字段的值也可以是一个文档。
 复合索引（compound index） 一个文档中的多个字段组成一个索引。最多支持31个字段。
 Prefixes 当查询的条件是索引的前面几个字段时会使用复合索引。
 比如：有索引{a:1,b:1,c:1}，查询条件{a:&amp;quot;a&amp;quot;,b:&amp;quot;b&amp;quot;}就会使用这个索引，但是{b:&amp;quot;b&amp;quot;}这样的查询条件就无法使用。
 排序 索引的顺序先按第一个字段排序，如果第一个字段相等，按照第二个字段排序，依次类推后面的字段顺序。因此，
- 如果有以下索引{a:1,b:1}，支持排序{a:-1,b:-1}/{a:1:b:1}，不支持排序{a:-1:b:1}/{a:1:b:-1}。 只支持Prefixes的排序。  多值索引（multikey index） 字段的值是一个数组，就会自动把这个索引变成多值索引，支持范围查询。
+ 如果有以下索引{a:1,b:1}，支持排序{a:-1,b:-1}/{a:1:b:1}，不支持排序{a:-1:b:1}/{a:1:b:-1}。
+ 只支持Prefixes的排序。
+  多值索引（multikey index） 字段的值是一个数组，就会自动把这个索引变成多值索引，支持范围查询。
 地理空间索引（geospatial index） 包含两种索引：2d/2dsphere index
 文本索引（text indexes） 作用于值是字符串或者是字符串数组的字段，查询字段中是否包含查询字符串。
 哈希索引（hashed indexes） 用于基于hash的sharding。
 交集索引（index intersection） 如果查询条件中出现使用了多个索引，包括Prefixes索引。mongodb可能会使用多个索引进行查询，然后取交集。是否使用了这个索引，可以通过explain来确定。
 当查询需要排序，同时排序的字段需要的索引和查询条件无法组成一个或者部分query predicate，那就无法使用这个索引了。
 比如：有索引{a:1}/{b:1,c:1}，查询db.col.find({a:&#39;a&#39;}).sort({b:1})无法使用，虽然排序中包含字段b，但是查询条件中无法使用这个索引；而查询db.col.find({a:&#39;a&#39;,b:&#39;b&#39;}).sort({c:1})却可以使用两个索引，这是因为查询条件中有{b:&#39;b&#39;}和排序字段{c:1}，索引{b:1,c:1}组成部分查询条件。
-索引的属性 唯一性 可以指定一个索引唯一。
-部分索引（partial indexes） 只索引满足条件的文档，它是稀疏索引的超集，相比稀疏索引采用部分索引。
-稀疏索引（sparse indexes） 只索引存在该字段值的文档。</description>
+索引的属性 唯一性 可以指定一个索引唯一。</description>
     </item>
     
   </channel>

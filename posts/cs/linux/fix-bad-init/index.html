@@ -12,8 +12,12 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>initramfs中的init进程系统启动失败</strong>
-<hr> <h2 id="缘起">缘起</h2>
+<hr> 
+
+<h2 id="缘起">缘起</h2>
+
 <p>执行系统全量更新数据<code>yay -Syu</code>，更新了以下软件：</p>
+
 <pre><code>upgraded grub (2:2.04-4 -&gt; 2:2.04-5)
 upgraded libjpeg-turbo (2.0.3-1 -&gt; 2.0.4-1)
 upgraded imagemagick (7.0.9.10-1 -&gt; 7.0.9.13-1)
@@ -25,21 +29,35 @@ upgraded marisa (0.2.5-5 -&gt; 0.2.5-7)
 upgraded opencl-nvidia (440.44-1 -&gt; 440.44-2)
 upgraded openvpn (2.4.8-1 -&gt; 2.4.8-3)
 upgraded s-nail (14.9.15-3 -&gt; 14.9.16-1)
-</code></pre><p>系统重启，启动失败。显示：</p>
+</code></pre>
+
+<p>系统重启，启动失败。显示：</p>
+
 <pre><code>[Firmware Bug]: TSC_DEADLINE disabled due to Errata; please update microcode to version: 0x22 (or later)
-</code></pre><h2 id="解决">解决</h2>
+</code></pre>
+
+<h2 id="解决">解决</h2>
+
 <p>google结果提示安装<code>intel-ucode</code>。烧个live cd进去执行命令<code>pacman -S intel-ucode</code>安装完毕，重启。失败，显示：</p>
+
 <pre><code>Failed to execute /init (error -2)
 Console: switching to colour frame buffer device 175x65
 .....
-</code></pre><p>命令<code>/init</code>位于initramfs这个rootfs中。简单说来initramfs是启动系统过程中用于其他系统的中间过程。上面显示的问题原因是启动的时候失败了。</p>
+</code></pre>
+
+<p>命令<code>/init</code>位于initramfs这个rootfs中。简单说来initramfs是启动系统过程中用于其他系统的中间过程。上面显示的问题原因是启动的时候失败了。</p>
+
 <p>接着google，因为initramfs是gzip压缩的，可以通过命令<code>zcat /boot/initramfs-linux.img | cpio -i</code>解压initramfs系统。</p>
+
 <p>解压以后通过命令<code>chroot . /bin/sh</code>测试能否进入这个rootfs。提示找不到命令<code>/bin/sh</code>。检查发现文件存在，然后确定是因为找不到依赖的动态连接库导致。</p>
+
 <p>通过命令<code>/usr/lib/ld-linux-x86-64.so.2 --list /bin/sh</code>找到依赖，然后把依赖更新到文件<code>/etc/mkinitcpio.conf</code>的字段<code>FILES</code>中去，然后重新执行命令<code>mkinitcpio -p linux</code>生成initramfs文件，重启系统。通过上面的循环测试发现，其实还有其他命令依赖的动态链接库也缺失了。都拷贝过去以后搞定！</p>
+
 <h2 id="覆盘">覆盘</h2>
+
 <p>系统更新以后不知道什么原因initramfs中缺失了很多动态连接库。最重要的是因为对initramfs系统不熟悉，导致没有地方下手，好在有google大法和archlinux的论坛，搞定。</p>
 
-<div class="np"><a href=/posts/cs/db/bolt/>← bolt源码分析</a> <a href=/posts/cs/language/learn/>如何学习一门编程语言 →</a></div>
+<div class="np"><a href=/posts/cs/language/learn/>← 如何学习一门编程语言</a> <a href=/posts/cs/db/bolt/>bolt源码分析 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

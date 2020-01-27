@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>db on 老K随笔</title>
+    <title>Db on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/db/</link>
-    <description>Recent content in db on 老K随笔</description>
+    <description>Recent content in Db on 老K随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
@@ -23,9 +23,8 @@
 数据结构 bolt使用的数据结构按照数据保存的位置划分两类：内存和磁盘。
 内存中的数据结构核心是B+树，它根据key组织在一起。B+树中的每个结点，对应数据结构node，其中的内部信息通过数据结构inode来描述。内存中其他主要数据结构还包括meta和freelist。
 描述磁盘中的数据结构是page，它的数据来自于node、meta或者freelist。对应者一块内存，大小为os的page size的倍数。
-node type node struct { bucket *Bucket // 这个结点所在的的bucket isLeaf bool // 是否是叶子结点 unbalanced bool // 是否平衡，删除的时候做标记 spilled bool // 是否已经分裂 key []byte // 对应着第一个inode中的key pgid pgid // 所在页的id parent *node // 父结点 children nodes // 子结点 inodes inodes // 结点中key或者key&amp;amp;value，如果是分支结点只有key，叶子结点还有value } inode 通过branchPageElement或者leafPageElement来获取数据。
-type inode struct { flags uint32 // 标记，用来区分支结点和叶子结点 pgid pgid // 所在页的id key []byte value []byte } page 代表一个页或者连续的几个页。
-type page struct { id pgid // 64位的id flags uint16 // 页的标记，表示存储的数据类型，包括分支、叶子，元数据和描述空闲页的数据 count uint16 // 包含数据的元素个数 overflow uint32 // 后面还有的页数 ptr uintptr // 只是一个标记字段，标记数据的起始位置 } bucketPageElement B+树中分支结点保存的数据元信息。</description>
+node type node struct { bucket *Bucket // 这个结点所在的的bucket isLeaf bool // 是否是叶子结点 unbalanced bool // 是否平衡，删除的时候做标记 spilled bool // 是否已经分裂 key []byte // 对应着第一个inode中的key pgid pgid // 所在页的id parent *node // 父结点 children nodes // 子结点 inodes inodes // 结点中key或者key&amp;amp;value，如果是分支结点只有key，叶子结点还有value }  inode 通过branchPageElement或者leafPageElement来获取数据。
+type inode struct { flags uint32 // 标记，用来区分支结点和叶子结点 pgid pgid // 所在页的id key []byte value []byte }  page 代表一个页或者连续的几个页。</description>
     </item>
     
   </channel>

@@ -12,32 +12,48 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>jit的基本原理以及实现</strong>
-<hr> <h2 id="基本原理">基本原理</h2>
-<p>JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：</p>
-<ol>
-<li>生成可以执行的代码</li>
-<li>执行代码</li>
-</ol>
+<hr> 
+
+<h2 id="基本原理">基本原理</h2>
+
+<p>JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：<br />
+1. 生成可以执行的代码<br />
+2. 执行代码</p>
+
 <h3 id="生成代码">生成代码</h3>
+
 <p>生成的代码是平台相关，一般就是一些机器码。</p>
+
 <h3 id="执行代码">执行代码</h3>
+
 <p>生成的代码如果要被执行，必须要确保代码所在的内存拥有可执行的标志。在linux下面通过<code>mmap</code>系统调用映射一块可执行的内存，然后把相关的代码复制到这块内存中。最后，把内存首地址转换成函数地址并进行调用。</p>
-<h2 id="helloworld">Hello，World</h2>
+
+<h2 id="hello-world">Hello，World</h2>
+
 <p>一个基于x86_64平台的JIT代码， 通过系统调用<code>write</code>实现打印<code>hello,world！</code>。</p>
-<h3 id="基于x86_64平台的jit代码">基于x86_64平台的JIT代码</h3>
+
+<h3 id="基于x86-64平台的jit代码">基于x86_64平台的JIT代码</h3>
+
 <p>linux下面系统调用通过软中断来实现，参数通过寄存器来传递。寄存器的使用情况如下：</p>
+
 <pre><code>+----------+--------+--------+--------+--------+--------+--------+
 | Syscall #| Param 1| Param 2| Param 3| Param 4| Param 5| Param 6|
 +----------+--------+--------+--------+--------+--------+--------+
 | rax      |  rdi   |  rsi   |   rdx  |   r10  |   r8   |   r9   |
 +----------+--------+--------+--------+--------+--------+--------+
-</code></pre><p>系统调用<a href="http://man7.org/linux/man-pages/man2/write.2.html">write(int fd, const void *buf, size_t count)</a></p>
+</code></pre>
+
+<p>系统调用<a href="http://man7.org/linux/man-pages/man2/write.2.html">write(int fd, const void *buf, size_t count)</a></p>
+
 <ul>
-<li>参数<code>fd</code>:文件描述符号</li>
-<li>参数<code>buf</code>:输出的内存起始地址</li>
-<li>参数<code>count</code>:输出的字节数</li>
+<li>参数<code>fd</code>:文件描述符号<br /></li>
+<li>参数<code>buf</code>:输出的内存起始地址<br /></li>
+<li>参数<code>count</code>:输出的字节数<br />
+<br /></li>
 </ul>
+
 <p>因此，x86_64平台下调用<code>write</code>的机器码为</p>
+
 <pre><code>0:  48 c7 c0 01 00 00 00    mov    rax,0x1
 7:  48 c7 c7 01 00 00 00    mov    rdi,0x1
 e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc
@@ -45,15 +61,18 @@ e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc
 1c: 0f 05                   syscall
 1e: c3 cc                   ret
 1f: 48 65 6c 6c 6f 20 57 6f 72 6c 64 21   // Hello World!
-</code></pre><p>其中：</p>
-<ol>
-<li><code>rax</code>值为1，系统调用<code>write</code>的编号</li>
-<li><code>rdi</code>值为1，参数<code>fd</code>的值，标准输出</li>
-<li><code>rsi</code>值为<code>rip+4</code>，参数<code>buf</code>的值，通过相对地址得到</li>
-<li><code>rdx</code>值为0xc（12），参数<code>count</code>的值</li>
-</ol>
+</code></pre>
+
+<p>其中：<br />
+1. <code>rax</code>值为1，系统调用<code>write</code>的编号<br />
+2. <code>rdi</code>值为1，参数<code>fd</code>的值，标准输出<br />
+3. <code>rsi</code>值为<code>rip+4</code>，参数<code>buf</code>的值，通过相对地址得到<br />
+4. <code>rdx</code>值为0xc（12），参数<code>count</code>的值</p>
+
 <h3 id="执行代码-1">执行代码</h3>
+
 <p>通过系统调用<a href="http://man7.org/linux/man-pages/man2/mmap.2.html">void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)</a>创建内存映射，确保这块内存可以执行，通过参数<code>prot</code>指定，其中<code>PROT_EXEC</code>可执行，<code>PROT_READ</code>可读，<code>PROD_WRITE</code>可写。</p>
+
 <pre><code>unsigned short code[] = {
     0x48c7, 0xc001, 0x0,          // mov %rax,$0x1
     0x48, 0xc7c7, 0x100, 0x0,     // mov %rdi,$0x1
@@ -69,13 +88,22 @@ e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc
 #define FLAGS MAP_PRIVATE|MAP_ANONYMOUS
 
 void *m = mmap(NULL, sizeof(code), PROTS, FLAGS, -1, 0);
-</code></pre><p>接下来，把机器码复制到刚刚映射的内存中，注意为了显示方便机器码保存在了<code>unsigned short</code>数组中，加上x86_64平台字节顺序按照小端来存储，需要把机器码字节顺序调换。</p>
+</code></pre>
+
+<p>接下来，把机器码复制到刚刚映射的内存中，注意为了显示方便机器码保存在了<code>unsigned short</code>数组中，加上x86_64平台字节顺序按照小端来存储，需要把机器码字节顺序调换。</p>
+
 <pre><code>for (int i = 0; i &lt; sizeof(code)/sizeof(code[0]); i++) {
     *((unsigned short *)m+i) = (unsigned short)(((code[i]&gt;&gt;8) | (code[i]&lt;&lt;8)) &amp; 0xffff);
 }
-</code></pre><p>最后，调用一个没有参数以及没有返回值的函数：<code>void (*)()</code></p>
+</code></pre>
+
+<p>最后，调用一个没有参数以及没有返回值的函数：<code>void (*)()</code></p>
+
 <pre><code>((void (*)())m)();
-</code></pre><h3 id="完整代码">完整代码</h3>
+</code></pre>
+
+<h3 id="完整代码">完整代码</h3>
+
 <pre><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;sys/mman.h&gt;
@@ -109,10 +137,13 @@ int main(void) {
 
   ((void (*)())m)();
 }
-</code></pre><h2 id="参考">参考</h2>
+</code></pre>
+
+<h2 id="参考">参考</h2>
+
 <p><a href="https://medium.com/kokster/writing-a-jit-compiler-in-golang-964b61295f">https://medium.com/kokster/writing-a-jit-compiler-in-golang-964b61295f</a></p>
 
-<div class="np"><a href=/posts/cs/vim-tips/>← vim常用操作</a> <a href=/posts/cs/rocketmq/store/>rocketmq store模块 →</a></div>
+<div class="np"><a href=/posts/cs/rocketmq/store/>← rocketmq store模块</a> <a href=/posts/cs/vim-tips/>vim常用操作 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

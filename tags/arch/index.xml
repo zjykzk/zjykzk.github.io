@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>arch on 老K随笔</title>
+    <title>Arch on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/arch/</link>
-    <description>Recent content in arch on 老K随笔</description>
+    <description>Recent content in Arch on 老K随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
@@ -43,7 +43,11 @@
 数量上N+2，N表示需要正常服务的数量，多出两个的原因是考虑热备容灾下，如果发布会失败就会失去热备容灾的功能。而发布失败概率不小。
 互备的服务必须对等，避免一大一小，或者互相依赖。
 流量控制：
- 隔离互相冲突的请求。 把消耗资源的请求限制在固定几个结点，避免这类请求把资源都占住影响其他请求。 防止一些导致服务挂掉的请求，打到全部结点，就是挂了几台服务以后，把这个请求给屏蔽掉，这个比较难。  参考 https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31.png</description>
+1. 隔离互相冲突的请求。
+2. 把消耗资源的请求限制在固定几个结点，避免这类请求把资源都占住影响其他请求。
+3. 防止一些导致服务挂掉的请求，打到全部结点，就是挂了几台服务以后，把这个请求给屏蔽掉，这个比较难。
+参考 https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw
+https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31.png</description>
     </item>
     
   </channel>
