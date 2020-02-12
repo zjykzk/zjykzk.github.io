@@ -250,7 +250,7 @@ type elemRef struct {
 
 <p>bolt数据库支持多个读事务和一个写事务同时进行。由于写事务分配数据的时候，因为超过文件大小，就需要重新做内存映射。为了避免读事务会读取这些数据，因此读事务开始的时候会获得内存映射的读锁。所以，因为这个锁有可能把写事务给阻塞。</p>
 
-<div class="np"><a href=/posts/cs/linux/fix-bad-init/>← initramfs中的init进程系统启动失败</a> <a></a></div>
+<div class="np"><a href=/posts/cs/linux/fix-bad-init/>← initramfs中的init进程系统启动失败</a> <a href=/posts/cs/db/mysql-servertimezone/>mysql连接中的serverTimezone参数解析 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

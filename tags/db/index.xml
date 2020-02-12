@@ -8,10 +8,21 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Sun, 19 Jan 2020 11:39:24 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 12 Feb 2020 10:41:51 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/tags/db/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>mysql连接中的serverTimezone参数解析</title>
+      <link>http://zjykzk.github.io/posts/cs/db/mysql-servertimezone/</link>
+      <pubDate>Wed, 12 Feb 2020 10:41:51 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/posts/cs/db/mysql-servertimezone/</guid>
+      <description>在mysql连接的选项中参数serverTimezone用来指定服务器的时区.它的作用主要用于当我们传递时间类型的参数以及获取时间类型的数值时,转换成程序运行所在环境的时区所对应的时间.注意:如果传递字符串是没问题的,因为jdbc会把参数都转成字符串类型的sql传递到服务区上去.
+如果不指定的情况下,会通过连接获取mysq服务器上面的时区.先获取变量time_zone值,如果是SYSTEM,就获取system_time_zone的值.参考代码:com.mysql.cj.protocol.a.NativeProtocol.configureTimezone.
+因此,关于system_time_zone值的设置的目的是为了解决你写入和读取的时间值一致性.如果你是读别人写的数据,那么需要把它设置成写入的时候指定的时区.</description>
+    </item>
     
     <item>
       <title>bolt源码分析</title>

@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://zjykzk.github.io/posts/cs/db/mysql-servertimezone/</loc>
+    <lastmod>2020-02-12T10:41:51+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/posts/cs/db/bolt/</loc>
     <lastmod>2020-01-19T11:39:24+08:00</lastmod>
   </url>
@@ -203,13 +208,13 @@
   
   <url>
     <loc>http://zjykzk.github.io/categories/cs/</loc>
-    <lastmod>2020-01-19T11:39:24+08:00</lastmod>
+    <lastmod>2020-02-12T10:41:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://zjykzk.github.io/tags/db/</loc>
-    <lastmod>2020-01-19T11:39:24+08:00</lastmod>
+    <lastmod>2020-02-12T10:41:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -244,13 +249,13 @@
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/categories/linux/</loc>
+    <loc>http://zjykzk.github.io/tags/linux/</loc>
     <lastmod>2020-01-14T11:11:37+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://zjykzk.github.io/tags/linux/</loc>
+    <loc>http://zjykzk.github.io/categories/linux/</loc>
     <lastmod>2020-01-14T11:11:37+08:00</lastmod>
     <priority>0</priority>
   </url>
@@ -274,8 +279,14 @@
   </url>
   
   <url>
+    <loc>http://zjykzk.github.io/tags/mysql/</loc>
+    <lastmod>2020-02-12T10:41:51+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://zjykzk.github.io/posts/</loc>
-    <lastmod>2020-01-19T11:39:24+08:00</lastmod>
+    <lastmod>2020-02-12T10:41:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -323,7 +334,7 @@
   
   <url>
     <loc>http://zjykzk.github.io/</loc>
-    <lastmod>2020-01-19T11:39:24+08:00</lastmod>
+    <lastmod>2020-02-12T10:41:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
