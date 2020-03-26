@@ -12,37 +12,25 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>guava中RateLimiter的设计</strong>
-<hr> 
-
-<p>guava中的<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131">RateLimiter</a>实现了比较有意思的功能：</p>
-
+<hr> <p>guava中的<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131">RateLimiter</a>实现了比较有意思的功能：</p>
 <ol>
-<li>平滑。<br /></li>
-<li>记录未使用的信息。<br /></li>
-<li>保存下次请求被满足的时间。<br />
-<br /></li>
+<li>平滑。</li>
+<li>记录未使用的信息。</li>
+<li>保存下次请求被满足的时间。</li>
 </ol>
-
 <h2 id="平滑">平滑</h2>
-
 <p>通过令牌桶算法实现。</p>
-
 <h2 id="记录未使用信息">记录未使用信息</h2>
-
-<p>实现中通过<code>storedPermits</code>表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：<br />
-1. 资源充足。这个实现是Burst模式。<br />
-2. 资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。</p>
-
+<p>实现中通过<code>storedPermits</code>表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：</p>
+<ol>
+<li>资源充足。这个实现是Burst模式。</li>
+<li>资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。</li>
+</ol>
 <p><code>storedPermits</code>的计算公式：<code>min(maxPermits, timeNotUsedMicros/coolDownIntervalMicros())</code>，其中<code>coolDownIntervalMicros()</code>和<code>maxPermits</code>在不同模式下面计算方式不同。</p>
-
 <p><strong>Burst模式</strong></p>
-
 <p>当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。<code>storedPermits</code>代表的就是当前充足资源的数量。</p>
-
 <p>另外，<code>coolDownIntervalMicros()</code>返回<code>stableIntervalMicros</code>，<code>maxPermits</code>等于<code>permitsPerSecond</code>。</p>
-
 <p><strong>Warmup模式</strong></p>
-
 <pre><code>          ^ throttling
           |
     cold  +                  /
@@ -59,37 +47,32 @@ body{background:#faf9de;}
           |          .       .
         0 +----------+-------+--------------→ storedPermits
           0 thresholdPermits maxPermits
-</code></pre>
-
-<p>上图是warmup模式消耗<code>storedPermits</code>所需要时间的建模。<br />
-1. RateLimiter的状态是一条垂直线，包含两个信息：当前的<code>storedPermits</code>和被消耗时需要的时间。<br />
-2. 当RateLimiter没有被使用时，<code>storedPermits</code>向<code>maxPermits</code>增加，增速是<code>warmupPeriodMicro/maxPermits</code>。<br />
-3. 当RateLimiter被使用时，<code>storedPermits</code>向0减少，需要的时间是这个函数的积分。</p>
-
-<p>注意：<br />
-1. 这里<code>thresholdPermits</code>是任意值，源代码中假设<code>storedPermits</code>从<code>thresholdPermits</code>减少到0需要的时间为<code>warmupPeriod/2</code>。因此，<code>thresholdPermits=0.5*warmupPeriod/stableInterval</code>。<br />
-2. 另外，<code>storedPermits</code>从<code>maxPermits</code>减少到<code>thresholdPermits</code>需要的时间为<code>warmupPeriod</code>，因此<code>maxPermits=thresholdPermits + 2 * warmupPeriod / (stableInterval + coldInterval)</code>。</p>
-
-<p>当RateLimiter发现资源没有没使用一段时间以后，请求再来的时候，资源需要一个预热，这个过程中请求处理会比预热完以后有一个变化。这个变化的效果可以是快也可以是慢，这个是根据<code>coldFactor</code>来定义。当这个值分三种情况：<br />
-1. 等于1，相当于没有预热效果。<br />
-2. 小于1，表示在没有使用这段时间里面，资源会有一部分的囤积，可以较快处理请求。<br />
-3. 大于1，表示在没有使用这段时间里面，资源被回收，需要重新申请来处理请求，所以会比较慢。</p>
-
+</code></pre><p>上图是warmup模式消耗<code>storedPermits</code>所需要时间的建模。</p>
+<ol>
+<li>RateLimiter的状态是一条垂直线，包含两个信息：当前的<code>storedPermits</code>和被消耗时需要的时间。</li>
+<li>当RateLimiter没有被使用时，<code>storedPermits</code>向<code>maxPermits</code>增加，增速是<code>warmupPeriodMicro/maxPermits</code>。</li>
+<li>当RateLimiter被使用时，<code>storedPermits</code>向0减少，需要的时间是这个函数的积分。</li>
+</ol>
+<p>注意：</p>
+<ol>
+<li>这里<code>thresholdPermits</code>是任意值，源代码中假设<code>storedPermits</code>从<code>thresholdPermits</code>减少到0需要的时间为<code>warmupPeriod/2</code>。因此，<code>thresholdPermits=0.5*warmupPeriod/stableInterval</code>。</li>
+<li>另外，<code>storedPermits</code>从<code>maxPermits</code>减少到<code>thresholdPermits</code>需要的时间为<code>warmupPeriod</code>，因此<code>maxPermits=thresholdPermits + 2 * warmupPeriod / (stableInterval + coldInterval)</code>。</li>
+</ol>
+<p>当RateLimiter发现资源没有没使用一段时间以后，请求再来的时候，资源需要一个预热，这个过程中请求处理会比预热完以后有一个变化。这个变化的效果可以是快也可以是慢，这个是根据<code>coldFactor</code>来定义。当这个值分三种情况：</p>
+<ol>
+<li>等于1，相当于没有预热效果。</li>
+<li>小于1，表示在没有使用这段时间里面，资源会有一部分的囤积，可以较快处理请求。</li>
+<li>大于1，表示在没有使用这段时间里面，资源被回收，需要重新申请来处理请求，所以会比较慢。</li>
+</ol>
 <p>另外，<code>coolDownIntervalMicros()</code>返回<code>warmupPeriodMicro/maxPermits</code>。这是一个任意值，没有理论依据。</p>
-
 <h2 id="保存下次请求被满足的时间">保存下次请求被满足的时间</h2>
-
 <p>这样做的好处是，可以比较方便判断在一段时间内，多个资源是否被满足的逻辑。permit的使用来源于两个地方：一段时间未使用而累积的<code>storedPermits</code>，以及一段时间以后才能满足的，假设用<code>freshPermits</code>表示。在不同模式下面消耗<code>storedPermits</code>和<code>freshPermits</code>需要的时间是不一样的。总的公式：<code>freshPermits * stableIntervalMicros + storedPermitsToWaitTime(storedPermits,permitsToTake)</code>，其中<code>storedPermitsToWaitTime(...)</code>在不同模式下面，实现方式不一样。</p>
-
 <p><strong>Burst模式</strong></p>
-
 <p>在这个模式下面，<code>storedPermitsToWaitTime(storedPermits,permitsToTake)</code>返回值是0。</p>
-
 <p><strong>Warmup模式</strong></p>
-
 <p><code>storedPermitsToWaitTime(storedPermits,permitsToTake)</code>返回的是建模函数在<code>storedPermits,permitsToTake</code>之间的积分（图像面积）。</p>
 
-<div class="np"><a href=/posts/cs/dist/rate-limit/>← 限流</a> <a href=/posts/cs/dist/circuit-breaker/>熔断 →</a></div>
+<div class="np"><a href=/posts/cs/dist/circuit-breaker/>← 熔断</a> <a href=/posts/cs/dist/rate-limit/>限流 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

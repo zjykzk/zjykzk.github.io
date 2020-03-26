@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Linux on 老K随笔</title>
+    <title>linux on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/linux/</link>
-    <description>Recent content in Linux on 老K随笔</description>
+    <description>Recent content in linux on 老K随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
@@ -20,8 +20,8 @@
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/linux/fix-bad-init/</guid>
       <description>缘起 执行系统全量更新数据yay -Syu，更新了以下软件：
-upgraded grub (2:2.04-4 -&amp;gt; 2:2.04-5) upgraded libjpeg-turbo (2.0.3-1 -&amp;gt; 2.0.4-1) upgraded imagemagick (7.0.9.10-1 -&amp;gt; 7.0.9.13-1) upgraded libarchive (3.4.0-3 -&amp;gt; 3.4.1-1) upgraded libmagick6 (6.9.10.80-1 -&amp;gt; 6.9.10.83-1) upgraded linux (5.4.6.arch3-1 -&amp;gt; 5.4.7.arch1-1) upgraded linux-headers (5.4.6.arch3-1 -&amp;gt; 5.4.7.arch1-1) upgraded marisa (0.2.5-5 -&amp;gt; 0.2.5-7) upgraded opencl-nvidia (440.44-1 -&amp;gt; 440.44-2) upgraded openvpn (2.4.8-1 -&amp;gt; 2.4.8-3) upgraded s-nail (14.9.15-3 -&amp;gt; 14.9.16-1)  系统重启，启动失败。显示：
-[Firmware Bug]: TSC_DEADLINE disabled due to Errata; please update microcode to version: 0x22 (or later)  解决 google结果提示安装intel-ucode。烧个live cd进去执行命令pacman -S intel-ucode安装完毕，重启。失败，显示：</description>
+upgraded grub (2:2.04-4 -&amp;gt; 2:2.04-5) upgraded libjpeg-turbo (2.0.3-1 -&amp;gt; 2.0.4-1) upgraded imagemagick (7.0.9.10-1 -&amp;gt; 7.0.9.13-1) upgraded libarchive (3.4.0-3 -&amp;gt; 3.4.1-1) upgraded libmagick6 (6.9.10.80-1 -&amp;gt; 6.9.10.83-1) upgraded linux (5.4.6.arch3-1 -&amp;gt; 5.4.7.arch1-1) upgraded linux-headers (5.4.6.arch3-1 -&amp;gt; 5.4.7.arch1-1) upgraded marisa (0.2.5-5 -&amp;gt; 0.2.5-7) upgraded opencl-nvidia (440.44-1 -&amp;gt; 440.44-2) upgraded openvpn (2.4.8-1 -&amp;gt; 2.4.8-3) upgraded s-nail (14.9.15-3 -&amp;gt; 14.9.16-1) 系统重启，启动失败。显示：
+[Firmware Bug]: TSC_DEADLINE disabled due to Errata; please update microcode to version: 0x22 (or later) 解决 google结果提示安装intel-ucode。烧个live cd进去执行命令pacman -S intel-ucode安装完毕，重启。失败，显示：</description>
     </item>
     
     <item>
@@ -31,11 +31,7 @@ upgraded grub (2:2.04-4 -&amp;gt; 2:2.04-5) upgraded libjpeg-turbo (2.0.3-1 -&am
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/linux/open-file-progress/</guid>
       <description>linux的VFS包含4个重要概念：
-1. superblock，包含文件系统的信息，管理整个文件系统。
-2. inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。
-3. dentry，目录项，代表路径中的每个部分，包含文件路径到inode的映射。
-4. file，文件，是文件在进程中的表示。
-同时，在linux中一切兼文件，包括目录。目录的内容是文件名和inode号。
+ superblock，包含文件系统的信息，管理整个文件系统。 inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。 dentry，目录项，代表路径中的每个部分，包含文件路径到inode的映射。 file，文件，是文件在进程中的表示。  同时，在linux中一切兼文件，包括目录。目录的内容是文件名和inode号。
 当打开一个文件/bin/vim，系统首先把路径分解成/、bin、vim，根据dentry查vim的inode，如果dentry还没有bin，会根据superblock中根目录的inode号得到它的子目录信息，其中就有bin和它的inode，并把它放到dentry中，然后根据bin的内容找到vim的inode。最终，返回一个文件描述符（file descriptor）。</description>
     </item>
     

@@ -13,60 +13,50 @@ body{background:#faf9de;}
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>vim常用操作</strong>
 <hr> <ol>
-<li><p>在命令模式使用函数</p>
-
+<li>在命令模式使用函数</li>
+</ol>
 <pre><code>:%s/ab(.*)c/\=submatch(1) . 'test'/gc
-</code></pre></li>
-
-<li><p>窗口间切换</p>
-
+</code></pre><ol start="2">
+<li>窗口间切换</li>
+</ol>
 <pre><code>跳转至某个窗口：窗口number + c-w + w：
 跳至当前位置的左边某个窗口：c-w &lt;number&gt;h
 跳至当前位置的右边某个窗口：c-w &lt;number&gt;l
 跳至当前位置的上边某个窗口：c-w &lt;number&gt;j
 跳至当前位置的下边某个窗口：c-w &lt;number&gt;k
-</code></pre></li>
-
-<li><p>全文缩进</p>
-
+</code></pre><ol start="3">
+<li>全文缩进</li>
+</ol>
 <pre><code>gg=G
-</code></pre></li>
-
-<li><p>把数字替换成原来的数字减一</p>
-
+</code></pre><ol start="4">
+<li>把数字替换成原来的数字减一</li>
+</ol>
 <pre><code>:%s/(\d+)/\=submatch(1)-1/gc
-</code></pre></li>
-
-<li><p>移动屏幕</p>
-
+</code></pre><ol start="5">
+<li>移动屏幕</li>
+</ol>
 <pre><code>H // 把当前行的位置移到最上面
 M // 把当前行的位置移到屏幕中间
 L // 把当前的位置移到屏幕底部
-</code></pre></li>
-
-<li><p>全局操作<code>g</code></p>
-
+</code></pre><ol start="6">
+<li>全局操作<code>g</code></li>
+</ol>
 <pre><code>:{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果
-</code></pre></li>
-
-<li><p>移动窗口</p>
-
+</code></pre><ol start="7">
+<li>移动窗口</li>
+</ol>
 <pre><code>CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签
-</code></pre></li>
-
-<li><p>跳到某个字符的左（右）边</p>
-
+</code></pre><ol start="8">
+<li>跳到某个字符的左（右）边</li>
+</ol>
 <pre><code>t{char} // 跳转到左边
 T{char} // 跳转到右边
-</code></pre></li>
-
-<li><p>在vim8的终端滚动</p>
-
-<pre><code>Ctrl-w N
-</code></pre></li>
+</code></pre><ol start="9">
+<li>在vim8的终端滚动</li>
 </ol>
-
-<div class="np"><a href=/posts/cs/jit/>← jit的基本原理以及实现</a> <a href=/posts/buddhism/dazuo/>打坐感悟 →</a></div>
+<pre><code>Ctrl-w N
+</code></pre>
+<div class="np"><a href=/posts/buddhism/dazuo/>← 打坐感悟</a> <a href=/posts/cs/jit/>jit的基本原理以及实现 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

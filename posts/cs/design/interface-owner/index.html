@@ -13,41 +13,27 @@ body{background:#faf9de;}
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>接口在哪里定义？</strong>
 <hr> <p>接口放在哪里决定了源代码依赖问题。因此，依赖是接口定义唯一考量，其他问题都可以归结为依赖问题，而定义的包永远是被依赖包。</p>
-
 <p>接口定义的位置有三种情况：</p>
-
 <ol>
-<li>使用者<br /></li>
-<li>实现者<br /></li>
-<li>单独一个第三方位置<br />
-<br /></li>
+<li>使用者</li>
+<li>实现者</li>
+<li>单独一个第三方位置</li>
 </ol>
-
 <p><strong>放在使用者这边</strong>，那么实现者依赖使用者的接口定义。</p>
-
 <p><strong>好处</strong>：可以并行开发，尤其是类似golang这样的语言，实现一接口不需要引用具体的接口定义，即使在必须引用的开发语言里面也只需要实现相关的接口，集成的时候加上是很简单的。</p>
-
 <p><strong>坏处</strong>：在实现者依赖接口定义源代码的情况下，实现者代码要提出来重用，必须要得要包含使用者的接口定义</p>
-
 <p>这样的方式比较适合多个使用者，单个实现者的情况。</p>
-
 <p><strong>放在实现者这边</strong>，那么使用者依赖实现者的接口定义。</p>
-
 <p><strong>好处</strong>：实现者是一个独立的包，可以很方便的重用。</p>
-
 <p><strong>坏处</strong>：使用者开发的时候需要引用实现者的接口定义，增加并行开发的难度，这里可以自己mock接口，集成的时候改成实现者的接口即可。</p>
-
 <p>这样的方式适合单个使用者，多个实现者情况。</p>
-
 <p><strong>单独放在第三方位置</strong></p>
-
 <p><strong>好处</strong>：定义完接口以后，使用者和实现者都可以并行开发，同时实现者包的重用和使用者解耦。</p>
-
 <p><strong>坏处</strong>：包的管理变得复杂，包含接口的包会变得很薄</p>
-
 <p>这样的方式适合多个使用者，多个实现者情况。</p>
+<h2 id="heading"></h2>
 
-<div class="np"><a href=/posts/cs/design/soild/>← 常用面向对象设计原则</a> <a href=/posts/cs/mongodb/>mongodb索引 →</a></div>
+<div class="np"><a href=/posts/cs/mongodb/>← mongodb索引</a> <a href=/posts/cs/design/soild/>常用面向对象设计原则 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

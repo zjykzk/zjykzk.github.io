@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on 老K随笔</title>
@@ -8,22 +8,13 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Sun, 04 Feb 2018 17:13:52 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 12 Feb 2020 10:41:51 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Buddhism</title>
-      <link>http://zjykzk.github.io/categories/buddhism/</link>
-      <pubDate>Sun, 04 Feb 2018 17:13:52 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/categories/buddhism/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Cs</title>
+      <title>cs</title>
       <link>http://zjykzk.github.io/categories/cs/</link>
       <pubDate>Wed, 12 Feb 2020 10:41:51 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
@@ -32,11 +23,20 @@
     </item>
     
     <item>
-      <title>Linux</title>
+      <title>linux</title>
       <link>http://zjykzk.github.io/categories/linux/</link>
       <pubDate>Tue, 14 Jan 2020 11:11:37 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/categories/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>buddhism</title>
+      <link>http://zjykzk.github.io/categories/buddhism/</link>
+      <pubDate>Sun, 04 Feb 2018 17:13:52 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/categories/buddhism/</guid>
       <description></description>
     </item>
     

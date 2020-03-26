@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Cs on 老K随笔</title>
+    <title>cs on 老K随笔</title>
     <link>http://zjykzk.github.io/categories/cs/</link>
-    <description>Recent content in Cs on 老K随笔</description>
+    <description>Recent content in cs on 老K随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
@@ -34,8 +34,9 @@
 数据结构 bolt使用的数据结构按照数据保存的位置划分两类：内存和磁盘。
 内存中的数据结构核心是B+树，它根据key组织在一起。B+树中的每个结点，对应数据结构node，其中的内部信息通过数据结构inode来描述。内存中其他主要数据结构还包括meta和freelist。
 描述磁盘中的数据结构是page，它的数据来自于node、meta或者freelist。对应者一块内存，大小为os的page size的倍数。
-node type node struct { bucket *Bucket // 这个结点所在的的bucket isLeaf bool // 是否是叶子结点 unbalanced bool // 是否平衡，删除的时候做标记 spilled bool // 是否已经分裂 key []byte // 对应着第一个inode中的key pgid pgid // 所在页的id parent *node // 父结点 children nodes // 子结点 inodes inodes // 结点中key或者key&amp;amp;value，如果是分支结点只有key，叶子结点还有value }  inode 通过branchPageElement或者leafPageElement来获取数据。
-type inode struct { flags uint32 // 标记，用来区分支结点和叶子结点 pgid pgid // 所在页的id key []byte value []byte }  page 代表一个页或者连续的几个页。</description>
+node type node struct { bucket *Bucket // 这个结点所在的的bucket isLeaf bool // 是否是叶子结点 unbalanced bool // 是否平衡，删除的时候做标记 spilled bool // 是否已经分裂 key []byte // 对应着第一个inode中的key pgid pgid // 所在页的id parent *node // 父结点 children nodes // 子结点 inodes inodes // 结点中key或者key&amp;amp;value，如果是分支结点只有key，叶子结点还有value } inode 通过branchPageElement或者leafPageElement来获取数据。
+type inode struct { flags uint32 // 标记，用来区分支结点和叶子结点 pgid pgid // 所在页的id key []byte value []byte } page 代表一个页或者连续的几个页。
+type page struct { id pgid // 64位的id flags uint16 // 页的标记，表示存储的数据类型，包括分支、叶子，元数据和描述空闲页的数据 count uint16 // 包含数据的元素个数 overflow uint32 // 后面还有的页数 ptr uintptr // 只是一个标记字段，标记数据的起始位置 } bucketPageElement B+树中分支结点保存的数据元信息。</description>
     </item>
     
     <item>
@@ -67,10 +68,37 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/golang/sync.map/</guid>
       <description>golang的SDK中提供线程安全的map实现sync.Map。它是针对RWMutex+map的实现方案中存在cache line的false share提出来的。主要适用于两个场景：
- 针对一个key一次写多次读。
- 多个goroutine并发读写修改的key是没有交集。
-  在这两种情况下，相比一个Mutex或者RWMutex加上普通的map，锁的竞争要少的多。那为什么呢？
+ 针对一个key一次写多次读。 多个goroutine并发读写修改的key是没有交集。  在这两种情况下，相比一个Mutex或者RWMutex加上普通的map，锁的竞争要少的多。那为什么呢？
 数据结构 type Map struct { mu Mutex // read contains the portion of the map&#39;s contents that are safe for // concurrent access (with or without mu held). // // The read field itself is always safe to load, but must only be stored with // mu held. // // Entries stored in read may be updated concurrently without mu, but updating // a previously-expunged entry requires that the entry be copied to the dirty // map and unexpunged with mu held.</description>
+    </item>
+    
+    <item>
+      <title>网关</title>
+      <link>http://zjykzk.github.io/posts/cs/network/gate/</link>
+      <pubDate>Tue, 30 Apr 2019 19:18:23 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/posts/cs/network/gate/</guid>
+      <description>解决跨网段访问。
+发包的目的地址和本机地址不在同一个网段的时候就会把包发给网关。网关把MAC头和IP头拿下来，根据IP地址和路由规则决定发往哪个结点。
+网关一般是路由器。
+路由方式  192.168.1.1/24|====| 192.168.56.1/24 192.168.56.2/24 |====| 192.168.4.1/24 +----------&amp;gt;| G1 |-----------------------------------&amp;gt;| G2 |--------+ | |====| |====| | | V |--+--| |--+--| | A | 192.168.1.101/24 | B | 192.168.4.101/24 |--+--| |--+--| 静态路由
+路由器配置跳转规则。它不修改IP地址，只修改MAC地址。这种类型的网关叫转发网关。
+A向B发消息的链路为：
+A-&amp;gt;G1-&amp;gt;G2-&amp;gt;B.
+A-&amp;gt;G1的地址内容：
+ MAC源地址：A的MAC地址。 MAC目的地址：G1中192.168.1.1网口的MAC地址。 IP源地址：192.168.1.101。 IP目的地址：192.168.4.101。
+ G1-&amp;gt;G2的地址内容：
+ MAC源地址：G1中192.168.56.1网口的地址。 MAC目的地址：G2中192.168.56.2网口的地址。 IP源地址：192.168.1.101。 IP目的地址：192.168.4.101。
+ G2-&amp;gt;B的地址内容：
+ MAC源地址：G2中192.168.4.1网口的地址。 MAC目的地址：B的MAC地址。 IP源地址：192.168.1.101。 IP目的地址：192.168.4.101。
+ 问题：
+不同局域网内的ip地址会冲突。比如，你需要访问的地址和你局域网内的地址是一样的。怎么办，看看动态路由！
+动态路由
+路由器同样需要配置跳转规则。为了解决静态路由的问题，需要内网机器一个不会冲突的ip地址，这个地址保证了在外面不会冲突外，为了区分局域网地址，这个地址叫外网地址。这样访问另外一台内网机器的时候，ip地址是外网地址。它需要它会同时修改IP地址和MAC地址，这样才能把数据发回来。这种类型的网关叫NAT网关。
+A向B发消息的链路为：
+A-&amp;gt;G1-&amp;gt;G2-&amp;gt;B.
+A-&amp;gt;G1的地址内容：
+ MAC源地址：A的MAC地址。 MAC目的地址：G1中192.168.1.1网口的MAC地址。 IP源地址：192.168.1.101。 IP目的地址：192.168.56.2。</description>
     </item>
     
     <item>
@@ -79,19 +107,16 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
       <pubDate>Fri, 19 Apr 2019 16:19:31 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/select-tech/</guid>
-      <description>因数 项目因数 规模 小：可以选用新技术
-大：使用成熟技术
-时间 紧：买商用的
-宽裕：自己搞
-成本 有钱：买现成的
-没钱：自己撸
+      <description>因数 项目因数 规模 小：可以选用新技术 大：使用成熟技术
+时间 紧：买商用的 宽裕：自己搞
+成本 有钱：买现成的 没钱：自己撸
 非功能性需求 高并发、低延迟、高可用、数据一致性、安全性。
 团队因数 当前团队成员的技术栈 选大家都熟悉的：方便开发，排查问题。
 领导需要前瞻性。
 分析和实验 征求团队意见，大家讨论分析实验。
 版权因数 选择合适的开源协议的软件：GPL/BSD/LGPL。考虑因数：商用、闭源、修改。
 技术因数 标准功能 我们需要的功能，比如说我们需要一个MQ，标准功能就是发拉消息，pub/sub。
-非标准功能 table{border-collapse:collapse;}table,td,th{border:1px solid #000}td{text-align:center}    特性 描述     可伸缩性 产品在性能上必须能容易且有效地伸缩以满足业务需求增长的需求。   灵活性 产品必须易于适应新的需求。   可操作性 产品必须被设计成易于与共享的数据和广泛可得的系统通讯。   可扩展性 产品功能必须在供应商很少介入的情况下能够定制和快速地增强。   可使用性 只需很少的培训就能使让顾客使用产品和他的任何特性，产品应该被设计成其目标使用者的技术水平很匹配。   高效率 产品应能在各种性能水平上工作，能够应付应用对效率的要求。   可靠性 产品必须有被证实可在预定环境中工作的功能与特性。   可管理性 产品必须能被配置、部署、监控和优化以确保其在预定的环境中工作良好   安全 产品必须保护信息和事务的完整性   高可用 通常来描述一个系统经过专门的设计，从而减少停工时间，而保持其服务的高度可用性。    技术标准</description>
+非标准功能    特性 描述     可伸缩性 产品在性能上必须能容易且有效地伸缩以满足业务需求增长的需求。   灵活性 产品必须易于适应新的需求。   可操作性 产品必须被设计成易于与共享的数据和广泛可得的系统通讯。   可扩展性 产品功能必须在供应商很少介入的情况下能够定制和快速地增强。   可使用性 只需很少的培训就能使让顾客使用产品和他的任何特性，产品应该被设计成其目标使用者的技术水平很匹配。   高效率 产品应能在各种性能水平上工作，能够应付应用对效率的要求。   可靠性 产品必须有被证实可在预定环境中工作的功能与特性。   可管理性 产品必须能被配置、部署、监控和优化以确保其在预定的环境中工作良好   安全 产品必须保护信息和事务的完整性   高可用 通常来描述一个系统经过专门的设计，从而减少停工时间，而保持其服务的高度可用性。    技术标准</description>
     </item>
     
     <item>
@@ -100,28 +125,14 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
       <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/ha/</guid>
-      <description> HA原理 RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：
- 等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。
- 大于0，从该值开始传输。
- 小于0，这种情况不存在。
-  所以，这里我们可以知道如果从结点已经就有数据情况，如果数据不是从主结点同步过来的，那么同步之后就会有问题了。比如说：从结点已经有10000条数据，同时某个topic，暂时就叫OLD_TOPIC的*消费队列0*长度1000。这个时候，主结点就会从第10000条数据开始同步，可能会发送几种情况：
- 主结点没有10000数据，那么就不会同步数据，造成从结点上面数据丢失。
- 主结点有超过10000数据，但是它的OLD_TOPIC的*消费队列0*的长度小于1000，那么同步过来的数据就会覆盖原来的数据。
-  所以，从结点的初始状态需要从0开始或者本来就是和主同步过的状态。因此，在删除topic的时候从结点要保证删除干净，不然从结点就会脏数据，影响消费。
+      <description>HA原理 RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：
+ 等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。 大于0，从该值开始传输。 小于0，这种情况不存在。  所以，这里我们可以知道如果从结点已经就有数据情况，如果数据不是从主结点同步过来的，那么同步之后就会有问题了。比如说：从结点已经有10000条数据，同时某个topic，暂时就叫OLD_TOPIC的消费队列0长度1000。这个时候，主结点就会从第10000条数据开始同步，可能会发送几种情况：
+ 主结点没有10000数据，那么就不会同步数据，造成从结点上面数据丢失。 主结点有超过10000数据，但是它的OLD_TOPIC的消费队列0的长度小于1000，那么同步过来的数据就会覆盖原来的数据。  所以，从结点的初始状态需要从0开始或者本来就是和主同步过的状态。因此，在删除topic的时候从结点要保证删除干净，不然从结点就会脏数据，影响消费。
 为什么这样同步不会有问题呢？
 那是因为同步的数据里面包含了具体消费队列ID，队列中的偏移量以及消息的偏移量，所以同步的时候能够写到同一个位置。
 主结点同步逻辑 发送一条消息的时候，在开启SYNC_MASTER情况下，需要四个线程合作才能完成消息的发送。
- SendMessageProcessor负责处理接收发送消息的请求并落盘（异步或者同步），接着向GroupTransferService发送等待同步完成的请求，然后等待知道超时或者GroupTransferService通知同步完成。同时，还会同时WriteSocketService有数据可以写了。
- WriteSocketService负责根据从结点上报的位置（变量slaveRequestOffset），不断的向从结点传输数据。同时会维护和从结点的一个心跳，如果一段时间没有通不过数据，就会发送一个消息头，包含当前同步的起始位置。
- GroupTransferService不断的轮询比较当前已经被从结点同步的最大偏移（变量push2SlaveMaxOffset）和SendMessageProcessor发送过来的请求中包含的偏移量，如果大于或者等于就会通知SendMessageProcessor。
- ReadSocketService负责读取从结点上报上来的同步偏移量。更新变量push2SlaveMaxOffset和slaveRequestOffset并通知GroupTransferService。从而，它也会影响WriteSocketService的行为。同时，它还维护着和从结点连接的过期工作，如果超过指定时间没有收到消息就会断开连接，同时会停止WriteSocketService。
-  从结点同步逻辑 从结点的同步逻辑相对简单主要做几件事情：
- 管理和主结点的连接，如果超过一段时间没有收到主点结点的数据，就会断开连接。这个时间戳保存在变量lastWriteTimestamp中，刚刚连接上主结点和从主结点读到数据都会更新该变量。
- 上报当前commitlog的最大偏移量，该行为会发生三个地方：a.写完一个消息；b.处理完当前收到的所有数据；c.一段时间内没有收到主结点的数据。
- 维护收到的数据。这里有两个接收数据的buffer，主要方便处理当一个buffer的空间用完以后处理剩余的消息。一个buffer的情况下，先拷贝到一个临时byte数据，然后再拷贝回去，需要两次内存拷贝。如果两个buffer只需要一次拷贝。
- 写消息。把从主结点同步过来的数据写到磁盘。收到数据的时候会判断主结点发过来的偏移量是否等于自己当前的偏移量如果不一样就会断开和主结点的连接。
- 任何从连接中读数据的时候如果有错误就会断开连接。
-  </description>
+ SendMessageProcessor负责处理接收发送消息的请求并落盘（异步或者同步），接着向GroupTransferService发送等待同步完成的请求，然后等待知道超时或者GroupTransferService通知同步完成。同时，还会同时WriteSocketService有数据可以写了。 WriteSocketService负责根据从结点上报的位置（变量slaveRequestOffset），不断的向从结点传输数据。同时会维护和从结点的一个心跳，如果一段时间没有通不过数据，就会发送一个消息头，包含当前同步的起始位置。 GroupTransferService不断的轮询比较当前已经被从结点同步的最大偏移（变量push2SlaveMaxOffset）和SendMessageProcessor发送过来的请求中包含的偏移量，如果大于或者等于就会通知SendMessageProcessor。 ReadSocketService负责读取从结点上报上来的同步偏移量。更新变量push2SlaveMaxOffset和slaveRequestOffset并通知GroupTransferService。从而，它也会影响WriteSocketService的行为。同时，它还维护着和从结点连接的过期工作，如果超过指定时间没有收到消息就会断开连接，同时会停止WriteSocketService。  从结点同步逻辑 从结点的同步逻辑相对简单主要做几件事情：
+ 管理和主结点的连接，如果超过一段时间没有收到主点结点的数据，就会断开连接。这个时间戳保存在变量lastWriteTimestamp中，刚刚连接上主结点和从主结点读到数据都会更新该变量。 上报当前commitlog的最大偏移量，该行为会发生三个地方：a.写完一个消息；b.处理完当前收到的所有数据；c.一段时间内没有收到主结点的数据。 维护收到的数据。这里有两个接收数据的buffer，主要方便处理当一个buffer的空间用完以后处理剩余的消息。一个buffer的情况下，先拷贝到一个临时byte数据，然后再拷贝回去，需要两次内存拷贝。如果两个buffer只需要一次拷贝。 写消息。把从主结点同步过来的数据写到磁盘。收到数据的时候会判断主结点发过来的偏移量是否等于自己当前的偏移量如果不一样就会断开和主结点的连接。 任何从连接中读数据的时候如果有错误就会断开连接。  </description>
     </item>
     
     <item>
@@ -131,37 +142,33 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/push-consumer/</guid>
       <description>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：
- DefaultMQPushConsumerImpl：拉消息的类型。
- ProcessQueue：保存拉出来的消息。
- PullMessageService：执行拉消息服务。
- ConsumeMessageService：消费消息服务。
- ReblanceService：负载均衡服务。
-  类关系
+ DefaultMQPushConsumerImpl：拉消息的类型。 ProcessQueue：保存拉出来的消息。 PullMessageService：执行拉消息服务。 ConsumeMessageService：消费消息服务。 ReblanceService：负载均衡服务。  类关系
 （真想吐槽！）
 执行过程
 DefaultMQPushConsumerImpl DefaultMQPushConsumerImpl实现了消费者的接口。同时是个启动者，通过它直接或间接启动了拉消息服务，消费消息服务。
 其中提供了一个重要的接口pullMessage。该接口的流程如下：
 在拉消息过程中，做了流控，防止拉的太快，消费的太慢。主要从三个方面检测：
- 从某个消费队列拉取的等待消费的消息数量。如果超过阀值，延迟50ms后再次拉取消息。阀值默认是1000。如果设置了topic级别的阀值（默认没有限制），在队列负载均衡以后会重新计算，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdForQueue和DefaultMQPushConsumerImpl.pullThresholdForTopic。
- 从某个消费队列拉取的等待消费的消息大小（只考虑body）。同样，超过阀值就会延迟50ms后再次拉取消息。阀值默认是100M。如果topic设置了级别（默认没有限制），队列负载均衡以后会重新计算队列的限制，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdSizeForQueue和DefaultMQPushConsumerImpl.pullThresholdSizeForTopic。
- 在并发消费模式下，从某个消费队列拉取的等待消费的消息中，在消费队列中的最大位置和最小位置之间差别。如果超过阀值，也会延迟50ms后再拉取消息。默认是2000，这里可能会存在误判。因为，有条件拉取消息的时候，是有可能出现同一个消费队列中拉到的两个消息在队列中的位置距离很远。
-  几个考虑：
- NO_NEW_MSG/NO_MATCHED_MSG情况下，correctTagsOffset的逻辑为什么需要考虑有没有消息？如果还有消息说明本地还没有消息没被消费，此时更新的offset是服务端返回的，存在比没有被消费的消息偏移量大的情况。
- OFFSET_ILLEAGL的情况下为什么要过10s以后才去更新offsetstore，保存offset，在reblance中移除process queue？出现这个问题是因为NO_MATCHED_LOGIC_QUEUE/NO_MESSAGE_IN_QUEUE/OFFSET_OVERFLOW_BADLY/OFFSET_TOO_SMALL这四种情况，而这些情况可能发生在服务端在恢复数据的时候，因此考虑是暂停消费这个队列。如果drop之后不延迟，就会有可能又去拉取消息了。
+ 从某个消费队列拉取的等待消费的消息数量。如果超过阀值，延迟50ms后再次拉取消息。阀值默认是1000。如果设置了topic级别的阀值（默认没有限制），在队列负载均衡以后会重新计算，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdForQueue和DefaultMQPushConsumerImpl.pullThresholdForTopic。 从某个消费队列拉取的等待消费的消息大小（只考虑body）。同样，超过阀值就会延迟50ms后再次拉取消息。阀值默认是100M。如果topic设置了级别（默认没有限制），队列负载均衡以后会重新计算队列的限制，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：DefaultMQPushConsumerImpl.pullThresholdSizeForQueue和DefaultMQPushConsumerImpl.pullThresholdSizeForTopic。 在并发消费模式下，从某个消费队列拉取的等待消费的消息中，在消费队列中的最大位置和最小位置之间差别。如果超过阀值，也会延迟50ms后再拉取消息。默认是2000，这里可能会存在误判。因为，有条件拉取消息的时候，是有可能出现同一个消费队列中拉到的两个消息在队列中的位置距离很远。  几个考虑：
+  NO_NEW_MSG/NO_MATCHED_MSG情况下，correctTagsOffset的逻辑为什么需要考虑有没有消息？如果还有消息说明本地还没有消息没被消费，此时更新的offset是服务端返回的，存在比没有被消费的消息偏移量大的情况。
+  OFFSET_ILLEAGL的情况下为什么要过10s以后才去更新offsetstore，保存offset，在reblance中移除process queue？出现这个问题是因为NO_MATCHED_LOGIC_QUEUE/NO_MESSAGE_IN_QUEUE/OFFSET_OVERFLOW_BADLY/OFFSET_TOO_SMALL这四种情况，而这些情况可能发生在服务端在恢复数据的时候，因此考虑是暂停消费这个队列。如果drop之后不延迟，就会有可能又去拉取消息了。
   ProcessQueue 保存push的消费者拉到的消息。同时，有序消费模式还记录了情况下正在消费的消息。
 PullMessageService PullMessageService只负责拉取消息，它会调用DefaultMQPushConsumerImpl.pullMessage。
 当ReblanceService执行负载均衡的时候如果发现被分配了新的消息队列就会最终调用PullMessage.executePullRequestImmediately执行拉取消息。代码执行路径：
-ReblanceService.run -&amp;gt;MQClientInstance.doReblance -&amp;gt;MQConsumerInnter.doReblance[DefaultMQPushConsumerImpl.doReblance] -&amp;gt;ReblanceImpl.doReblance -&amp;gt;ReblanceImpl.dispatchPullRequest[ReblancePushImpl.dispatchPullRequest] -&amp;gt;DefaultMQPushConsumerImpl.executePullRequestImmediately -&amp;gt;PullMessage.executePullRequestImmediately  另外，在DefaultMQPushConsumerImpl.pullMessage执行时，也会根据条件调用PullMessageService.executePullRequestImmediately、PullMessageService.executeTaskLater或者PullMessageService.executePullRequestLater触发拉取消息。
+ReblanceService.run -&amp;gt;MQClientInstance.doReblance -&amp;gt;MQConsumerInnter.doReblance[DefaultMQPushConsumerImpl.doReblance] -&amp;gt;ReblanceImpl.doReblance -&amp;gt;ReblanceImpl.dispatchPullRequest[ReblancePushImpl.dispatchPullRequest] -&amp;gt;DefaultMQPushConsumerImpl.executePullRequestImmediately -&amp;gt;PullMessage.executePullRequestImmediately 另外，在DefaultMQPushConsumerImpl.pullMessage执行时，也会根据条件调用PullMessageService.executePullRequestImmediately、PullMessageService.executeTaskLater或者PullMessageService.executePullRequestLater触发拉取消息。
 ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别在于提交消费任务逻辑，消费逻辑和处理消费结果的逻辑，以及对message queue的处理逻辑。另外，顺序消费是指在同一个消费队列里面的消息顺序消费。
 提交消费任务 并发消费：把消息分成多个批次并发处理，一批多少个消息是自定义的，默认是1。如果提交异常，则延迟5s后提交。
 顺序消费：依赖于process queue是否正在被消费，这样避免同时消费多个不同的消息，不然就没法保证有序了。
-消费逻辑 下图中左边是*并发消费*，右边是*顺序消费*。
+消费逻辑 下图中左边是并发消费，右边是顺序消费。
 消费消息的时候，在可能停顿的执行点上面都加上了process queue是否已经drop的检查。
 因为提交任务的方式不一样导致了不同模式下面消费逻辑的差别。
 并发消费：只考虑当前的消息即可。
 顺序消费：从process queue中取消息。消费的时候需要确保：
- 每个消费队列某一时候只有一个消费请求被执行。
- 每个消费队列某一时刻只有一个地方在执行用户的消费逻辑。</description>
+ 每个消费队列某一时候只有一个消费请求被执行。 每个消费队列某一时刻只有一个地方在执行用户的消费逻辑。  以上两个条件中只要一个条件不满足，就没法保证消息顺序消费。另外，第一个逻辑需要的锁，是因为消费慢，同时队列被分配别的消费者，在消费结束之前又分配回来了，就有可能导致1条件不满足，所以需要加锁。在代码层面第一个逻辑需要的锁已经确保了第二个逻辑。消费之前需要锁的原因是为了避免，用户还在消费的时候向broker解锁。
+锁的逻辑
+只有message queue被锁住了才能消费。客户端向服务端发送锁的请求成功以后才算锁成功。同时锁会有一个过期时间。在客户端这边定时向broker发送锁的请求，所得粒度是group+clientID，过期时间是30s。在服务端这边，锁了的过期时间是60s，这个时间以后能够接收其他锁的请求。
+在负载均衡的时候，检查一个消费队列发现不属于自己或者长时间没有拉的时候就会把这个消费队列移除掉。移除的逻辑比较有意思，为了确保这个消费队列正在被消费不会被移除，这里使用了一个消费锁。移除的时候尝试获得这个锁，如果超过1s还没有获得就会等待下一次负载均衡的检查，如果获得了锁就会延迟20s再向broker发送解锁请求。这里的延迟，有个效果就是可能这时候已经向broker发送了拉消息的请求，如果在它返回之前又把队列分配给自己了，那么就有可能两个触发一个拉消息的请求，这个时候就会同时有两个拉消息的请求，那么拉出来重复的消息。
+处理消费结果 下图中左边是并发消费，右边是顺序消费。
+处理消费结果的逻辑主要是处理消费失败的消息。</description>
     </item>
     
     <item>
@@ -170,19 +177,18 @@ ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别�
       <pubDate>Fri, 28 Dec 2018 16:03:51 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/offset/</guid>
-      <description> 作用 记录每个消费队列的消费进度。以topic，group为单位。
+      <description>作用 记录每个消费队列的消费进度。以topic，group为单位。
 类型 根据保存的位置可以分为本地和远程两种类型。本地类型就是以文本文件的形式保存在客户端，内容是非正式的json数据，而远程类型是指数据保存在broker服务器上面，内容同样是非正式的json数据。
 代码
-本地类型：org.apache.rocketmq.client.consumer.store.LocalFileOffsetStore。
-远程类型：org.apache.rocketmq.client.consumer.store.RemoteBrokerOffsetStore。
+本地类型：org.apache.rocketmq.client.consumer.store.LocalFileOffsetStore。 远程类型：org.apache.rocketmq.client.consumer.store.RemoteBrokerOffsetStore。
 使用
-默认情况，当消费模式是*广播*的时候使用*本地类型*，因为每个消费者管理自己的进度，而且是所有消费队列的进度，各个消费者之间也不会有消费进度的交集。当消费模式是*集群*的时候使用*远程类型*，因为消息被多个消费者消费，每个消费者只负责消费其中部分消费队列，在添加、删除消费者的时候，原来消费者负责的消费队列会动态变化，因此需要集中管理消费进度，不然就冲突了。
+默认情况，当消费模式是广播的时候使用本地类型，因为每个消费者管理自己的进度，而且是所有消费队列的进度，各个消费者之间也不会有消费进度的交集。当消费模式是集群的时候使用远程类型，因为消息被多个消费者消费，每个消费者只负责消费其中部分消费队列，在添加、删除消费者的时候，原来消费者负责的消费队列会动态变化，因此需要集中管理消费进度，不然就冲突了。
 但是，代码中依然提供了接口，让用户自己指定类型，比如可以保存数据到monogodb。
 存储 本地类型
 数据保存在$storeDir/.rocketmq_offsets/$clientID/$group/offsets.json中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。其中$storeDir是可以通过系统变量rocketmq.client.localOffsetStoreDir配置，如果没有指定参数就使用HOME目录。$clientID和$group分别表示消费者的id和分组。
-// example {&amp;quot;offsetTable&amp;quot;:{{&amp;quot;brokerName&amp;quot;:&amp;quot;topic&amp;quot;,&amp;quot;queueId&amp;quot;:1,&amp;quot;topic&amp;quot;:&amp;quot;broker&amp;quot;}:0}}  远程类型
+// example {&amp;quot;offsetTable&amp;quot;:{{&amp;quot;brokerName&amp;quot;:&amp;quot;topic&amp;quot;,&amp;quot;queueId&amp;quot;:1,&amp;quot;topic&amp;quot;:&amp;quot;broker&amp;quot;}:0}} 远程类型
 数据保存在$rootPath/config/consumerOffset.json文件中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。offsetTable中的key格式是topic@group，value格式queueID:offset。
-// example { &amp;quot;offsetTable&amp;quot;:{ &amp;quot;test@benchmark_consumer_61&amp;quot;:{ 0:5280,1:5312,2:5312,3:5312 } } }  接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
+// example { &amp;quot;offsetTable&amp;quot;:{ &amp;quot;test@benchmark_consumer_61&amp;quot;:{ 0:5280,1:5312,2:5312,3:5312 } } } 接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
 load
 在消费者启动的时候，需要把消费进度载入内存。只有本地类型会载入数据。
 updateOffset
@@ -198,10 +204,7 @@ removeOffset
 updateConsumeOffsetToBroker
 更新消费队列到broker服务，只有远程类型实现了该接口。（这个设计好尴尬，本地类型需要么。。。）
 管理 org.apache.rocketmq.client.impl.consumer.RebalanceImpl.updateProcessQueueTableInRebalance做消费的负载均衡时，会对消费进度做管理。这个过程通过对比新分配的消费队列（简称新队列）和org.apache.rocketmq.client.impl.consumer.RebalanceImpl.processQueueTable维护的消费队列（简称旧队列），有几种情况：
- 如果旧队列的消费队列不在新队列中，那么就会先持久化该队列的消费进度，再做删除操作。push模式同时优势有序的集群消费还需要做外的事情。
- 如果如果旧队列的消费队列在新队列中，push模式下检查是否过期，过期的化先持久化，再删除进度。
- 如果新队列的消费队列不在旧队列中，删除消费进度。本地模式不会做删除操作，远程模式会把内存中的消费进度删除掉。同时，push模式下面会从存储中拉取消费进度并保存到内存。
-  </description>
+ 如果旧队列的消费队列不在新队列中，那么就会先持久化该队列的消费进度，再做删除操作。push模式同时优势有序的集群消费还需要做外的事情。 如果如果旧队列的消费队列在新队列中，push模式下检查是否过期，过期的化先持久化，再删除进度。 如果新队列的消费队列不在旧队列中，删除消费进度。本地模式不会做删除操作，远程模式会把内存中的消费进度删除掉。同时，push模式下面会从存储中拉取消费进度并保存到内存。  </description>
     </item>
     
     <item>
@@ -211,8 +214,8 @@ updateConsumeOffsetToBroker
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</guid>
       <description>来一个hello, world!。
-package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5  编译调试。
-# go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?</description>
+package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5 编译调试。
+# go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?? () (gdb) s 216 if atomic.</description>
     </item>
     
     <item>
@@ -245,11 +248,7 @@ package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 
 数量上N+2，N表示需要正常服务的数量，多出两个的原因是考虑热备容灾下，如果发布会失败就会失去热备容灾的功能。而发布失败概率不小。
 互备的服务必须对等，避免一大一小，或者互相依赖。
 流量控制：
-1. 隔离互相冲突的请求。
-2. 把消耗资源的请求限制在固定几个结点，避免这类请求把资源都占住影响其他请求。
-3. 防止一些导致服务挂掉的请求，打到全部结点，就是挂了几台服务以后，把这个请求给屏蔽掉，这个比较难。
-参考 https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw
-https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31.png</description>
+ 隔离互相冲突的请求。 把消耗资源的请求限制在固定几个结点，避免这类请求把资源都占住影响其他请求。 防止一些导致服务挂掉的请求，打到全部结点，就是挂了几台服务以后，把这个请求给屏蔽掉，这个比较难。  参考 https://mp.weixin.qq.com/s/7nfSvxZ4vJAxpIN5rCdaCw https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31.png</description>
     </item>
     
     <item>
@@ -259,11 +258,7 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/linux/open-file-progress/</guid>
       <description>linux的VFS包含4个重要概念：
-1. superblock，包含文件系统的信息，管理整个文件系统。
-2. inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。
-3. dentry，目录项，代表路径中的每个部分，包含文件路径到inode的映射。
-4. file，文件，是文件在进程中的表示。
-同时，在linux中一切兼文件，包括目录。目录的内容是文件名和inode号。
+ superblock，包含文件系统的信息，管理整个文件系统。 inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。 dentry，目录项，代表路径中的每个部分，包含文件路径到inode的映射。 file，文件，是文件在进程中的表示。  同时，在linux中一切兼文件，包括目录。目录的内容是文件名和inode号。
 当打开一个文件/bin/vim，系统首先把路径分解成/、bin、vim，根据dentry查vim的inode，如果dentry还没有bin，会根据superblock中根目录的inode号得到它的子目录信息，其中就有bin和它的inode，并把它放到dentry中，然后根据bin的内容找到vim的inode。最终，返回一个文件描述符（file descriptor）。</description>
     </item>
     
@@ -275,7 +270,7 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/slave-sync-from-master-disconnect/</guid>
       <description>缘起 封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。
 排查过程 查看boots-broker日志，发现问题日志：
-[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0  说明，RocketMQ处理发送消息比较慢。可是，从size of queue可以看出，堆积的消息为0。
+[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0 说明，RocketMQ处理发送消息比较慢。可是，从size of queue可以看出，堆积的消息为0。
 查看机器资源消耗情况，发现资源都是充裕的。
 查看RocketMQ日志，发现store.log中有异常，master中的store.log周期性的发生以下日志：
 2018-10-22 15:44:07 INFO AcceptSocketService - HAService receive new connection, /10.38.34.27:54052 2018-10-22 15:44:07 INFO ReadSocketService - ReadSocketService service started 2018-10-22 15:44:07 INFO WriteSocketService - WriteSocketService service started 2018-10-22 15:44:08 INFO WriteSocketService - WriteSocketService service end 2018-10-22 15:44:12 INFO ReadSocketService - slave[/10.38.34.27:54052] request offset 157843228 2018-10-22 15:44:12 INFO WriteSocketService - master transfer data from 157843228 to slave[/10.</description>
@@ -292,28 +287,10 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
 服务状态
 服务状态一般是通过记录请求失败的情况来表示，比如说服务因为文件句柄占用过多导致一致无法建立连接，从而请求失败，熔断器认为当前服务状态存在不可用情况。
 熔断器包含三个状态：
- 关闭（Closed）状态：在这个状态下，请求都会被转发给后端服务。同时会记录请求失败的次数，当请求失败次数在一段时间超过一定次数就会进入打开状态。另外，失败次数会在特定时间间隔内重置。最后，除了基于一段时间内失败次数这个条件以外还可以使用连续失败次数。
- 打开（Open）状态：在这个状态下，熔断器会直接拒绝请求，返回错误，而不去调用后端服务。同时，会有一个定时器，时间到的时候会变成半打开状态。目的假设服务会在一段时间内恢复正常。
- 半打开（Half Open）状态：在这个状态下，熔断器会尝试把部分请求转发给后端服务，目的是为了探测后端服务是否恢复。当请求失败的情况下会进入打开状态，成功情况下会进入关闭状态，同时重置计数。
-  设计重点 在设计过程中需要考虑以下几个点。
- 错误类型。后端服务会因为不同的问题返回不同的错误信息。针对不同的错误信息，熔断器可以采取不同的策略。比如说，针对限流错误，可以采用重试，如果连接拒绝大概率是服务宕机了，这中情况直接返回错误就可以了。另外，根据不同的错误类型可以使用不同的熔断条件，比如超时的threshold为10， 而连接拒绝的threshold值为3。
- 日志监控。熔断器记录状态变化以及失败的请求应该被记录下来。这些信息反应的服务质量。方便管理员进一步处理。
- 测试服务可用。在半打开状态下，可以通过定制的接口探测后端服务是否恢复，而不是用用户的请求来探测。可以提高服务的质量。
- 返回错误。返回给用户的错误，区分后端服务返回的错误和熔断器产生的错误。
- 手工重置。因为有时候后端服务恢复时间的不确定性，导致熔断器判断失误。提供手工重置，可以方便熔断器的状态切换。
- 并发问题。熔断器需要做计数，多个请求之间存在数据竞争。需要避免熔断器自己的开销影响请求的响应时间。可以采用无锁计数实现。
- 资源区分。有时候，资源是分布在不同的服务器上，是独立。最好，熔断器对请求也做资源区分，针对在不同资源请求做熔断，不然一个资源有问题会影响其他资源的访问。
- 重试错误的请求。有时候，错误和请求的参数有关系。把这部分请求记录下来，可以准备探测后端服务是否恢复。但是要做好重复请求的处理，比如幂等。
-  实现 Netflix中的Hystrix有一个完整的实现。
+ 关闭（Closed）状态：在这个状态下，请求都会被转发给后端服务。同时会记录请求失败的次数，当请求失败次数在一段时间超过一定次数就会进入打开状态。另外，失败次数会在特定时间间隔内重置。最后，除了基于一段时间内失败次数这个条件以外还可以使用连续失败次数。 打开（Open）状态：在这个状态下，熔断器会直接拒绝请求，返回错误，而不去调用后端服务。同时，会有一个定时器，时间到的时候会变成半打开状态。目的假设服务会在一段时间内恢复正常。 半打开（Half Open）状态：在这个状态下，熔断器会尝试把部分请求转发给后端服务，目的是为了探测后端服务是否恢复。当请求失败的情况下会进入打开状态，成功情况下会进入关闭状态，同时重置计数。  设计重点 在设计过程中需要考虑以下几个点。
+ 错误类型。后端服务会因为不同的问题返回不同的错误信息。针对不同的错误信息，熔断器可以采取不同的策略。比如说，针对限流错误，可以采用重试，如果连接拒绝大概率是服务宕机了，这中情况直接返回错误就可以了。另外，根据不同的错误类型可以使用不同的熔断条件，比如超时的threshold为10， 而连接拒绝的threshold值为3。 日志监控。熔断器记录状态变化以及失败的请求应该被记录下来。这些信息反应的服务质量。方便管理员进一步处理。 测试服务可用。在半打开状态下，可以通过定制的接口探测后端服务是否恢复，而不是用用户的请求来探测。可以提高服务的质量。 返回错误。返回给用户的错误，区分后端服务返回的错误和熔断器产生的错误。 手工重置。因为有时候后端服务恢复时间的不确定性，导致熔断器判断失误。提供手工重置，可以方便熔断器的状态切换。 并发问题。熔断器需要做计数，多个请求之间存在数据竞争。需要避免熔断器自己的开销影响请求的响应时间。可以采用无锁计数实现。 资源区分。有时候，资源是分布在不同的服务器上，是独立。最好，熔断器对请求也做资源区分，针对在不同资源请求做熔断，不然一个资源有问题会影响其他资源的访问。 重试错误的请求。有时候，错误和请求的参数有关系。把这部分请求记录下来，可以准备探测后端服务是否恢复。但是要做好重复请求的处理，比如幂等。  实现 Netflix中的Hystrix有一个完整的实现。
 流程如下：
- allowRequest()通过函数isOpen()判断是否处理请求。
- isOpen()判断逻辑：
- 如果熔断器处在打开状态，并且定时没到，返回false，请求处理完毕，否则进入半打开状态并返回true，走下一步。
- 如果最近一秒内失败率超过了某个百分比，返回false，请求处理完毕，否则返回true，走下一步。
- 返回true，走下一步。
-  markSuccess(duration)，表示请求处理成功，更新处理成功次数和处理时间，同时如果熔断器处于打开状态，那么需要重置计数，并把状态变成关闭状态。
- markFailure(duration)，表示请求处理失败，更新处理失败次数。
-  Hystrix维护了10个时间间隔为1秒的桶，用于记录请求处理结果成功、失败、超时、拒绝的数量。每过1秒就会创建一个新的桶，如果桶的数量超过10个，最旧的那个会被删除掉。</description>
+ allowRequest()通过函数isOpen()判断是否处理请求。 isOpen()判断逻辑：  如果熔断器处在打开状态，并且定时没到，返回false，请求处理完毕，否则进入半打开状态并返回true，走下一步。 如果最近一秒内失败率超过了某个百分比，返回false，请求处理完毕，否则返回true，走下一步。 返回true，走下一步。   markSuccess(duration)，表示请求处理成功，更新处理成功次数和处理时间，同时如果熔断器处于打开状态，那么需要重置计数，并把状态变成关闭状态。 markFailure(duration)，表示请求处理失败，更新处理失败次数。  Hystrix维护了10个时间间隔为1秒的桶，用于记录请求处理结果成功、失败、超时、拒绝的数量。每过1秒就会创建一个新的桶，如果桶的数量超过10个，最旧的那个会被删除掉。</description>
     </item>
     
     <item>
@@ -323,19 +300,14 @@ https://dn-coding-net-production-pp.qbox.me/5c5eab94-4e42-4cd4-b827-8a3699204a31
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</guid>
       <description>guava中的RateLimiter实现了比较有意思的功能：
- 平滑。
- 记录未使用的信息。
- 保存下次请求被满足的时间。
-  平滑 通过令牌桶算法实现。
+ 平滑。 记录未使用的信息。 保存下次请求被满足的时间。  平滑 通过令牌桶算法实现。
 记录未使用信息 实现中通过storedPermits表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：
-1. 资源充足。这个实现是Burst模式。
-2. 资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。
-storedPermits的计算公式：min(maxPermits, timeNotUsedMicros/coolDownIntervalMicros())，其中coolDownIntervalMicros()和maxPermits在不同模式下面计算方式不同。
+ 资源充足。这个实现是Burst模式。 资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。  storedPermits的计算公式：min(maxPermits, timeNotUsedMicros/coolDownIntervalMicros())，其中coolDownIntervalMicros()和maxPermits在不同模式下面计算方式不同。
 Burst模式
 当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。storedPermits代表的就是当前充足资源的数量。
 另外，coolDownIntervalMicros()返回stableIntervalMicros，maxPermits等于permitsPerSecond。
 Warmup模式
- ^ throttling | cold + / interval | /. | / . | / . ← &amp;quot;warmup period&amp;quot; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | .</description>
+ ^ throttling | cold + / interval | /. | / . | / . ← &amp;quot;warmup period&amp;quot; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | . UP . | .</description>
     </item>
     
     <item>
@@ -345,11 +317,7 @@ Warmup模式
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/dist/rate-limit/</guid>
       <description>缘起 为了保证API的可用性，以及系统的可靠性，需要为API限速。不然，API请求量大到系统无法处理时就会出现系统变慢，甚至宕机的情况。常见的限速场景：
- 挡住某个用户的过多请求（用户激增或者恶意请求），确保正常处理其他用户请求。
- 挡住过多的低优先级的请求，确保核心请求得到处理。
- 由于系统内部错误，导致系统处理能力下降，调节系统的处理能力。
- 挡住过多某类请求，确保其他请求可以得到处理。
-  限速类型 请求限速
+ 挡住某个用户的过多请求（用户激增或者恶意请求），确保正常处理其他用户请求。 挡住过多的低优先级的请求，确保核心请求得到处理。 由于系统内部错误，导致系统处理能力下降，调节系统的处理能力。 挡住过多某类请求，确保其他请求可以得到处理。  限速类型 请求限速
 限制API在一秒中内能够处理的请求数量。如果超过这个数量，等待或者拒绝服务。通常情况下这个是首选。
 并发限制
 针对资源敏感的请求，比如CPU密集型API，进行并发限制，限制某一时刻最多只有有限个请求正在被处理。防止因为这些请求占用资源，导致其他请求得不到处理。
@@ -360,10 +328,13 @@ Warmup模式
 限速结果 http服务的话按照场景返回429或者503。
 常用算法 计数
 单位时间内计数，超过这个数量时，拒绝服务，每个单位时间开始后计数清零。缺点是在时间边界处，会超过上限。比如，每秒限速100，在0.9s的时候来了100个请求全部得到处理，在下一秒0.1s来了100个请求。在0.9s到1.1s这个范围小于1s，但是请求达到了200。
- 0.1s 0.2s 0.3s 0.4s 0.5s 0.6s 0.7s 0.8s 0.9s 0.1s 0.2s +----+----+----+----+----+----+----+----+----+----+----+--- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 100| 100| 0 | 0 +----+----+----+----+----+----+----+----+----+----+----+---  队列
+ 0.1s 0.2s 0.3s 0.4s 0.5s 0.6s 0.7s 0.8s 0.9s 0.1s 0.2s +----+----+----+----+----+----+----+----+----+----+----+--- | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 100| 100| 0 | 0 +----+----+----+----+----+----+----+----+----+----+----+--- 队列
 请求过来的时候，先如队列，处理逻辑处理队列中的请求。
- 基于大小的队列：当队列大小超过一个阀值的时候，拒绝新来的请求。
- 基于时间的队列：请求在队列里面的时间超过多长时间没有被处理，立即返回。RocketMQ就是采用这种方式。</description>
+ 基于大小的队列：当队列大小超过一个阀值的时候，拒绝新来的请求。 基于时间的队列：请求在队列里面的时间超过多长时间没有被处理，立即返回。RocketMQ就是采用这种方式。 优先级队列：对请求做优先级分类，不同优先级的请求进入不同的队列。为了避免低优先级请求被饿死，需要对不同优先级队列分配不同的处理时间。  漏桶
+有一个容量固定的桶，桶中的请求以恒定的速率被处理。请求过来的时候，尝试进入桶，当桶满时被丢弃。本质上是队列后面加一个速率限制器。
+漏桶还有一个变形，在漏桶前面加一个队列。当桶满的时候，先放入队列，这样可以保留一部分请求。
+令牌桶
+以恒定的速率向桶中加入token，当请求过来的时候从桶中获取token。如果桶空了，请求等待或者丢弃。相比漏桶令牌桶还可以做蓄水，当桶满的时候可以预留一部分token，可以做到突发(burst)的请求。</description>
     </item>
     
     <item>
@@ -373,21 +344,13 @@ Warmup模式
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/dist/uuid/</guid>
       <description>分布式Unique ID在分布式系统使用很广泛，常用的用途有：
- 请求的ID，用于跟踪请求链路。
- 消息队列中的unique id。
- 业务对象的id。
-  总结下生成分布式ID常用算法。
+ 请求的ID，用于跟踪请求链路。 消息队列中的unique id。 业务对象的id。  总结下生成分布式ID常用算法。
 数据库自增id 通过MySQL中的auto_increment特性来实现数据库唯一的ID。问题是扩展性差，性能受限于一台机器。可以做的优化是使用多个数据库实例，设置相同的步长和不同的起始值，避免重复产生ID。通过一个这种方式可以利用多台机器的资源。同时，还有一个优化是获取ID的时候可以批量获取ID，这样可以减少DB的操作，减少响应时间。
 基于Redis，Postgres，Oracle也有类似的方案。
 UUID UUID由[0-9a-f-]字符组成，总共16个字节，转换成16进制的格式为：XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX。
 数据由5个部分组成：
- 时间戳，占60位。
- 时钟序列，占13位。
- 结点编号，占48位。
- 版本号，版本不同以上1-3个字段的数据来源也不一样，占4位。
- UUID类型，用于解析UUID数据中的意义，占3位。
-  每个数据的位置：
- 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | time_low | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | time_mid | time_hi_and_version | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |clk_seq_hi_res | clk_seq_low | node (0-1) | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | node (2-5) | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  time_hi_and_version的第4-7位是版本号，clk_seq_hi_res的第5-7位是UUID类型编号。</description>
+ 时间戳，占60位。 时钟序列，占13位。 结点编号，占48位。 版本号，版本不同以上1-3个字段的数据来源也不一样，占4位。 UUID类型，用于解析UUID数据中的意义，占3位。  每个数据的位置：
+ 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | time_low | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | time_mid | time_hi_and_version | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |clk_seq_hi_res | clk_seq_low | node (0-1) | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | node (2-5) | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ time_hi_and_version的第4-7位是版本号，clk_seq_hi_res的第5-7位是UUID类型编号。</description>
     </item>
     
     <item>
@@ -398,26 +361,22 @@ UUID UUID由[0-9a-f-]字符组成，总共16个字节，转换成16进制的格�
       <guid>http://zjykzk.github.io/posts/cs/mongodb/</guid>
       <description>默认索引 每个文档默认都有一个字段_id，这个字段会自动生成唯一索引，这个索引无法删除。这个字段的值可以是用户指定，如果不指定mongodb会自动生成。
 生成的规则：
-|&amp;lt;-- 4 --&amp;gt;|&amp;lt;- 3 -&amp;gt;|&amp;lt;-2-&amp;gt;|&amp;lt;-- 3 --&amp;gt;| +---------+-------+-----+---------+ |unix time| mid | pid | counter | +---------+-------+-----+---------+  包含四个字段：
- unix时间戳，4个字节
- 机器id，3个字节
- 进程id，2个字节
- 计数器，3个字节，自增，从一个随机数开始
-  索引类型 单字段索引 文档中的任何字段或者子文档的字段都可以当作索引，字段的值也可以是一个文档。
+|&amp;lt;-- 4 --&amp;gt;|&amp;lt;- 3 -&amp;gt;|&amp;lt;-2-&amp;gt;|&amp;lt;-- 3 --&amp;gt;| +---------+-------+-----+---------+ |unix time| mid | pid | counter | +---------+-------+-----+---------+ 包含四个字段：
+ unix时间戳，4个字节 机器id，3个字节 进程id，2个字节 计数器，3个字节，自增，从一个随机数开始  索引类型 单字段索引 文档中的任何字段或者子文档的字段都可以当作索引，字段的值也可以是一个文档。
 复合索引（compound index） 一个文档中的多个字段组成一个索引。最多支持31个字段。
 Prefixes 当查询的条件是索引的前面几个字段时会使用复合索引。
 比如：有索引{a:1,b:1,c:1}，查询条件{a:&amp;quot;a&amp;quot;,b:&amp;quot;b&amp;quot;}就会使用这个索引，但是{b:&amp;quot;b&amp;quot;}这样的查询条件就无法使用。
 排序 索引的顺序先按第一个字段排序，如果第一个字段相等，按照第二个字段排序，依次类推后面的字段顺序。因此，
- 如果有以下索引{a:1,b:1}，支持排序{a:-1,b:-1}/{a:1:b:1}，不支持排序{a:-1:b:1}/{a:1:b:-1}。
- 只支持Prefixes的排序。
-  多值索引（multikey index） 字段的值是一个数组，就会自动把这个索引变成多值索引，支持范围查询。
+ 如果有以下索引{a:1,b:1}，支持排序{a:-1,b:-1}/{a:1:b:1}，不支持排序{a:-1:b:1}/{a:1:b:-1}。 只支持Prefixes的排序。  多值索引（multikey index） 字段的值是一个数组，就会自动把这个索引变成多值索引，支持范围查询。
 地理空间索引（geospatial index） 包含两种索引：2d/2dsphere index
 文本索引（text indexes） 作用于值是字符串或者是字符串数组的字段，查询字段中是否包含查询字符串。
 哈希索引（hashed indexes） 用于基于hash的sharding。
 交集索引（index intersection） 如果查询条件中出现使用了多个索引，包括Prefixes索引。mongodb可能会使用多个索引进行查询，然后取交集。是否使用了这个索引，可以通过explain来确定。
 当查询需要排序，同时排序的字段需要的索引和查询条件无法组成一个或者部分query predicate，那就无法使用这个索引了。
 比如：有索引{a:1}/{b:1,c:1}，查询db.col.find({a:&#39;a&#39;}).sort({b:1})无法使用，虽然排序中包含字段b，但是查询条件中无法使用这个索引；而查询db.col.find({a:&#39;a&#39;,b:&#39;b&#39;}).sort({c:1})却可以使用两个索引，这是因为查询条件中有{b:&#39;b&#39;}和排序字段{c:1}，索引{b:1,c:1}组成部分查询条件。
-索引的属性 唯一性 可以指定一个索引唯一。</description>
+索引的属性 唯一性 可以指定一个索引唯一。
+部分索引（partial indexes） 只索引满足条件的文档，它是稀疏索引的超集，相比稀疏索引采用部分索引。
+稀疏索引（sparse indexes） 只索引存在该字段值的文档。</description>
     </item>
     
     <item>
@@ -428,10 +387,7 @@ Prefixes 当查询的条件是索引的前面几个字段时会使用复合索�
       <guid>http://zjykzk.github.io/posts/cs/design/interface-owner/</guid>
       <description>接口放在哪里决定了源代码依赖问题。因此，依赖是接口定义唯一考量，其他问题都可以归结为依赖问题，而定义的包永远是被依赖包。
 接口定义的位置有三种情况：
- 使用者
- 实现者
- 单独一个第三方位置
-  放在使用者这边，那么实现者依赖使用者的接口定义。
+ 使用者 实现者 单独一个第三方位置  放在使用者这边，那么实现者依赖使用者的接口定义。
 好处：可以并行开发，尤其是类似golang这样的语言，实现一接口不需要引用具体的接口定义，即使在必须引用的开发语言里面也只需要实现相关的接口，集成的时候加上是很简单的。
 坏处：在实现者依赖接口定义源代码的情况下，实现者代码要提出来重用，必须要得要包含使用者的接口定义
 这样的方式比较适合多个使用者，单个实现者的情况。
@@ -442,7 +398,8 @@ Prefixes 当查询的条件是索引的前面几个字段时会使用复合索�
 单独放在第三方位置
 好处：定义完接口以后，使用者和实现者都可以并行开发，同时实现者包的重用和使用者解耦。
 坏处：包的管理变得复杂，包含接口的包会变得很薄
-这样的方式适合多个使用者，多个实现者情况。</description>
+这样的方式适合多个使用者，多个实现者情况。
+ </description>
     </item>
     
     <item>
@@ -455,33 +412,22 @@ Prefixes 当查询的条件是索引的前面几个字段时会使用复合索�
 单一职责原则 又名SRP（Single Responsibility Principle）。针对一个函数、类、组件、架构的修改有且只有一个理由，而理由的来自于使用者。
 这样的好处是把拥有相同修改理由的函数、类、组件组织在一起，不同的分开，达到修改的时候不会影响其他代码，增强了可维护性。
 这是一个定义简单，实操不容易正确的原则。原因在于：
-1. 职责无法度量。
-2. 因为团队、项目背景等待原因，在具体实现的细节中很难做到SRP。
-因此，在设计的时候接口一定做到SRP，实现尽量SRP。
+ 职责无法度量。 因为团队、项目背景等待原因，在具体实现的细节中很难做到SRP。  因此，在设计的时候接口一定做到SRP，实现尽量SRP。
 注：
 组件层面的SRP，叫做Component common closure，架构层面的SRP叫做axis of change responsibility for creation of architecture boundary。
 开闭原则 又名OCP（Open-Close Principle）。对扩展开发，对修改关闭。
 通过这样的方式达到添加一个功能时，尽可能少的修改现有源代码、模块、二进制文件，尽可能的通过添加代码来实现。这样减少原来的功能被破坏的概率，达到软件的可维护性、可扩展性、可复用性。因此，它是其他面向对象设计原则的核心。
 遵守OCP原则的手段是抽象。一个功能的抽象，更依赖于使用者，而非实现者。只有使用者才明白需要抽象什么内容。抽象的难点是找到易变的部分，一个指导原则是“快速失败，下不为例”，有以下几条参考实践：
-1. TDD，先写测试代码。
-2. 更短的开发周期。
-3. 先开发特性，后开发基础设施代码，并经常给使用者review。
-4. 先开发重要功能。
-5. 经常并尽早发布，尽可能让用户和使用者使用。
-抽象的对象一般是类、模块以及组件。几个比较的好的实践：
-1. 在函数参数、类抽象中提供稳定的接口定义。
-2. 通过元数据抽象逻辑，比如通过配置的形式表达逻辑。
-3. 定义项目章程，建立团队文化，沉淀优秀的习惯，提高开发效率。
-4. 在架构层面，分析功能变化的来源、时机以及原因，把功能划分为不同的组件，底层组件依赖高层组件，高层组件不会受到底层组件变化的影响，同时避免循环依赖。
-5. 抽象的时候需要避免过度抽象，带来不必要的复杂度。
-里氏替换原则 又名LSP（Liskov Substitutiion Principle）。基类能够被子类代替，并且保证程序行为不变。
+ TDD，先写测试代码。 更短的开发周期。 先开发特性，后开发基础设施代码，并经常给使用者review。 先开发重要功能。 经常并尽早发布，尽可能让用户和使用者使用。  抽象的对象一般是类、模块以及组件。几个比较的好的实践：
+ 在函数参数、类抽象中提供稳定的接口定义。 通过元数据抽象逻辑，比如通过配置的形式表达逻辑。 定义项目章程，建立团队文化，沉淀优秀的习惯，提高开发效率。 在架构层面，分析功能变化的来源、时机以及原因，把功能划分为不同的组件，底层组件依赖高层组件，高层组件不会受到底层组件变化的影响，同时避免循环依赖。 抽象的时候需要避免过度抽象，带来不必要的复杂度。  里氏替换原则 又名LSP（Liskov Substitutiion Principle）。基类能够被子类代替，并且保证程序行为不变。
 OCP的实现需要使用抽象和多态，静态语言中继承是多态的一个重要实现方式。LSP就是解决继承带来的一些问题，比如侵入性、耦合性、缺乏灵活性。遵守LSP能够更加容易遵守OCP，因为子类可以替换基类，达到不修改原来代码，通过扩展的方式，添加逻辑。提高程序的健壮性，版本升级的兼容性。
 继承中常说的IS-A，强调的是方法的行为，子类中的方法行为要和基类中的一致，而不是性质一致。这个行为需要从设计的使用者角度来判断模块。模块逻辑的一致性，说的就是这个行为需要一致。所以，IS-A语义是子类替换时，保证程序行为一致。
 虽然这里LSP强调代码中的继承，其实LSP也适用于其他约定的服务、组件，这些内容修改、替换以后都不应该影响原来程序的行为。
 几个比较好的实践：
-1. 当子类中override的方法工作比较少时，可能违反LSP。
-2. 采用DBC（design by contract）编程方法。约定方法的前置条件和后置条件，在LSP下，子类中的前置条件只能比基类的弱，而子类中的后置条件只能比基类的强。因为，如果子类中的前置条件强，那么替换以后原来基类的前置条件下的输入就没法满足了，同样如果子类的后置条件弱，那么方法的输出在一些情况下程序行为就会和原来的不一样。
-依赖反转原则 又名DIP（Dependence Inversion Principle）。高层不依赖底层，依赖抽象，底层也只依赖抽象；抽象不依赖细节，细节依赖抽象。</description>
+ 当子类中override的方法工作比较少时，可能违反LSP。 采用DBC（design by contract）编程方法。约定方法的前置条件和后置条件，在LSP下，子类中的前置条件只能比基类的弱，而子类中的后置条件只能比基类的强。因为，如果子类中的前置条件强，那么替换以后原来基类的前置条件下的输入就没法满足了，同样如果子类的后置条件弱，那么方法的输出在一些情况下程序行为就会和原来的不一样。  依赖反转原则 又名DIP（Dependence Inversion Principle）。高层不依赖底层，依赖抽象，底层也只依赖抽象；抽象不依赖细节，细节依赖抽象。
+反转（inversion）包含两层含义：
+ 控制流和源代码依赖相反，a模块执行时会调用b模块函数，但是源代码层面来说b模块会依赖a模块。 接口所有者，原先a模块使用b模块定义的接口，而现在接口放在了a模块中，从而从源代码层面来说b模块依赖a模块。  为什么要依赖抽象？显然抽象比实现细节稳定。从编程语言角度上来说，接口变了实现不变，而实现变了，接口不一定变，显然接口更加稳定。因此，接口的稳定也十分重要。
+DIP能够减少类、模块之间的耦合，提供系统的稳定性，提高代码的复用性、可扩展性、可读性和可维护性。它是其他OO设计技巧的基础。</description>
     </item>
     
     <item>
@@ -509,9 +455,9 @@ OCP的实现需要使用抽象和多态，静态语言中继承是多态的一�
       <description>在golang中，为了性能的目的，当前执行的g是保存在当前线程的TLS中的，而TLS的地址在结构体m里面。问题是怎么放进去的呢？
 可以从程序的启动入手，顺藤摸瓜。
 编写一个打印hello,world的程序
-// hello.go package main func main() { print(&amp;quot;hello, world&amp;quot;) }  编译生成可执行文件
-go build -o hello hello.go  用gdb进行调试，找到程序的入口 _rt0_amd64_linux
-gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;quot;textflag.h&amp;quot; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12  发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
+// hello.go package main func main() { print(&amp;quot;hello, world&amp;quot;) } 编译生成可执行文件
+go build -o hello hello.go 用gdb进行调试，找到程序的入口 _rt0_amd64_linux
+gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;quot;textflag.h&amp;quot; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12 发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
     </item>
     
     <item>
@@ -520,16 +466,7 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
       <pubDate>Wed, 10 Jan 2018 18:16:35 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/vim-tips/</guid>
-      <description> 在命令模式使用函数
-:%s/ab(.*)c/\=submatch(1) . &#39;test&#39;/gc  窗口间切换
-跳转至某个窗口：窗口number + c-w + w： 跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h 跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l 跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j 跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k  全文缩进
-gg=G  把数字替换成原来的数字减一
-:%s/(\d+)/\=submatch(1)-1/gc  移动屏幕
-H // 把当前行的位置移到最上面 M // 把当前行的位置移到屏幕中间 L // 把当前的位置移到屏幕底部  全局操作g
-:{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果  移动窗口
-CTRL-W [K/J/H/L/T] // 把窗口移到最上面、下面、左边、右边、新标签  跳到某个字符的左（右）边
-t{char} // 跳转到左边 T{char} // 跳转到右边  在vim8的终端滚动
-Ctrl-w N   </description>
+      <description> 在命令模式使用函数  :%s/ab(.*)c/\=submatch(1) . &#39;test&#39;/gc 窗口间切换  跳转至某个窗口：窗口number + c-w + w： 跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h 跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l 跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j 跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k 全文缩进  gg=G 把数字替换成原来的数字减一  :%s/(\d+)/\=submatch(1)-1/gc 移动屏幕  H // 把当前行的位置移到最上面 M // 把当前行的位置移到屏幕中间 L // 把当前的位置移到屏幕底部 全局操作g  :{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果 移动窗口  CTRL-W [K/J/H/L/T] // 把窗口移到最上面、下面、左边、右边、新标签 跳到某个字符的左（右）边  t{char} // 跳转到左边 T{char} // 跳转到右边 在vim8的终端滚动  Ctrl-w N </description>
     </item>
     
     <item>
@@ -539,17 +476,12 @@ Ctrl-w N   </description>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/jit/</guid>
       <description>基本原理 JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：
-1. 生成可以执行的代码
-2. 执行代码
-生成代码 生成的代码是平台相关，一般就是一些机器码。
+ 生成可以执行的代码 执行代码  生成代码 生成的代码是平台相关，一般就是一些机器码。
 执行代码 生成的代码如果要被执行，必须要确保代码所在的内存拥有可执行的标志。在linux下面通过mmap系统调用映射一块可执行的内存，然后把相关的代码复制到这块内存中。最后，把内存首地址转换成函数地址并进行调用。
 Hello，World 一个基于x86_64平台的JIT代码， 通过系统调用write实现打印hello,world！。
 基于x86_64平台的JIT代码 linux下面系统调用通过软中断来实现，参数通过寄存器来传递。寄存器的使用情况如下：
-+----------+--------+--------+--------+--------+--------+--------+ | Syscall #| Param 1| Param 2| Param 3| Param 4| Param 5| Param 6| +----------+--------+--------+--------+--------+--------+--------+ | rax | rdi | rsi | rdx | r10 | r8 | r9 | +----------+--------+--------+--------+--------+--------+--------+  系统调用write(int fd, const void *buf, size_t count)
- 参数fd:文件描述符号
- 参数buf:输出的内存起始地址
- 参数count:输出的字节数
-  因此，x86_64平台下调用write的机器码为
++----------+--------+--------+--------+--------+--------+--------+ | Syscall #| Param 1| Param 2| Param 3| Param 4| Param 5| Param 6| +----------+--------+--------+--------+--------+--------+--------+ | rax | rdi | rsi | rdx | r10 | r8 | r9 | +----------+--------+--------+--------+--------+--------+--------+ 系统调用write(int fd, const void *buf, size_t count)
+ 参数fd:文件描述符号 参数buf:输出的内存起始地址 参数count:输出的字节数  因此，x86_64平台下调用write的机器码为
 0: 48 c7 c0 01 00 00 00 mov rax,0x1 7: 48 c7 c7 01 00 00 00 mov rdi,0x1 e: 48 c7 c2 0c 00 00 00 mov rdx,0xc 15: 48 8d 35 03 00 00 00 lea rsi,[rip+0x4] # 0x1f 1c: 0f 05 syscall 1e: c3 cc ret 1f: 48 65 6c 6c 6f 20 57 6f 72 6c 64 21 // Hello World!</description>
     </item>
     
@@ -560,13 +492,7 @@ Hello，World 一个基于x86_64平台的JIT代码， 通过系统调用write实
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/rocketmq/store/</guid>
       <description>功能 store模块是rocketmq的核心模块。主要功能有：
- 消息存储
- 消息索引
- 消费队列
- 主从同步
- 延迟消息
- 清理过期的消息和消费队列
-  消息存储 负责消息存储，包括写消息，刷盘。
+ 消息存储 消息索引 消费队列 主从同步 延迟消息 清理过期的消息和消费队列  消息存储 负责消息存储，包括写消息，刷盘。
 消息文件 消息保存在默认值为${user.home}\store\commitlog文件夹下，可以通过配置项storePathCommitLog修改。所有的消息都写入一个逻辑文件，每个逻辑文件包含大小相等的物理文件。
 写消息 写消息在不同的场景下面会有不同的逻辑。
 同步刷盘 每条消息要写到磁盘以后才算完成。
@@ -576,10 +502,10 @@ Hello，World 一个基于x86_64平台的JIT代码， 通过系统调用write实
 主从同步 每条消息要等一个从broker同步完才算完成。
 在主从同步的场景下，会有一个定期检查消息是否已经被从broker同步的辅助线程：GroupTransferService。写消息的时候会生成一个GroupCommitRequest提交给GroupTransferService，并等待被唤醒或者超时。当GroupTransferService发现从broker已经同步的最后一个消息的索引大于本次消息的索引时就会唤醒GroupCommitRequest。
 写buffer 使用了写buffer以后，写消息的全部逻辑就是把消息写入buffer。同时，系统会有一个线程CommitRealTimeService定期把消息写入文件。
-核心代码 org.apache.rocketmq.store.CommitLog  消费队列 每个topic对应多个消费队列，这个是提高消费并发度的前提。
+核心代码 org.apache.rocketmq.store.CommitLog 消费队列 每个topic对应多个消费队列，这个是提高消费并发度的前提。
 结构 每个消费队列对应一个逻辑文件，文件中对应每个消息的内容大小是固定的20个字节，包含消息的偏移量，大小以及tag哈希值。
 文件目录 数据保存在目录${rootpath}/consumequeue下面，rootpath 通过配置项storePathRootDir指定，默认的是${user.home}/store。
-${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │ └── 00000000000000000000 ├── 1 // queue 1 │ └── 00000000000000000000 ├── 2 // queue 2 │ └── 00000000000000000000 └── 3 // queue 3 └── 00000000000000000000  队列元素 |&amp;lt;----- 8 byte -----&amp;gt;|&amp;lt;- 4 byte -&amp;gt;|&amp;lt;------ 8 byte ------&amp;gt;| +--------------------+------------+----------------------+ | commitlog offset | size | message tag hash code| +--------------------+------------+----------------------+  执行 通过线程ReputMessageService的分派消息的逻辑执行。</description>
+${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │ └── 00000000000000000000 ├── 1 // queue 1 │ └── 00000000000000000000 ├── 2 // queue 2 │ └── 00000000000000000000 └── 3 // queue 3 └── 00000000000000000000 队列元素 |&amp;lt;----- 8 byte -----&amp;gt;|&amp;lt;- 4 byte -&amp;gt;|&amp;lt;------ 8 byte ------&amp;gt;| +--------------------+------------+----------------------+ | commitlog offset | size | message tag hash code| +--------------------+------------+----------------------+ 执行 通过线程ReputMessageService的分派消息的逻辑执行。</description>
     </item>
     
     <item>
@@ -588,24 +514,20 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
       <pubDate>Tue, 24 Oct 2017 18:46:11 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/first-optimal/</guid>
-      <description>缘起 table{border-collapse:collapse;}table,td,th{border:1px solid #000}td{text-align:center}
-最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：
+      <description>缘起 最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：
    发送线程数量 消费线程数量 发送TPS 消费TPS     3 3 200-400 20-60    而且，随着消费线程的数量增加发送&amp;amp;消费的TPS都下降。
 排查 接口 一次发送涉及的数据库操作：
- 一次topic查询
- 一次跟MQ之间的RPC
- 一次写统计数据
-  一次消费涉及的数据库操作：
- 两次cas操作
- 两次写统计操作
-  系统状态 磁盘IO 通过命令 iotop 发现：mongodb写磁盘速度最大2M/s。
+ 一次topic查询 一次跟MQ之间的RPC 一次写统计数据  一次消费涉及的数据库操作：
+ 两次cas操作 两次写统计操作  系统状态 磁盘IO 通过命令 iotop 发现：mongodb写磁盘速度最大2M/s。
 网络 通过命令 nethogs 发现：mongodb的通信速度最大200+KB/s。
 系统总体情况 通过命令vmstat发现：
- 系统和用户的CPU使用率都超低，两者加起来不到5%，系统的中断和上下文切换非常高，特别是上下文切换，达到了十几万/s
- 从缓存写到磁盘的io比较高好几百/s
- 内存使用率非常低
-  结论 问题一定是使用mongodb上面。
-排查 profile程序 通过golang自带的profile功能，在程序里面添加profile代码，通过go tool pprof对程序做profile，用 go-torch生成火焰图。发现果不其然，一个请求过程中，数据操作耗时占整体的40%以上。</description>
+ 系统和用户的CPU使用率都超低，两者加起来不到5%，系统的中断和上下文切换非常高，特别是上下文切换，达到了十几万/s 从缓存写到磁盘的io比较高好几百/s 内存使用率非常低  结论 问题一定是使用mongodb上面。
+排查 profile程序 通过golang自带的profile功能，在程序里面添加profile代码，通过go tool pprof对程序做profile，用 go-torch生成火焰图。发现果不其然，一个请求过程中，数据操作耗时占整体的40%以上。
+发送消息火焰图
+拉取消息火焰图
+确认消息火焰图
+通过看程序以及对需求的分析，程序可以做优化：
+ 统计数据可以不用每次都去写数据库，把它放在内存或者写本地磁盘，定期刷到数据库 去重以后的消息，可以放在内存，减少拉取消息时候一次cas操作  mongodb 通过命令 mongostat 查看mongodb的运行状态，发现随着消费线程并发的提高锁的百分比越来越高最后超过的90%。查看mongodb的版本是2.4.9，它用的数据库锁。换个mongodb版本，避免锁的开销，通过了解公司线上使用的版本3.0.15，并使用wireTiger存储引擎。果断按照这个环境进行benchmark，结果仍然不尽任意。查看profiler，一个类似mysql的慢查询的命令。通过以下命令加上专家的讲解，从信息 nscannedObjects : 71040，发现扫描对象比较多，从代码确认是缺少了一个索引。</description>
     </item>
     
     <item>
@@ -615,8 +537,8 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/golang/map/</guid>
       <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
-// file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap  显然，makemap 返回的是指针。
-数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用 count int // map标记: // 1. key和value是否包指针 // 2. 是否正在扩容 // 3. 是否是同样大小的扩容 // 4. 是否正在 `range`方式访问当前的buckets // 5. 是否有 `range`方式访问旧的bucket flags uint8 B uint8 // log_2(B) == bucket数量 noverflow uint16 // overflow bucket的数量，是个近似值 hash0 uint32 // hash种子 buckets unsafe.</description>
+// file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap 显然，makemap 返回的是指针。
+数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用  count int // map标记:  // 1. key和value是否包指针  // 2. 是否正在扩容  // 3. 是否是同样大小的扩容  // 4. 是否正在 `range`方式访问当前的buckets  // 5. 是否有 `range`方式访问旧的bucket  flags uint8 B uint8 // log_2(B) == bucket数量  noverflow uint16 // overflow bucket的数量，是个近似值  hash0 uint32 // hash种子  buckets unsafe.</description>
     </item>
     
     <item>
@@ -627,18 +549,14 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
       <guid>http://zjykzk.github.io/posts/cs/complement/</guid>
       <description>加法 2个十进制数字的非正式算法：两个数字中相同位置的数相加，如果结果超过10产生进位，该进位在下一位数相加时加上。直到两个数字的所有位数都加完为止。
 考虑十进制的2位数加法，例如：16 + 26。
- 1 6 + 2 6 ------- 4 2  上例中的加法过程是：
- 6+6 得2，产生进位
- 1 + 2 + 1 的4，其中最后加1是1步骤的几位，最终结果是 42
-  减法 2个10进制数字的非正式算法：
- 如果被减数大于等于减数，两个数字中相同位置的数相减，如果被减数小于减数，从高位借一位，轮到高位计算时要多减去一个1。直到两个数字的所有位都减完为止。
- 如果被减数小于减数，交互减数与被减数的位置进行 1 操作，把结果加一个负号
-  考虑十进制的2位数减法，例如：16 - 25。
- 1 6 + 2 5 ------- - 9  上例中的加法过程是：
- 16 比25小，交换两个数的位置
- 5比 6 小产生借位， 15-6 得到 9
- 2-1-1 得到0，最后一个 1是借位
- 加上负号，最终的结果是 -9</description>
+ 1 6 + 2 6 ------- 4 2 上例中的加法过程是：
+ 6+6 得2，产生进位 1 + 2 + 1 的4，其中最后加1是1步骤的几位，最终结果是 42  减法 2个10进制数字的非正式算法：
+ 如果被减数大于等于减数，两个数字中相同位置的数相减，如果被减数小于减数，从高位借一位，轮到高位计算时要多减去一个1。直到两个数字的所有位都减完为止。 如果被减数小于减数，交互减数与被减数的位置进行 1 操作，把结果加一个负号  考虑十进制的2位数减法，例如：16 - 25。
+ 1 6 + 2 5 ------- - 9 上例中的加法过程是：
+ 16 比25小，交换两个数的位置 5比 6 小产生借位， 15-6 得到 9 2-1-1 得到0，最后一个 1是借位 加上负号，最终的结果是 -9  补码 加法需要记录进位，而减法需要记录借位，比较大小，记录符号。这样减法的复杂度就要比较加法高。
+减法变加法 注意到16-25=16+(-25)，如果-25能够表示成一个正数，那么减法就变成了加法。
+2位10进制的整数范围0-99，取一半用来做正数和零，一半做负数，分布如下：
+0 - 0 1 - 1 .</description>
     </item>
     
     <item>
@@ -649,13 +567,12 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
       <guid>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</guid>
       <description>内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
 Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
-int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
-int a = 0; print(a); int b = 1; print(b);  但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.
+int a = 0; int b = 1; print(a); print(b); 在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
+int a = 0; print(a); int b = 1; print(b); 但是，多个goroutine执行时，就无法保证打印a的时候，b的值一定是1.
 happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 e2 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
 在一个goroutine中，happens before的顺序就是代码表达的顺序。
 共享变量 v 的读操作 r ，能够读到是另一个对变量 v 写操作 w 写入的值的条件是：
- w happens before r
- 没有其他的对变量 v 写操作happens before r 并且happens after w</description>
+ w happens before r 没有其他的对变量 v 写操作happens before r 并且happens after w  这两个条件并不能保证有一个与 r&amp;amp;w 没有任何happens before关系的对共享变量 v 写操作 w&amp;rsquo; 的存在，导致 r 读到的是 w&amp;rsquo; 的结果。所以，保证 r 的结果是 w 的值的条件是：</description>
     </item>
     
     <item>
@@ -672,7 +589,8 @@ Utf8编码 utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 362
 utf8编码规则：
  1. 一个字节的编码，最高位为0，其他的位表示unicode编号 2. n个字节的编码（n&amp;gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号  下表表示了utf8的编码，z表示用于编码的bit
    unicode范围 utf8编码     十六进制表示 二进制表示   000000 - 00007F 0zzzzzzz   000080 - 0007FF 110zzzzz 10zzzzzz   000800 - 00D7FF/00E000 - 00FFFF 1110zzzz 10zzzzzz 10zzzzzz   010000 - 10FFFF 11110zzz 10zzzzzz 10zzzzzz 10zzzzzz    环境中的编码 一个程序读取字符的输入的时候，读取的是二进制的数据。如果程序需要理解这个字符串是什么意思，必须了解字符的编码。同理，程序输出字符串的时候必须告知字符串的编码，不然使用者就无法理解程序的输出。程序中遇到乱码的问题，都是因为一个程序输出的字符串的编码和另一个程序接受字符串时使用的编码不一致导致的。因此，在解决编码的问题的思路就是搞清楚涉及到了哪几个环境。
-比如：一个程序打印一个字符串到终端。程序的编码是utf8，终端显示的编码是gbk。这样就会造成乱码。</description>
+比如：一个程序打印一个字符串到终端。程序的编码是utf8，终端显示的编码是gbk。这样就会造成乱码。
+不同语言的字符串的支持 python 中的字符串 python 2 字符类型 分为byte字符串(str)和unicode(unicode)，前者的内容是字节，后者的内容是unicode中的编号。默认的是byte字符串。</description>
     </item>
     
     <item>
@@ -681,35 +599,19 @@ utf8编码规则：
       <pubDate>Sun, 09 Oct 2016 14:45:21 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/prometheus/</guid>
-      <description>架构 基本概念 数据模型 prometheus把数据当作时间序列进行存储。
-每个时间序列通过 metric name和 key-value pairs(也叫做 label)标识。
-metric name表示需要进行测量的系统指标。
-它允许包含ASCII字母，数字，下划线和分号。
-正则表示为：[a-zA-Z:][a-zA-Z0-9:]*。
-label表示一个系统指标的维度，可以按照这个维度进行查询统计。
-Label名字允许包含ASCII字母，数字以及下划线。
-正则表示为：[a-zA-Z][a-zA-Z0-9]*。同时，“__”开头的名字系统保留的。
-Label值允许任意的Unicode字符
+      <description>架构 基本概念 数据模型 prometheus把数据当作时间序列进行存储。 每个时间序列通过 metric name和 key-value pairs(也叫做 label)标识。
+metric name表示需要进行测量的系统指标。 它允许包含ASCII字母，数字，下划线和分号。 正则表示为：[a-zA-Z_:][a-zA-Z0-9_:]*。
+label表示一个系统指标的维度，可以按照这个维度进行查询统计。 Label名字允许包含ASCII字母，数字以及下划线。 正则表示为：[a-zA-Z_][a-zA-Z0-9_]*。同时，“__”开头的名字系统保留的。 Label值允许任意的Unicode字符
 度量类型 Counter 累计统计度量的单个值。适用于只增不减度量，比如累计请求数量。
 Gauge 统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。
 Histogram 统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。
 这个度量类型有三个时间序列统计：
- &amp;lt;base_name&amp;gt;_bucket{le=&amp;laquo;upper inclusive bound&amp;raquo;}：小于某个阀值的度量事件发生的次数
- &amp;lt;base_name&amp;gt;_sum：度量值的和
- &amp;lt;base_name&amp;gt;_count：度量事件发生的次数
-  Summary 统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。
+ &amp;lt;base_name&amp;gt;_bucket{le=&amp;quot;upper inclusive bound&amp;rdquo;}：小于某个阀值的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Summary 统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。
 这个度量类型有三个时间序列统计：
- &amp;lt;base_name&amp;gt;{quantile=&amp;raquo;&amp;lt;p&amp;gt;&amp;laquo;}：度量值在前百分之p的度量事件发生的次数
- &amp;lt;base_name&amp;gt;_sum：度量值的和
- &amp;lt;base_name&amp;gt;_count：度量事件发生的次数
-  Job &amp;amp; Instance 在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如
-一个支付进程。Job代表一个监控的逻辑单位。
-比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。
- job: payment-server
- instance 1: 1.2.3.4:5678
- instance 2: 1.2.3.5:5689
- instance 3: 1.2.3.6:5689
-   自动生成的label和时间序列 当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。</description>
+ &amp;lt;base_name&amp;gt;{quantile=&amp;rdquo;&amp;lt;p&amp;gt;&amp;rdquo;}：度量值在前百分之p的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Job &amp;amp; Instance 在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如 一个支付进程。Job代表一个监控的逻辑单位。 比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。
+ job: payment-server  instance 1: 1.2.3.4:5678 instance 2: 1.2.3.5:5689 instance 3: 1.2.3.6:5689    自动生成的label和时间序列 当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。
+label:
+ job: 配置好的job名字 instance:&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;格式的url  时间序列：</description>
     </item>
     
     <item>
@@ -731,15 +633,11 @@ Histogram 统计度量事件发生的次数以及度量值的和。还支持统�
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/flume/</guid>
       <description>架构 概念 source 数据的生成源。比如：读取一个本地文件，MQ等等。一个数据单元被封装成一个event。
-event 数据单元，从source产生，直到被序列化到存储中。event包含*header*，*body*两个部分：
- header: 一个map数据，可以被interceptor引用
- body: 一个字节序列，具体日志数据
-  interceptor source读取一个event在放到channel中之前，event可以被添加数据。比如说：采集机器的主机名称，时间戳。
+event 数据单元，从source产生，直到被序列化到存储中。event包含header，body两个部分：
+ header: 一个map数据，可以被interceptor引用 body: 一个字节序列，具体日志数据  interceptor source读取一个event在放到channel中之前，event可以被添加数据。比如说：采集机器的主机名称，时间戳。
 channel 数据队列，高可用的保障。source产生的数据先放到这里，sink接着从这里取出来放到存储当中。
 channel selector 两个作用：
- 复制：把一个event写到一个或者多个channel中
- 路由：根据event中的某个属性值，把数据写到指定的channel中
-  sink 负责把channel中的数据写入目标存储。
+ 复制：把一个event写到一个或者多个channel中 路由：根据event中的某个属性值，把数据写到指定的channel中  sink 负责把channel中的数据写入目标存储。
 sink processor 选择sink，在这里可以完成负载均衡和容错处理。
 event serializer 把event中的数据，转换成存储需要的格式。</description>
     </item>

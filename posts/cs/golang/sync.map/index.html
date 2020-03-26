@@ -12,20 +12,13 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>sync.Map实现分析</strong>
-<hr> 
-
-<p>golang的SDK中提供线程安全的map实现<code>sync.Map</code>。它是针对<code>RWMutex+map</code>的实现方案中存在cache line的false share提出来的。主要适用于两个场景：</p>
-
+<hr> <p>golang的SDK中提供线程安全的map实现<code>sync.Map</code>。它是针对<code>RWMutex+map</code>的实现方案中存在cache line的false share提出来的。主要适用于两个场景：</p>
 <ol>
-<li>针对一个key一次写多次读。<br /></li>
-<li>多个goroutine并发读写修改的key是没有交集。<br />
-<br /></li>
+<li>针对一个key一次写多次读。</li>
+<li>多个goroutine并发读写修改的key是没有交集。</li>
 </ol>
-
 <p>在这两种情况下，相比一个<code>Mutex</code>或者<code>RWMutex</code>加上普通的map，锁的竞争要少的多。那为什么呢？</p>
-
 <h3 id="数据结构">数据结构</h3>
-
 <pre><code>type Map struct {
   mu Mutex
 
@@ -89,31 +82,19 @@ type entry struct {
   // map find the entry.
   p unsafe.Pointer // *interface{}
 }
-</code></pre>
-
-<p><code>Map.read</code>包含了部分数据，读写请求优先考虑<code>read</code>，针对它的操作都是CAS，无锁的。</p>
-
+</code></pre><p><code>Map.read</code>包含了部分数据，读写请求优先考虑<code>read</code>，针对它的操作都是CAS，无锁的。</p>
 <p><code>Map.dirty</code>包含的数据是<code>read</code>的超集，对他的操作需要加锁。</p>
-
 <p><code>readOnly.m</code>表示当前<code>read</code>的数据，<code>readOnly.amended</code>表示是否有数据在<code>dirty</code>中。</p>
-
 <p><code>entry</code>保存具体数值的指针。有三种情况：</p>
-
 <ol>
-<li><code>nil</code>，表示已经删除，这个时候<code>dirty</code>中<code>entry</code>的值也是<code>nil</code>，因为他们是同一个<code>entry</code>的地址。<br /></li>
-<li><code>expunged</code>，表示数据已经擦除，<code>entry</code>不在<code>dirty</code>中。<br /></li>
-<li>具体的数据值，一定会在<code>dirty</code>中。<br />
-<br /></li>
+<li><code>nil</code>，表示已经删除，这个时候<code>dirty</code>中<code>entry</code>的值也是<code>nil</code>，因为他们是同一个<code>entry</code>的地址。</li>
+<li><code>expunged</code>，表示数据已经擦除，<code>entry</code>不在<code>dirty</code>中。</li>
+<li>具体的数据值，一定会在<code>dirty</code>中。</li>
 </ol>
-
 <h3 id="接口">接口</h3>
-
 <p><code>sync.Map</code>包含五个接口：<code>Load</code>、<code>Store</code>、<code>LoadOrStore</code>、<code>Delete</code>和<code>Range</code>。</p>
-
-<h4 id="load-store-loadorstore和delete">Load、Store、LoadOrStore和Delete</h4>
-
+<h4 id="loadstoreloadorstore和delete">Load、Store、LoadOrStore和Delete</h4>
 <p>这几个接口都有类似的模式：</p>
-
 <pre><code>read, _ := m.read.Load().(readOnly)
 if e, ok := read.m[key]; ok {
 	ret := do_the_operation()
@@ -129,80 +110,64 @@ if e, ok := read.m[key]; ok {
 	ret := do_the_operation()
 }
 m.mu.Unlock()
-</code></pre>
-
-<p>利用<code>read</code>的CAS操作减少锁并发，同时由于并发存在获取锁之后还是有可能数据已经在<code>read</code>中，因此还是对<code>read</code>再做一次同样的操作，复用内存。如果数据仍然不在<code>read</code>中才会考虑操作<code>dirty</code>。针对数据是否在<code>read</code>中这几个接口的逻辑如下：</p>
-
+</code></pre><p>利用<code>read</code>的CAS操作减少锁并发，同时由于并发存在获取锁之后还是有可能数据已经在<code>read</code>中，因此还是对<code>read</code>再做一次同样的操作，复用内存。如果数据仍然不在<code>read</code>中才会考虑操作<code>dirty</code>。针对数据是否在<code>read</code>中这几个接口的逻辑如下：</p>
 <p><code>read</code>包含了部分数据，如果<code>key</code>存在并而且与它对应的<code>entry</code>不是<code>expunged</code>，数据操作优先在这里进行。</p>
-
 <ol>
-<li><code>Store</code>：直接更新<code>entry</code>值。<br /></li>
-<li><code>Load</code>：直接返回<code>entry</code>值。<br /></li>
-<li><code>LoadOrStore</code>:针对<code>entry</code>做<code>tryLoadOrStore</code>操作。<br /></li>
-<li><code>Delete</code>:把<code>entry</code>设置成<code>nil</code>。<br />
-<br /></li>
+<li><code>Store</code>：直接更新<code>entry</code>值。</li>
+<li><code>Load</code>：直接返回<code>entry</code>值。</li>
+<li><code>LoadOrStore</code>:针对<code>entry</code>做<code>tryLoadOrStore</code>操作。</li>
+<li><code>Delete</code>:把<code>entry</code>设置成<code>nil</code>。</li>
 </ol>
-
 <p>当数据不在<code>read</code>中时，就会涉及到<code>dirty</code>了：</p>
-
 <ol>
-<li><code>Store</code>：<br />
-a. 如果<code>entry</code>在<code>read</code>中并且是<code>expunged</code>，则复用，同时把它修改成<code>nil</code>，然后把<code>entry</code>赋值到<code>dirty</code>，这样就避免了只在<code>read</code>不在<code>dirty</code>的情况。<br />
-b. 如果<code>entry</code>在<code>dirty</code>中，那么更新<code>entry</code>值。<br />
-c. 如果<code>entry</code>也不在<code>dirty</code>中，如果<code>dirty</code>是<code>nil</code>，则复制<code>read</code>中的<code>entry</code>值非<code>nil</code>的数据。然后，添加值到<code>dirty</code>。<br /></li>
-<li><code>Load</code>：从<code>dirty</code>查找，同时增加<code>misses</code>。如果超过一定的阀值，就会发生数据从<code>dirty</code>到<code>read</code>的迁移。<br /></li>
-<li><code>LoadOrStore</code>：流程和<code>Store</code>接口类似，只是返回值和对<code>entry</code>的处理逻辑不一样。<br />
-a. 如果<code>entry</code>有值，则返回具体值以及存在的标识。<br />
-b. 如果<code>entry</code>值为<code>nil</code>，设置<code>entry</code>为新的值并返回它和不存在标识。<br />
-c. 如果<code>entry</code>值是<code>expunged</code>，则返回<code>nil</code>和存在标志，这个是比较特殊。在<code>LoadOrStore</code>同时，并发的把<code>entry</code>从<code>read</code>复制到<code>dirty</code>，这种情况就会发生。<br />
-<br /></li>
+<li><code>Store</code>：
+a. 如果<code>entry</code>在<code>read</code>中并且是<code>expunged</code>，则复用，同时把它修改成<code>nil</code>，然后把<code>entry</code>赋值到<code>dirty</code>，这样就避免了只在<code>read</code>不在<code>dirty</code>的情况。
+b. 如果<code>entry</code>在<code>dirty</code>中，那么更新<code>entry</code>值。
+c. 如果<code>entry</code>也不在<code>dirty</code>中，如果<code>dirty</code>是<code>nil</code>，则复制<code>read</code>中的<code>entry</code>值非<code>nil</code>的数据。然后，添加值到<code>dirty</code>。</li>
+<li><code>Load</code>：从<code>dirty</code>查找，同时增加<code>misses</code>。如果超过一定的阀值，就会发生数据从<code>dirty</code>到<code>read</code>的迁移。</li>
+<li><code>LoadOrStore</code>：流程和<code>Store</code>接口类似，只是返回值和对<code>entry</code>的处理逻辑不一样。
+a. 如果<code>entry</code>有值，则返回具体值以及存在的标识。
+b. 如果<code>entry</code>值为<code>nil</code>，设置<code>entry</code>为新的值并返回它和不存在标识。
+c. 如果<code>entry</code>值是<code>expunged</code>，则返回<code>nil</code>和存在标志，这个是比较特殊。在<code>LoadOrStore</code>同时，并发的把<code>entry</code>从<code>read</code>复制到<code>dirty</code>，这种情况就会发生。</li>
 </ol>
-
 <h4 id="range">Range</h4>
-
 <p><code>Range</code>接口相对简单，如果有部分数据在<code>dirty</code>中就会把<code>dirty</code>的数据提升到<code>read</code>中，并重置<code>dirty</code>。然后，遍历的是<code>dirty</code>数据。否则，只遍历<code>read</code>中的数据。这里不保证能遍历到之后添加的数据。</p>
-
 <p>通过上面的逻辑我们发现<code>read</code>和<code>dirty</code>直接数据流转逻辑如下：</p>
-
 <ol>
-<li><code>read</code>到<code>dirty</code>：在<code>Store</code>和<code>LoadOrStore</code>的时候，如果需要保存的key既不在<code>read</code>也不在<code>dirty</code>，而且这时<code>dirty</code>是<code>nil</code>，就会把<code>read</code>中的<code>nil</code>数据变成<code>expunged</code>，并复制除了这份以外的数据到<code>dirty</code>。<br /></li>
-<li><code>dirty</code>到<code>read</code>：<br />
-a. 在<code>Load</code>和<code>LoadOrStore</code>的时候，如果<code>read</code>中不存在，需要从<code>dirty</code>中获取数据，就会增加<code>misses</code>，当<code>misses</code>等于<code>dirty</code>的大小时，就会把<code>dirty</code>封装成<code>readOnly</code>，然后原子的赋值给<code>read</code>，并重置<code>dirty</code>。<br />
-b. 在<code>Range</code>的时候，如果有数据不在<code>read</code>中同样会把<code>dirty</code>封装成<code>readOnly</code>，然后原子的赋值给<code>read</code>，并重置<code>dirty</code>数据。<br />
-<br /></li>
+<li><code>read</code>到<code>dirty</code>：在<code>Store</code>和<code>LoadOrStore</code>的时候，如果需要保存的key既不在<code>read</code>也不在<code>dirty</code>，而且这时<code>dirty</code>是<code>nil</code>，就会把<code>read</code>中的<code>nil</code>数据变成<code>expunged</code>，并复制除了这份以外的数据到<code>dirty</code>。</li>
+<li><code>dirty</code>到<code>read</code>：
+a. 在<code>Load</code>和<code>LoadOrStore</code>的时候，如果<code>read</code>中不存在，需要从<code>dirty</code>中获取数据，就会增加<code>misses</code>，当<code>misses</code>等于<code>dirty</code>的大小时，就会把<code>dirty</code>封装成<code>readOnly</code>，然后原子的赋值给<code>read</code>，并重置<code>dirty</code>。
+b. 在<code>Range</code>的时候，如果有数据不在<code>read</code>中同样会把<code>dirty</code>封装成<code>readOnly</code>，然后原子的赋值给<code>read</code>，并重置<code>dirty</code>数据。</li>
 </ol>
-
 <h4 id="疑问">疑问</h4>
-
 <ol>
-<li><p><strong>为什么需要expunged状态？</strong><br />
-&gt; 如果没有这个状态，更新已经删除的但是已经存在的数据就需要加锁了。</p></li>
-
-<li><p><strong>为什么newEntry的时候取的是参数interface{}的地址，这个地址不是栈上的么，会不会有问题？</strong><br />
-&gt; 参数<code>i</code>的地址被保存到<code>map</code>中时，变量<code>&amp;i</code>已经逃逸到堆上面去了。</p></li>
+<li><strong>为什么需要expunged状态？</strong></li>
 </ol>
-
+<blockquote>
+<p>如果没有这个状态，更新已经删除的但是已经存在的数据就需要加锁了。</p>
+</blockquote>
+<ol start="2">
+<li><strong>为什么newEntry的时候取的是参数interface{}的地址，这个地址不是栈上的么，会不会有问题？</strong></li>
+</ol>
+<blockquote>
+<p>参数<code>i</code>的地址被保存到<code>map</code>中时，变量<code>&amp;i</code>已经逃逸到堆上面去了。</p>
+</blockquote>
 <h3 id="总结">总结</h3>
-
 <p>文中开头提到的两个主要使用场景的原因主要使用的以下技术：</p>
-
 <ol>
-<li>无锁的CAS操作。<br /></li>
-<li>读写分离，通过一份只读的数据结合CAS操作减少锁竞争。<br /></li>
-<li>延迟删除，只有当只读的数据被写的数据覆盖以后才会被gc回收。<br /></li>
-<li>内存复用，已经删除的数据所在的内存，当同一个key赋值的时候，可以被重新被使用。<br /></li>
-<li>分摊分析。<br />
-<br /></li>
+<li>无锁的CAS操作。</li>
+<li>读写分离，通过一份只读的数据结合CAS操作减少锁竞争。</li>
+<li>延迟删除，只有当只读的数据被写的数据覆盖以后才会被gc回收。</li>
+<li>内存复用，已经删除的数据所在的内存，当同一个key赋值的时候，可以被重新被使用。</li>
+<li>分摊分析。</li>
 </ol>
-
 <h3 id="参考连接">参考连接</h3>
-
 <ol>
-<li><a href="https://github.com/golang/sync/commits/master/syncmap/map.go">https://github.com/golang/sync/commits/master/syncmap/map.go</a><br /></li>
-<li><a href="https://golang.org/pkg/sync/#Map">https://golang.org/pkg/sync/#Map</a><br /></li>
+<li><a href="https://github.com/golang/sync/commits/master/syncmap/map.go">https://github.com/golang/sync/commits/master/syncmap/map.go</a></li>
+<li><a href="https://golang.org/pkg/sync/#Map">https://golang.org/pkg/sync/#Map</a></li>
 </ol>
 
-<div class="np"><a href=/posts/cs/select-tech/>← 技术选型</a> <a href=/posts/cs/language/learn/>如何学习一门编程语言 →</a></div>
+<div class="np"><a href=/posts/cs/language/learn/>← 如何学习一门编程语言</a> <a href=/posts/cs/network/gate/>网关 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

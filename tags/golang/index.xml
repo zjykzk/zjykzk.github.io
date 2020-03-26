@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Golang on 老K随笔</title>
+    <title>golang on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/golang/</link>
-    <description>Recent content in Golang on 老K随笔</description>
+    <description>Recent content in golang on 老K随笔</description>
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
@@ -20,9 +20,7 @@
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/golang/sync.map/</guid>
       <description>golang的SDK中提供线程安全的map实现sync.Map。它是针对RWMutex+map的实现方案中存在cache line的false share提出来的。主要适用于两个场景：
- 针对一个key一次写多次读。
- 多个goroutine并发读写修改的key是没有交集。
-  在这两种情况下，相比一个Mutex或者RWMutex加上普通的map，锁的竞争要少的多。那为什么呢？
+ 针对一个key一次写多次读。 多个goroutine并发读写修改的key是没有交集。  在这两种情况下，相比一个Mutex或者RWMutex加上普通的map，锁的竞争要少的多。那为什么呢？
 数据结构 type Map struct { mu Mutex // read contains the portion of the map&#39;s contents that are safe for // concurrent access (with or without mu held). // // The read field itself is always safe to load, but must only be stored with // mu held. // // Entries stored in read may be updated concurrently without mu, but updating // a previously-expunged entry requires that the entry be copied to the dirty // map and unexpunged with mu held.</description>
     </item>
     
@@ -33,8 +31,8 @@
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</guid>
       <description>来一个hello, world!。
-package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5  编译调试。
-# go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?</description>
+package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5 编译调试。
+# go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?? () (gdb) s 216 if atomic.</description>
     </item>
     
     <item>
@@ -46,9 +44,9 @@ package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 
       <description>在golang中，为了性能的目的，当前执行的g是保存在当前线程的TLS中的，而TLS的地址在结构体m里面。问题是怎么放进去的呢？
 可以从程序的启动入手，顺藤摸瓜。
 编写一个打印hello,world的程序
-// hello.go package main func main() { print(&amp;quot;hello, world&amp;quot;) }  编译生成可执行文件
-go build -o hello hello.go  用gdb进行调试，找到程序的入口 _rt0_amd64_linux
-gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;quot;textflag.h&amp;quot; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12  发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
+// hello.go package main func main() { print(&amp;quot;hello, world&amp;quot;) } 编译生成可执行文件
+go build -o hello hello.go 用gdb进行调试，找到程序的入口 _rt0_amd64_linux
+gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;quot;textflag.h&amp;quot; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12 发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
     </item>
     
     <item>
@@ -58,8 +56,8 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/golang/map/</guid>
       <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
-// file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap  显然，makemap 返回的是指针。
-数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用 count int // map标记: // 1. key和value是否包指针 // 2. 是否正在扩容 // 3. 是否是同样大小的扩容 // 4. 是否正在 `range`方式访问当前的buckets // 5. 是否有 `range`方式访问旧的bucket flags uint8 B uint8 // log_2(B) == bucket数量 noverflow uint16 // overflow bucket的数量，是个近似值 hash0 uint32 // hash种子 buckets unsafe.</description>
+// file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap 显然，makemap 返回的是指针。
+数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用  count int // map标记:  // 1. key和value是否包指针  // 2. 是否正在扩容  // 3. 是否是同样大小的扩容  // 4. 是否正在 `range`方式访问当前的buckets  // 5. 是否有 `range`方式访问旧的bucket  flags uint8 B uint8 // log_2(B) == bucket数量  noverflow uint16 // overflow bucket的数量，是个近似值  hash0 uint32 // hash种子  buckets unsafe.</description>
     </item>
     
     <item>
@@ -70,13 +68,12 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
       <guid>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</guid>
       <description>内存模型定义了一系列的条件，在这些条件下，多个goroutine对一个变量进行读写，保证一个goroutine读取到的值是是另外一个goroutine写入的某个值。
 Happens Before 编译器会对程序做优化，比如指令重排。在go语言中规定，在同一个goroutine里面，程序表达的顺序就是读写的顺序。但是，多个goroutine执行同样的代码时，就会出现读写顺序不一样的情况。例如，代码：
-int a = 0; int b = 1; print(a); print(b);  在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
-int a = 0; print(a); int b = 1; print(b);  但是，多个goroutine执行时，就无法保证打印*a*的时候，*b*的值一定是1.
+int a = 0; int b = 1; print(a); print(b); 在编译器的优化下，代码的执行顺序有可能变成下面这样的情况：
+int a = 0; print(a); int b = 1; print(b); 但是，多个goroutine执行时，就无法保证打印a的时候，b的值一定是1.
 happens before定义了内存操作的顺序，它是一种偏序。e1 happens before e2, e2 happens after e1 。如果 e1 既不happens before e2 也不happens after e2 ，那么 e1 和 e2 是并发执行的。它有传递的性质（自反性，对称性就不考虑了）。这个关系就决定了共享变量在某个上下文下面读写顺序，那么它的具体值变化也就确定了。
 在一个goroutine中，happens before的顺序就是代码表达的顺序。
 共享变量 v 的读操作 r ，能够读到是另一个对变量 v 写操作 w 写入的值的条件是：
- w happens before r
- 没有其他的对变量 v 写操作happens before r 并且happens after w</description>
+ w happens before r 没有其他的对变量 v 写操作happens before r 并且happens after w  这两个条件并不能保证有一个与 r&amp;amp;w 没有任何happens before关系的对共享变量 v 写操作 w&amp;rsquo; 的存在，导致 r 读到的是 w&amp;rsquo; 的结果。所以，保证 r 的结果是 w 的值的条件是：</description>
     </item>
     
   </channel>

@@ -12,36 +12,21 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>字符串</strong>
-<hr> 
-
-<h1 id="为什么要字符">为什么要字符</h1>
-
+<hr> <h1 id="为什么要字符">为什么要字符</h1>
 <p>人类发明了文字，同时想用计算机来处理文字。由此，就产生了字符。每个字符代码一个文字的图形。</p>
-
 <h1 id="字符串的表示">字符串的表示</h1>
-
 <p>在计算机内部，只有01的信息。因此，为了能让计算机能够认识字符串，每个字符就的被映射成01数据。这个映射功能就叫编码。</p>
-
 <h2 id="ascii">ASCII</h2>
-
 <p>ASCII是美国19世纪60年代发明的一种编码，总共规定了128个字符，每个字符有1个字节大小。范围从0-127，比如<code>A</code>的编码是<code>01000001</code></p>
-
 <h2 id="unicode">Unicode</h2>
-
 <p>世界语言文字异常丰富，每个国家都有自己独特的语言文字。ASCII的编码无法编码所有的文字，因此产生了很多编码，比如中文的BIG5，GB2312等等。这些编码无法兼容，比如<code>中</code>在GB2312编码是<code>1101011011010000</code>，BIG5的编码是<code>1010010010100100</code>。因此，Unicode就出现了。Unicode规定了每个字符的唯一编号，目前已经有100多万个字符。需要注意的是Unicode只规定了字符的编号，没有规定二进制的表示。</p>
-
 <h2 id="utf8编码">Utf8编码</h2>
-
 <p>utf8是Ken Thompson于1992年创建，现在已经标准化为RFC 3629。是目前使用最为广泛的unicode编码方式，其他的有utf-16，utf-32。它的特点是变长的，使用1-4个字节表示一个字符，不同的符号有不同的长度。</p>
-
 <p>utf8编码规则：</p>
-
 <pre><code>  1. 一个字节的编码，最高位为0，其他的位表示unicode编号
   2. n个字节的编码（n&gt;1），第一个字节的n位都是1，第n+1位是0，后面的每个字节的最高两位都是10，其余的位用来表示unicode编号
 </code></pre>
-
 <p>下表表示了utf8的编码，z表示用于编码的bit</p>
-
 <table>
 <thead>
 <tr>
@@ -49,102 +34,75 @@ body{background:#faf9de;}
 <th align="left">utf8编码</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">十六进制表示</td>
 <td align="left">二进制表示</td>
 </tr>
-
 <tr>
 <td align="left">000000 - 00007F</td>
 <td align="left">0zzzzzzz</td>
 </tr>
-
 <tr>
 <td align="left">000080 - 0007FF</td>
 <td align="left">110zzzzz 10zzzzzz</td>
 </tr>
-
 <tr>
 <td align="left">000800 - 00D7FF/00E000 - 00FFFF</td>
 <td align="left">1110zzzz 10zzzzzz 10zzzzzz</td>
 </tr>
-
 <tr>
 <td align="left">010000 - 10FFFF</td>
 <td align="left">11110zzz 10zzzzzz 10zzzzzz 10zzzzzz</td>
 </tr>
 </tbody>
 </table>
-
 <h1 id="环境中的编码">环境中的编码</h1>
-
 <p>一个程序读取字符的输入的时候，读取的是二进制的数据。如果程序需要理解这个字符串是什么意思，必须了解字符的编码。同理，程序输出字符串的时候必须告知字符串的编码，不然使用者就无法理解程序的输出。程序中遇到乱码的问题，都是因为一个程序输出的字符串的编码和另一个程序接受字符串时使用的编码不一致导致的。因此，在解决编码的问题的思路就是搞清楚涉及到了哪几个环境。</p>
-
 <p>比如：一个程序打印一个字符串到终端。程序的编码是utf8，终端显示的编码是gbk。这样就会造成乱码。</p>
-
 <h1 id="不同语言的字符串的支持">不同语言的字符串的支持</h1>
-
 <h2 id="python-中的字符串">python 中的字符串</h2>
-
 <h3 id="python-2">python 2</h3>
-
 <h4 id="字符类型">字符类型</h4>
-
 <p>分为byte字符串(str)和unicode(unicode)，前者的内容是字节，后者的内容是unicode中的编号。默认的是byte字符串。</p>
-
 <h4 id="重要方法">重要方法</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># &lt;type &#39;str&#39;&gt; to &lt;type &#39;unicode&#39;&gt;</span>
+<span style="color:#75715e"># 如果 s 是&#39;unicode&#39;类型，python会先通过encode函数把s转换成&#39;str&#39;类型</span>
+<span style="color:#75715e"># encode函数的encoding是sys.getdefaultencoding()的值</span>
+s<span style="color:#f92672">.</span>decode(encoding)
 
-<pre><code class="language-python"># &lt;type 'str'&gt; to &lt;type 'unicode'&gt;
-# 如果 s 是'unicode'类型，python会先通过encode函数把s转换成'str'类型
-# encode函数的encoding是sys.getdefaultencoding()的值
-s.decode(encoding)
+<span style="color:#75715e"># &lt;type &#39;unicode&#39;&gt; to &lt;type &#39;str&#39;&gt;</span>
+<span style="color:#75715e"># 如果u是&#39;str&#39;类型，python会通过decode函数把u转换成&#39;unicode&#39;类型</span>
+<span style="color:#75715e"># decode函数的encoding是sys.getdefaultencoding()的值</span>
+u<span style="color:#f92672">.</span>encode(encoding)
 
-# &lt;type 'unicode'&gt; to &lt;type 'str'&gt;
-# 如果u是'str'类型，python会通过decode函数把u转换成'unicode'类型
-# decode函数的encoding是sys.getdefaultencoding()的值
-u.encode(encoding)
+<span style="color:#75715e"># 获取系统默认的编码</span>
+sys<span style="color:#f92672">.</span>getdefaultencoding()
 
-# 获取系统默认的编码
-sys.getdefaultencoding()
+<span style="color:#75715e"># 修改系统的默认编码</span>
+sys<span style="color:#f92672">.</span>setdefaultencoding(encoding)
 
-# 修改系统的默认编码
-sys.setdefaultencoding(encoding)
-
-# 修改代码
-import sys
-reload(sys) # 因为python初始化的时候会把setdefaultencoding方法给删除掉
-sys.setdefaultencoding('utf8')
-</code></pre>
-
-<h4 id="codecs">codecs</h4>
-
+<span style="color:#75715e"># 修改代码</span>
+<span style="color:#f92672">import</span> sys
+reload(sys) <span style="color:#75715e"># 因为python初始化的时候会把setdefaultencoding方法给删除掉</span>
+sys<span style="color:#f92672">.</span>setdefaultencoding(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">utf8</span><span style="color:#e6db74">&#39;</span>)
+</code></pre></div><h4 id="codecs">codecs</h4>
 <p>指定encoding参数生成file-object-like对象，利用：</p>
-
 <ol>
-<li>函数 <code>read</code> 读取byte字符串，按照encoding的编码返回unicode<br /></li>
-<li><code>write</code> 输入unicode，按照encoding的编码转换成byte字符串写入文件<br />
-<br /></li>
+<li>函数 <code>read</code> 读取byte字符串，按照encoding的编码返回unicode</li>
+<li><code>write</code> 输入unicode，按照encoding的编码转换成byte字符串写入文件</li>
 </ol>
-
 <h3 id="python-3">python 3</h3>
-
 <p>显然，python2中的字符串处理方式会变得复杂，因此在python3中字符串统一都是unicode。</p>
-
 <h2 id="go中的字符串">go中的字符串</h2>
-
 <p>go中有两种类型支持字符串分别是：<code>string</code> 和 <code>rune</code> 。</p>
-
 <ol>
-<li>string表示字节slice（分片）<br /></li>
-<li>rune表示unicode的编码（code point）<br />
-<br /></li>
+<li>string表示字节slice（分片）</li>
+<li>rune表示unicode的编码（code point）</li>
 </ol>
-
 <p>go对utf8有天然的支持。go的源代码是utf8编码，<code>for ... range</code> 循环字符串的时候也是按照utf8编码来处理每个字符，而不是字节。</p>
 
-<div class="np"><a href=/posts/cs/prometheus/>← prometheus</a> <a href=/posts/cs/golang/go-memory-model/>GO 内存模型 →</a></div>
+<div class="np"><a href=/posts/cs/golang/go-memory-model/>← GO 内存模型</a> <a href=/posts/cs/prometheus/>prometheus →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

@@ -12,17 +12,17 @@ body{background:#faf9de;}
 <script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
 <script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
 <strong>如何定位一个文件</strong>
-<hr> <p>linux的VFS包含4个重要概念：<br />
-1. superblock，包含文件系统的信息，管理整个文件系统。<br />
-2. inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。<br />
-3. dentry，目录项，代表路径中的每个部分，包含文件路径到inode的映射。<br />
-4. file，文件，是文件在进程中的表示。</p>
-
+<hr> <p>linux的VFS包含4个重要概念：</p>
+<ol>
+<li>superblock，包含文件系统的信息，管理整个文件系统。</li>
+<li>inode，索引文件（index node），代表一个文件，包含文件的元数据和数据，不包含文件名。</li>
+<li>dentry，目录项，代表路径中的每个部分，包含文件路径到inode的映射。</li>
+<li>file，文件，是文件在进程中的表示。</li>
+</ol>
 <p>同时，在linux中一切兼文件，包括目录。目录的内容是文件名和inode号。</p>
-
 <p>当打开一个文件<code>/bin/vim</code>，系统首先把路径分解成<code>/</code>、<code>bin</code>、<code>vim</code>，根据dentry查<code>vim</code>的inode，如果dentry还没有<code>bin</code>，会根据superblock中<strong>根目录</strong>的inode号得到它的子目录信息，其中就有<code>bin</code>和它的inode，并把它放到dentry中，然后根据<code>bin</code>的内容找到<code>vim</code>的inode。最终，返回一个文件描述符（file descriptor）。</p>
 
-<div class="np"><a href=/posts/cs/rocketmq/slave-sync-from-master-disconnect/>← slave和master同步连接经常重连，导致发送消息失败</a> <a href=/posts/cs/dist/ha/>高可用 →</a></div>
+<div class="np"><a href=/posts/cs/dist/ha/>← 高可用</a> <a href=/posts/cs/rocketmq/slave-sync-from-master-disconnect/>slave和master同步连接经常重连，导致发送消息失败 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>
