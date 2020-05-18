@@ -8,10 +8,26 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 12 Feb 2020 10:41:51 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 17 Apr 2020 15:12:22 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/categories/cs/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>二阶段提交和三阶段提交</title>
+      <link>http://zjykzk.github.io/posts/cs/dist/2_3pc/</link>
+      <pubDate>Fri, 17 Apr 2020 15:12:22 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/posts/cs/dist/2_3pc/</guid>
+      <description>缘起 事务是一段访问或者更新数据的程序。它的特点是ACID。本地事务只涉及到一个数据库能够保证事务ACID了。当涉及到多个不同数据库（广义的数据库，他们可以是MQ，甚至缓存）操作时，为了保证每个数据库的操作要么都成功或者都失败，就需要额外的技术来处理。这是因为单个数据库操作会失败，同时通信失败会导致整个事务无法感知这个失败。二阶段提交（2PC）或者三阶段提交（3PC）就是用来解决这个问题。
+一般来说这个有两个角色一个是事务协调者，简称TC，一个是事务参，简称TP。下文用简称来说明。
+2PC 准备完毕状态 当TP把事务中修改的结果持久化到存储以后，它才能算是准备完毕。
+在所有的TP准备完毕之前，不能有任何一个TP提交事务。不然就会破坏事务的原子性。比如：TP1提交了，TP2还没准备完毕，这个时候TP2crash了，因为TP2并没有保存事务相关的after-images，就没法恢复。这时就出现了TP1成功，但是TP2没有执行的情况。
+2PC本质：在提交之前确保所有的TP都已经准备完毕。
+协议 2pc包含两个阶段。准备阶段和提交（终止）阶段，TC和TP的通信如下。
+ TC TP +----+ REQUEST-TO-PREPARE +----+ | | -----------------------&amp;gt; | | | | PREPARE | | | | &amp;lt;----------------------- | | | | NO | | | | | | | | COMMIT | | | | -----------------------&amp;gt; | | | | ABORT | | | | DONE | | | | &amp;lt;----------------------- | | +----+ +----+ Messages 2pc本质是任何TP提交之前，所有的TP都必须已经准备好。
+第一阶段</description>
+    </item>
     
     <item>
       <title>mysql连接中的serverTimezone参数解析</title>

@@ -16,7 +16,7 @@ body{background:#faf9de;}
 <p>如果不指定的情况下,会通过连接获取mysq服务器上面的时区.先获取变量<code>time_zone</code>值,如果是<code>SYSTEM</code>,就获取<code>system_time_zone</code>的值.参考代码:<code>com.mysql.cj.protocol.a.NativeProtocol.configureTimezone</code>.</p>
 <p>因此,关于<code>system_time_zone</code>值的设置的目的是为了解决你写入和读取的时间值一致性.如果你是读别人写的数据,那么需要把它设置成写入的时候指定的时区.</p>
 
-<div class="np"><a/> <a href=/posts/cs/db/bolt/>bolt源码分析 →</a></div>
+<div class="np"><a href=/posts/cs/dist/2_3pc/>← 二阶段提交和三阶段提交</a> <a href=/posts/cs/db/bolt/>bolt源码分析 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

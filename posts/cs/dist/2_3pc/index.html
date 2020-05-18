@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>二阶段提交和三阶段提交</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>二阶段提交和三阶段提交</strong>
+<hr> <h2 id="缘起">缘起</h2>
+<p>事务是一段访问或者更新数据的程序。它的特点是ACID。本地事务只涉及到一个数据库能够保证事务ACID了。当涉及到多个不同数据库（广义的数据库，他们可以是MQ，甚至缓存）操作时，为了保证每个数据库的操作要么都成功或者都失败，就需要额外的技术来处理。这是因为单个数据库操作会失败，同时<strong>通信失败</strong>会导致整个事务无法感知这个失败。二阶段提交（2PC）或者三阶段提交（3PC）就是用来解决这个问题。</p>
+<p>一般来说这个有两个角色一个是事务协调者，简称<strong>TC</strong>，一个是事务参，简称<strong>TP</strong>。下文用简称来说明。</p>
+<h2 id="2pc">2PC</h2>
+<h3 id="准备完毕状态">准备完毕状态</h3>
+<p>当TP把事务中修改的结果持久化到存储以后，它才能算是准备完毕。</p>
+<p>在所有的TP准备完毕之前，不能有任何一个TP提交事务。不然就会破坏事务的原子性。比如：TP1提交了，TP2还没准备完毕，这个时候TP2crash了，因为TP2并没有保存事务相关的after-images，就没法恢复。这时就出现了TP1成功，但是TP2没有执行的情况。</p>
+<p><strong>2PC本质：在提交之前确保所有的TP都已经准备完毕。</strong></p>
+<h3 id="协议">协议</h3>
+<p>2pc包含两个阶段。准备阶段和提交（终止）阶段，TC和TP的通信如下。</p>
+<pre><code>                       TC                              TP
+                     +----+  REQUEST-TO-PREPARE      +----+
+                     |    | -----------------------&gt; |    |
+                     |    |         PREPARE          |    |
+                     |    | &lt;----------------------- |    |
+                     |    |           NO             |    |
+                     |    |                          |    |
+                     |    |         COMMIT           |    |
+                     |    | -----------------------&gt; |    |
+                     |    |          ABORT           |    |
+                     |    |          DONE            |    |
+                     |    | &lt;----------------------- |    |
+                     +----+                          +----+
+                                    Messages
+</code></pre><p>2pc<em>本质是任何TP提交之前，所有的TP都必须已经准备好。</em></p>
+<p><strong>第一阶段</strong></p>
+<ol>
+<li>TC向每个TP发送REQUEST-TO-PREPARE消息。</li>
+<li>TC等待每个TP的投票。</li>
+<li>TP收到REQUEST-TO-PREPARE返回消息：
+<ol>
+<li>TP确认可以提交事务，返回PREPARE消息。</li>
+<li>TP准备资源失败，返回NO消息。</li>
+<li>因为系统负载原因或者系统挂掉了，一直没有投票</li>
+</ol>
+</li>
+</ol>
+<p><strong>第二阶段</strong></p>
+<ol>
+<li>TC决定，分三种情况：
+<ol>
+<li>收到所有的TP返回PREPARE，决定COMMIT。</li>
+<li>收到某个TP返回NO，决定ABORT。</li>
+<li>等待TP的消息超时，决定ABORT。</li>
+</ol>
+</li>
+<li>向所有TP发送COMMIT或者ABORT消息。</li>
+<li>TP收到COMMIT或者ABORT之后发回DONE消息。</li>
+<li>TC收到所有的TP发回的DONE消息之后，清理本事务的资源。</li>
+</ol>
+<h3 id="阻塞">阻塞</h3>
+<p>当TP发送完PREPARE之后，收到COMMIT或者ABORT之前，它无法做任何操作。因为，它不知道该提交还是终止事务。这个时候，TP就会处在一直等待状态。因此，当TC挂了，同时也没有其他已经提交的TP情况下，事务就会一直阻塞在那里。</p>
+<h3 id="错误处理与恢复">错误处理与恢复</h3>
+<h4 id="错误处理">错误处理</h4>
+<p>等待消息超时时的处理。</p>
+<p><strong>TC视角</strong></p>
+<ol>
+<li>
+<p>向TP发送REQUEST-TO-PREPARE消息</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>等待TP的PREPARE或者NO消息</p>
+<p>一段时间以后没有收到所有TP的PREPARE消息或者某个TP的NO消息，TC自己决定终止事务。向每个TP发送ABORT消息。</p>
+</li>
+<li>
+<p>决定提交还是终止</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>向TP发送COMMIT或者ABORT消息</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>等待TP的DONE消息</p>
+<p>等待超时以后，重新发送COMMIT或者ABORT消息。这个消息除了事务本身资源没有释放，其他资源都可以释放。</p>
+</li>
+<li>
+<p>释放事务资源</p>
+<p>没等待消息，没有处理。</p>
+</li>
+</ol>
+<p><strong>TP视角</strong></p>
+<ol>
+<li>
+<p>等待TC发送REQUEST-TO-PREPARE消息</p>
+<p>一段时间以后没有收到所有TC的消息，TP自己决定终止事务。如果，后面再收到REQUEST-TO-PREPARE回复NO消息。</p>
+</li>
+<li>
+<p>进行PREPARE操作</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>如果（2）成功向TC发送PREPARE，否则发送NO</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>等待TC的COMMIT或者ABORT消息</p>
+<p><strong>阻塞</strong>，一直等待。</p>
+</li>
+<li>
+<p>向TC发送DONE消息</p>
+<p>没等待消息，没有处理。</p>
+</li>
+</ol>
+<h4 id="恢复">恢复</h4>
+<p>当TC或者TP宕机重启以后需要日志辅助事务的恢复。如果没有日志，事务就没法正常结束了。</p>
+<p><strong>日志</strong></p>
+<pre><code>                     TC                                             TP
+            +-------------------+                          +-------------------+
+        1 ===&gt;                  |                          |                   |
+            |log start-two-phase|                          |                   |
+            |                   |   REQUEST-TO-PREPARE     |                   |
+            |                   | -----------------------&gt; |                  &lt;=== 1
+        2 ===&gt;                  |                          |                   |
+            |                   |         PREPARE          |    log prepare    |
+            |                   | &lt;----------------------- |                   |
+            |                   |           NO             |                   |
+            | log commit/abort  |                          |                  &lt;=== 2
+            |                   |                          |                   |
+        3 ===&gt;                  |         COMMIT           |                   |
+            |                   | -----------------------&gt; |                   |
+            |                   |          ABORT           |                   |
+            |                   |                          |                   |
+            |                   |          DONE            |    log commited   |
+            |                   | &lt;----------------------- |                   |
+            |      log done     |                          |                  &lt;=== 3
+            |                   |                          |                   |
+        4 ===&gt;                  |                          |                   |
+            +-------------------+                          +-------------------+
+</code></pre><p>如上图TC需要3条日志，TP需要2条日志。</p>
+<p><strong>TC日志</strong></p>
+<ol>
+<li>
+<p>log start-two-phase</p>
+<p>在开始2PC之前记录start-two-phase日志。包含所有TP的信息，不然TC恢复的时候，就不知道哪些TP，也就无法发送恢复信息了。</p>
+</li>
+<li>
+<p>log commit/abort</p>
+<p>在提交之前记录commit/abort日志。不然，TC发送了COMMIT消息之后失败，恢复的时候就不知道到底是提交还是失败。</p>
+</li>
+<li>
+<p>log done</p>
+<p>当收到所有的TP的DONE消息后，记录done日志。恢复的时候可以用来清除事务资源。</p>
+</li>
+</ol>
+<p><strong>TP日志</strong></p>
+<ol>
+<li>
+<p>log prepare</p>
+<p>在发送PREPARE消息之前记录prepare日志。当TP没有记录日志的情况下发送了PREPARE消息给TC然后crash，恢复的时候，因为没有准备和提交日志，就不知道自己的状态了。这个时候，就会终止事务。特别在它已经发送了PREPARE消息情况下，而TC已经提交事务，就会造成数据的不一致。</p>
+</li>
+<li>
+<p>log commited</p>
+<p>在收到TC的COMMIT或者ABORT的消息以后在发送DONE之前记录commited日志。这样恢复的时候知道自己的状态，不然就会陷入不确定状态。同时，可以尽快释放一些锁资源。</p>
+</li>
+</ol>
+<p><strong>恢复处理</strong></p>
+<p>通过上面的日志，<strong>TC</strong>有四种恢复情况，如上图：</p>
+<ol>
+<li>没有任何日志。终止事务。TP等待REQUEST-TO-PREPARE超时以后会终止事务。</li>
+<li>有start-two-phase日志，但是还没决定COMMIT或者ABORT。终止事务。因为，TP可能等待COMMIT或者ABORT，需要向每个TP发送ABORT消息。有些TP可能没有收到REQUEST-TO-PREPARE，但是发送ABORT消息是没关系的。</li>
+<li>有commit/abort日志，还没有done日志。同样有可能TP正在等待COMMIT或者ABORT，因此向每个TP发送日志中记录的COMMIT或者ABORT。</li>
+<li>有done日志。说明所有的TP都已经处理完了，不需要做任何事情。</li>
+</ol>
+<p>通过上面的日志，<strong>TP</strong>有三种恢复情况，如上图：</p>
+<ol>
+<li>
+<p>没有任何日志。终止事务。</p>
+</li>
+<li>
+<p>有prepare日志，还没有commited日志。执行<em>终止协议</em>。</p>
+</li>
+<li>
+<p>有commited日志。向TC发送DONE消息，或者等TC发送COMMIT或者ABORT的时候回复DONE消息。</p>
+</li>
+</ol>
+<p>终止协议是说当TP恢复的时候终止事务的协议。最简单的做法就是等到恢复和TC的通信，从TC哪里得到消息。这样的坏处是一直阻塞到和TC的通信恢复为止，只要TC挂了事务永远阻塞。</p>
+<h3 id="总结">总结</h3>
+<p>2PC是XA规范的标准实现。最重要的问题是阻塞，即当TC以及知道事务状态的TP都挂的情况下，事务没法终止。</p>
+<h2 id="3pc">3PC</h2>
+<p>2PC之所以会阻塞是因为通信失败的原因会发生当一个TP处在不确定状态时，不确定其他TP是否已经终止或者提交，从而使TP一直阻塞。<strong>如果能够确保任何TP提交时确保不会存在不确定状态的TP</strong>，就不会阻塞事务了。3PC是2PC的一种改进，主要是把第二阶段拆分为两个阶段。</p>
+<h3 id="协议-1">协议</h3>
+<pre><code>                       TC                              TP
+                     +----+          VOTE-REQ        +----+
+                     |    | -----------------------&gt; |    |
+                     |    |           YES            |    |
+                     |    | &lt;----------------------- |    |
+                     |    |           NO             |    |
+                     |    |                          |    |
+                     |    |        PRE-PREPARE       |    |
+                     |    | -----------------------&gt; |    |
+                     |    |           ABORT          |    |
+                     |    |           ACK            |    |
+                     |    | &lt;----------------------- |    |
+                     |    |           DONE           |    |
+                     |    |                          |    |
+                     |    |       DO-COMMIT          |    |
+                     |    | -----------------------&gt; |    |
+                     |    |          DONE            |    |
+                     |    | &lt;----------------------- |    |
+                     +----+                          +----+
+                                    Messages
+</code></pre><p><strong>第一阶段</strong></p>
+<ol>
+<li>TC向所有的TP发送VOTE-REQ消息。</li>
+<li>TC等待TP的消息。</li>
+<li>TP收到VOTE-REQ后，分两种情况：
+<ol>
+<li>如果可以执行事务，返回YES</li>
+<li>否则终止事务返回NO。</li>
+</ol>
+</li>
+<li>如果（3）中返回YES，TP等待TC的PRE-PREPARE消息。</li>
+</ol>
+<p><strong>第二阶段</strong></p>
+<ol>
+<li>TC决定
+<ol>
+<li>收到了所有TP的YES消息，决定执行事务。</li>
+<li>收到一个或者多个TP的NO消息，决定终止事务。</li>
+</ol>
+</li>
+<li>TC发送PRE-PREPARE消息或者ABORT消息。</li>
+<li>如果（2）发送PRE-PREPARE，TC等待TP的ACK消息。</li>
+<li>TP向TC发送ACK消息。</li>
+<li>TP等待TC的DO-COMMIT消息。</li>
+</ol>
+<p><strong>第三阶段</strong></p>
+<ol>
+<li>TC收集到所有的TP返回的ACK消息以后，向TP发送DO-COMMIT消息。</li>
+<li>TC等待TP的DONE消息。</li>
+<li>TP收到DO-COMMIT消息，向TC发送DONE消息。</li>
+<li>TC收到TP的DONE消息之后释放事务资源。</li>
+</ol>
+<h3 id="错误处理与恢复-1">错误处理与恢复</h3>
+<h4 id="错误处理-1">错误处理</h4>
+<p>等待消息超时时的处理。</p>
+<p><strong>TC视角</strong></p>
+<ol>
+<li>
+<p>向所有的TP发送VOTE-REQ消息</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>等待TP的YES或者NO消息</p>
+<p>一段时间以后TC没有收集到所有TP的YES消息或者某个TP的NO消息，自行终止事务，并向每个返回YES消息的TP发送ABORT消息。</p>
+</li>
+<li>
+<p>决定预提交或者终止</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>等待TP的ACK消息</p>
+<p>一段时间以后TC没有收到所有TP的ACK消息。向TP发送DO-COMMIT消息，就当所有的TP都发回了ACK消息。因为，比较所有的TP针对VOTE-REQ消息的回答是YES，说明是可以提交的。</p>
+</li>
+<li>
+<p>等待TP的DONE消息</p>
+<p>等待超时以后，重新发送DO-COMMIT消息。这个消息除了事务本身资源没有释放，其他资源都可以释放。</p>
+</li>
+</ol>
+<p><strong>TP视角</strong></p>
+<ol>
+<li>
+<p>等待TC的VOTE-REQ消息</p>
+<p>一段时间以后TP没有收到VOTE-REQ消息，自行终止事务。</p>
+</li>
+<li>
+<p>发送YES或者NO消息</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>等待TC的PRE-PREPARE或者ABORT消息</p>
+<p><strong>阻塞</strong>，一直等待。</p>
+</li>
+<li>
+<p>发送ACK或者DONE消息</p>
+<p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>发送DONE消息</p>
+<p>没等待消息，没有处理。</p>
+</li>
+</ol>
+<h4 id="恢复-1">恢复</h4>
+<p><strong>日志</strong></p>
+<p>日志内容和2PC是一样的。</p>
+<pre><code>                     TC                                             TP
+            +---------------------+                          +-------------------+
+        1 ===&gt;                    |                          |                   |
+            |log start-three-phase|                          |                   |
+            |                     |         VOTE-REQ         |                   |
+            |                     | -----------------------&gt; |                  &lt;=== 1
+            |                     |           YES            |    log prepare    |
+        2 ===&gt;                    | &lt;----------------------- |                   |
+            |                     |           NO             |                   |
+            |                     |                          |                  &lt;=== 2
+            |                     |                          |                   |
+            |                     |      PRE-PREPARE         |                   |
+            |   log commit/abort  | -----------------------&gt; |                   |
+            |                     |          ABORT           |                   |
+        3 ===&gt;                    |           ACK            |    log commited   |
+            |                     | &lt;----------------------- |                   |
+            |                     |          DONE            |                  &lt;=== 3
+            |                     |                          |                   |
+            |                     |        DO-COMMIT         |                   |
+            |                     | -----------------------&gt; |                   |
+            |      log done       |          DONE            |                   |
+            |                     | &lt;----------------------- |                   |
+        4 ===&gt;                    |                          |                   |
+            +---------------------+                          +-------------------+
+</code></pre><p><strong>TC日志</strong></p>
+<ol>
+<li>
+<p>log start-three-phase</p>
+<p>在开始3PC之前记录start-three-phase日志。包含所有TP的信息，不然TC恢复的时候，就不知道哪些TP，也就无法发送恢复信息了。</p>
+</li>
+<li>
+<p>log commit/abort</p>
+<p>在提交之前记录commit/abort日志。不然，TC发送了PRE-PREPARE消息之后失败，恢复的时候就不知道到底是提交还是失败。</p>
+</li>
+<li>
+<p>log done</p>
+<p>当收到所有的TP的DONE消息后，记录done日志。恢复的时候可以用来清除事务资源。</p>
+</li>
+</ol>
+<p><strong>TP日志</strong></p>
+<ol>
+<li>
+<p>log prepare</p>
+<p>在发送YES消息之前记录prepare日志。当TP没有记录日志的情况下发送了YES消息给TC然后crash，恢复的时候，因为没有准备和提交日志，就不知道自己的状态了。这个时候，就会终止事务。特别在它已经发送了YES消息情况下，而TC已经提交事务，就会造成数据的不一致。</p>
+</li>
+<li>
+<p>log commited</p>
+<p>在收到TC的PRE-PREPARE或者ABORT的消息以后在发送ACK或者DONE之前记录commited日志。这样恢复的时候知道自己的状态，不然就会陷入不确定状态。</p>
+</li>
+</ol>
+<p><strong>恢复处理</strong></p>
+<p>通过上面的日志，<strong>TC</strong>有四种恢复情况，如上图：</p>
+<ol>
+<li>没有任何日志。终止事务。TP等待VOTE-REQ超时以后会终止事务。</li>
+<li>有start-three-phase日志，但是还没决定PRE-PREPARE或者ABORT。终止事务。因为，TP可能等待YES或者NO，需要向每个TP发送ABORT消息。有些TP可能没有收到VOTE-REQ，但是发送ABORT消息是没关系的。</li>
+<li>有commit/abort日志，还没有done日志。同样有可能TP正在等待PRE-PREPARE或者ABORT。因此，如果决定是提交，那么向每个TP发送日志中记录的DO-COMMIT，否则发送ABORT。这里发送PRE-PREPARE有点多余，因为在3PC里面本身就有可能存在一些故障的TP没有收到PRE-PREPARE，就收到DO-COMMIT的情况。</li>
+<li>有done日志。说明所有的TP都已经处理完了，不需要做任何事情。</li>
+</ol>
+<p>通过上面的日志，<strong>TP</strong>有三种恢复情况，如上图：</p>
+<ol>
+<li>没有任何日志。终止事务。</li>
+<li>有prepare日志，还没有commited日志。执行<em>终止协议</em>。</li>
+<li>有commited日志。向TC发送DONE消息，或者等TC发送COMMIT或者ABORT的时候回复DONE消息。</li>
+</ol>
+<h2 id="终止协议">终止协议</h2>
+<p>不管是2PC还是3PC当<strong>TP</strong>恢复的时候，如果处在不确定状态就需要执行终止协议。在确定了事务状态的情况，最简单的做法等待恢复和TC之间的通信，获得事务状态。还有，通过其他<strong>TP</strong>的获得事务状态。如果事务状态还不确定，可以通过重新开始事务或者终止事务的方式搞定。详细的算法《Concurrency Control and Recovery in Database Systems》中7.5节有详细说明。</p>
+
+<div class="np"><a/> <a href=/posts/cs/db/mysql-servertimezone/>mysql连接中的serverTimezone参数解析 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>
