@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>高内聚和低耦合</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>高内聚和低耦合</strong>
+<hr> <h2 id="缘起">缘起</h2>
+<p>如何减少软件开发过程中维护和修改的成本？如果代码具有鲁棒性、可靠性、可读性、可复用性，那维护和修改都是比较省力气的。这就需要一些方法来实现（废话）。开发方法有很多，怎么衡量？《Composite/Structured Design》提出内聚(cohesion)和耦合(coupling)就是用来解决这个问题。</p>
+<p>高内聚和低耦合是我们最求的目标。往往高内聚意味者低耦合，反过来也是。具有这两个特征的代码能够使代码的维护和修改的成本更低。</p>
+<h2 id="内聚">内聚</h2>
+<p>什么是内聚？它是一个尺度，衡量多个不同元素属于同一个模块的合适程度。越合适越好，也就是所谓的高内聚。经常会遇到的有：</p>
+<ol>
+<li>一个类的方法和数据与这个类需要表达的目的是否一致。</li>
+<li>一个类的方法本身以及和数据之间的关联是否紧密。</li>
+<li>一个jar包中各个字模块的语义是不是和这个jar的语义一致。</li>
+</ol>
+<p>《Composite/Structured Design》把内聚分成了以下7类，按照顺序内聚程度一次降低。</p>
+<ol>
+<li>
+<p>信息内聚(functional strength)</p>
+<p>把操作相同信息和执行单一功能的函数放在一起。比如：数据库连接池，打开连接，获取一个空闲连接，关闭一个空闲连接，缓存一个连接。这些逻辑共享一个连接池的数据结构，同时执行的逻辑都是连接池这个单一功能。</p>
+</li>
+<li>
+<p>功能内聚(information strength)</p>
+<p>执行相同单一功能的函数放在一起。一种检查方式是，把函数的语义合在一起是不是和某个具体功能一致，没有多余。比如：数据库操作需要通过数据库连接池模块拿到一个数据库连接，执行SQL，关闭数据库连接。这几个函数放在一起是一种功能内聚。封装到一个执行SQL的模块里面去。</p>
+</li>
+<li>
+<p>通信内聚(communicational strength)</p>
+<p>因为某个业务逻辑而调用多个函数放在一起。函数之间有数据依赖，一个函数的输出是另外一个函数的输入。</p>
+</li>
+<li>
+<p>过程内聚(procedural strength)</p>
+<p>同样因为某个业务逻辑而调用多个函数放在一起。但是，他们之间也没有本质关联。比如：购买某商品获得积分。就把下单、支付、添加积分放在同一个模块里面了。</p>
+</li>
+<li>
+<p>空间内聚(classical strength)</p>
+<p>在一个逻辑中，有时会调用某些函数，但是这些函数之间并没有本质的关联，却把他们放在一起了。比如：转账失败的时候需要通知用户，然后就把通知用户逻辑和转账逻辑放在了一起。</p>
+</li>
+<li>
+<p>逻辑内聚(logical strength)</p>
+<p>多个函数放在一起是因为在同一个逻辑里面会被调用，即使他们本质上是不同的东西。比如，处理信号的时候把处理鼠标输入的函数和处理键盘输入的函数放在一起，然后入口函数通过识别参数来调用不同的函数。</p>
+</li>
+<li>
+<p>偶然内聚(coincidental strength)</p>
+<p>函数任意的放在一起了，他们之间没有任何关系。比如常见的utils类。</p>
+</li>
+</ol>
+<p>几种内聚不是天然互斥的。有时候会同时满足多种内聚，这个时候保险起见还是当作内聚性较低的那种吧。</p>
+<p><strong>信息内聚</strong>是最理想的情况了没有外部依赖，没有多余的逻辑，通常也是我们<strong>设计的类时候最需要做到的</strong>。<strong>功能内聚</strong>在一个大模块里面是常遇到的，尤其是分层架构里面，是<strong>需要追求</strong>的一种内聚。<strong>通信内聚</strong>、<strong>过程内聚</strong>是也是<strong>可以接收</strong>，<strong>空间内聚</strong>、<strong>逻辑内聚</strong>就得<strong>避免</strong>了，<strong>偶然内聚</strong>虽然在平时写代码的时候习惯使用一些utils，但是是<strong>可以避免</strong>的，只要把相关的逻辑放到相应的模块即可。</p>
+<h2 id="耦合">耦合</h2>
+<p>什么是耦合？它也是一个尺度，衡量多个模块之间的依赖程度。依赖程度越低越好，也就是所谓的低耦合。经常会遇到的有：</p>
+<ol>
+<li>一类中的方法之间联系是否紧密。</li>
+<li>一类中的方法和字段联系是否紧密。</li>
+<li>一个jar中各个模块语义是否和jar包提供的功能一致。</li>
+</ol>
+<p>《Composite/Structured Design》同样把耦合分成了以下7类，按照顺序耦合程度一次增强。他们主要体现在函数式编程范式下</p>
+<ol>
+<li>
+<p>没有直接的耦合</p>
+<p>可以作为一个基准。它是指没有其他类别的耦合。</p>
+</li>
+<li>
+<p>数据耦合(data couping)</p>
+<p>模块之间只有参数的依赖。同时，每个参数都是有意义的。</p>
+</li>
+<li>
+<p>印章耦合(stamp coupling)</p>
+<p>模块之间只有参数依赖。但是，这个参数对不同模块需要的数据是不一样的，但是提供了一个包含很多不必要的数据。比如：模块A/B都依赖结构体C，A只需要C中的a字段，B需要C的全部。这时模块A/B就冗余依赖了，就是一个印章把模块A和模块B都印上了一样。</p>
+</li>
+<li>
+<p>控制耦合(control coupling)</p>
+<p>一个模块需要传递一些控制另外一个模块执行的信息时，他们就产生了控制耦合。比如：快速排序函数中的比较函数。</p>
+</li>
+<li>
+<p>外部耦合(external coupling)</p>
+<p>多个模块同时引用相同的全局变量。全局变量是同构的，模块对全局变量的理解是一致的。</p>
+</li>
+<li>
+<p>全局耦合(common coupling)</p>
+<p>多个模块同时引用相同的全局变量。和外部变量有点类似，区别在于这些全局变量在不同模块内部的理解还不一样。</p>
+</li>
+<li>
+<p>需要的是内容耦合(content coupling)</p>
+<p>一个模块直接访问另外一个模块内部的数据。比如，某个模块直接访问某个结构体中的字段。</p>
+</li>
+</ol>
+<p>在上面的几种耦合中<strong>内容耦合</strong>是<strong>不能接收的</strong>，<strong>外部耦合</strong>和<strong>全局耦合</strong>是<strong>尽量避免</strong>，但是<strong>有时可能没法避免</strong>，<strong>控制耦合</strong>是可以接收的，<strong>数据耦合</strong>和<strong>印章耦合</strong>是我们需要<strong>追求</strong>的，最好做到数据耦合。</p>
+<p>在面向对象编程范式里面，常见的耦合有：</p>
+<ol>
+<li>
+<p>空间耦合</p>
+<p>把两个模块放在一起，仅仅是因为他们在同一个地方被使用了。最应该避免的一种情况。</p>
+</li>
+<li>
+<p>结构化耦合</p>
+<p>最直接的耦合。比如：一个类包含另外一个类的列表字段，一个类继承另外一个类，还有一个类的方法中定义了另外一个类的变量。</p>
+</li>
+<li>
+<p>克隆耦合</p>
+<p>代码相似，需要同时修改。比如，重复代码。</p>
+</li>
+<li>
+<p>进化耦合</p>
+<p>一种间接耦合。比如：修改功能的时候，不同的两个类，需要同时修改。</p>
+</li>
+</ol>
+<h2 id="结论">结论</h2>
+<p>从上面的定义都可以看出重要的一个内容是<strong>依赖</strong>。内聚和耦合是它的一体两面。高内聚意味着模块（广义上的称呼）内部依赖越紧密，低耦合意味着模块之间依赖越少。大的来说，要达到高内聚和低耦合，主要是要识别问题本质，然后分解问题，建立每个子问题边界，让子问题之间依赖越少越好，同时让依赖越简单越好。</p>
+<p>达到高内聚低耦合的方式，也有很多设计原则。比如SOLID，DOL，信息隐藏，康威定律。</p>
+
+<div class="np"><a/> <a href=/posts/cs/dist/2_3pc/>二阶段提交和三阶段提交 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

@@ -366,7 +366,7 @@ body{background:#faf9de;}
 <h2 id="终止协议">终止协议</h2>
 <p>不管是2PC还是3PC当<strong>TP</strong>恢复的时候，如果处在不确定状态就需要执行终止协议。在确定了事务状态的情况，最简单的做法等待恢复和TC之间的通信，获得事务状态。还有，通过其他<strong>TP</strong>的获得事务状态。如果事务状态还不确定，可以通过重新开始事务或者终止事务的方式搞定。详细的算法《Concurrency Control and Recovery in Database Systems》中7.5节有详细说明。</p>
 
-<div class="np"><a/> <a href=/posts/cs/db/mysql-servertimezone/>mysql连接中的serverTimezone参数解析 →</a></div>
+<div class="np"><a href=/posts/cs/design/coupling_cohesion/>← 高内聚和低耦合</a> <a href=/posts/cs/db/mysql-servertimezone/>mysql连接中的serverTimezone参数解析 →</a></div>
 <div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
 
 <div id="gitalk-container"></div>

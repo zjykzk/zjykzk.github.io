@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>design on 老K随笔</title>
+    <link>http://zjykzk.github.io/categories/design/</link>
+    <description>Recent content in design on 老K随笔</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
+    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <copyright>(c) 2017 zenk.</copyright>
+    <lastBuildDate>Fri, 12 Jun 2020 13:40:04 +0800</lastBuildDate>
+    
+	<atom:link href="http://zjykzk.github.io/categories/design/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>高内聚和低耦合</title>
+      <link>http://zjykzk.github.io/posts/cs/design/coupling_cohesion/</link>
+      <pubDate>Fri, 12 Jun 2020 13:40:04 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/posts/cs/design/coupling_cohesion/</guid>
+      <description>缘起 如何减少软件开发过程中维护和修改的成本？如果代码具有鲁棒性、可靠性、可读性、可复用性，那维护和修改都是比较省力气的。这就需要一些方法来实现（废话）。开发方法有很多，怎么衡量？《Composite/Structured Design》提出内聚(cohesion)和耦合(coupling)就是用来解决这个问题。
+高内聚和低耦合是我们最求的目标。往往高内聚意味者低耦合，反过来也是。具有这两个特征的代码能够使代码的维护和修改的成本更低。
+内聚 什么是内聚？它是一个尺度，衡量多个不同元素属于同一个模块的合适程度。越合适越好，也就是所谓的高内聚。经常会遇到的有：
+ 一个类的方法和数据与这个类需要表达的目的是否一致。 一个类的方法本身以及和数据之间的关联是否紧密。 一个jar包中各个字模块的语义是不是和这个jar的语义一致。  《Composite/Structured Design》把内聚分成了以下7类，按照顺序内聚程度一次降低。
+  信息内聚(functional strength)
+把操作相同信息和执行单一功能的函数放在一起。比如：数据库连接池，打开连接，获取一个空闲连接，关闭一个空闲连接，缓存一个连接。这些逻辑共享一个连接池的数据结构，同时执行的逻辑都是连接池这个单一功能。
+  功能内聚(information strength)
+执行相同单一功能的函数放在一起。一种检查方式是，把函数的语义合在一起是不是和某个具体功能一致，没有多余。比如：数据库操作需要通过数据库连接池模块拿到一个数据库连接，执行SQL，关闭数据库连接。这几个函数放在一起是一种功能内聚。封装到一个执行SQL的模块里面去。
+  通信内聚(communicational strength)
+因为某个业务逻辑而调用多个函数放在一起。函数之间有数据依赖，一个函数的输出是另外一个函数的输入。
+  过程内聚(procedural strength)
+同样因为某个业务逻辑而调用多个函数放在一起。但是，他们之间也没有本质关联。比如：购买某商品获得积分。就把下单、支付、添加积分放在同一个模块里面了。
+  空间内聚(classical strength)
+在一个逻辑中，有时会调用某些函数，但是这些函数之间并没有本质的关联，却把他们放在一起了。比如：转账失败的时候需要通知用户，然后就把通知用户逻辑和转账逻辑放在了一起。
+  逻辑内聚(logical strength)
+多个函数放在一起是因为在同一个逻辑里面会被调用，即使他们本质上是不同的东西。比如，处理信号的时候把处理鼠标输入的函数和处理键盘输入的函数放在一起，然后入口函数通过识别参数来调用不同的函数。
+  偶然内聚(coincidental strength)
+函数任意的放在一起了，他们之间没有任何关系。比如常见的utils类。
+  几种内聚不是天然互斥的。有时候会同时满足多种内聚，这个时候保险起见还是当作内聚性较低的那种吧。
+信息内聚是最理想的情况了没有外部依赖，没有多余的逻辑，通常也是我们设计的类时候最需要做到的。功能内聚在一个大模块里面是常遇到的，尤其是分层架构里面，是需要追求的一种内聚。通信内聚、过程内聚是也是可以接收，空间内聚、逻辑内聚就得避免了，偶然内聚虽然在平时写代码的时候习惯使用一些utils，但是是可以避免的，只要把相关的逻辑放到相应的模块即可。
+耦合 什么是耦合？它也是一个尺度，衡量多个模块之间的依赖程度。依赖程度越低越好，也就是所谓的低耦合。经常会遇到的有：
+ 一类中的方法之间联系是否紧密。 一类中的方法和字段联系是否紧密。 一个jar中各个模块语义是否和jar包提供的功能一致。  《Composite/Structured Design》同样把耦合分成了以下7类，按照顺序耦合程度一次增强。他们主要体现在函数式编程范式下
+  没有直接的耦合
+可以作为一个基准。它是指没有其他类别的耦合。
+  数据耦合(data couping)
+模块之间只有参数的依赖。同时，每个参数都是有意义的。</description>
+    </item>
+    
+  </channel>
+</rss>
