@@ -8,10 +8,19 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Sun, 28 Jun 2020 15:44:46 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 16 Dec 2020 16:58:31 +0800</lastBuildDate>
     
 	<atom:link href="http://zjykzk.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>cs</title>
+      <link>http://zjykzk.github.io/categories/cs/</link>
+      <pubDate>Wed, 16 Dec 2020 16:58:31 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/categories/cs/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>design</title>
@@ -19,15 +28,6 @@
       <pubDate>Sun, 28 Jun 2020 15:44:46 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/categories/design/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>cs</title>
-      <link>http://zjykzk.github.io/categories/cs/</link>
-      <pubDate>Fri, 17 Apr 2020 15:12:22 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
-      <guid>http://zjykzk.github.io/categories/cs/</guid>
       <description></description>
     </item>
     
