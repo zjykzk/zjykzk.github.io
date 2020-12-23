@@ -110,7 +110,7 @@ body{background:#faf9de;}
 </li>
 <li>
 <p>等待TC的COMMIT或者ABORT消息</p>
-<p><strong>阻塞</strong>，一直等待。</p>
+<p><strong>阻塞</strong>，一直等待，超时执行终止协议。</p>
 </li>
 <li>
 <p>向TC发送DONE消息</p>
@@ -193,7 +193,8 @@ body{background:#faf9de;}
 <h3 id="总结">总结</h3>
 <p>2PC是XA规范的标准实现。最重要的问题是阻塞，即当TC以及知道事务状态的TP都挂的情况下，事务没法终止。</p>
 <h2 id="3pc">3PC</h2>
-<p>2PC之所以会阻塞是因为通信失败的原因会发生当一个TP处在不确定状态时，不确定其他TP是否已经终止或者提交，从而使TP一直阻塞。<strong>如果能够确保任何TP提交时确保不会存在不确定状态的TP</strong>，就不会阻塞事务了。3PC是2PC的一种改进，主要是把第二阶段拆分为两个阶段。</p>
+<p>2PC之所以会阻塞是因为通信失败的原因会发生当一个TP处在不确定状态时，不确定其他TP是否已经终止或者提交，从而使TP一直阻塞。<strong>如果能够确保任何TP提交时确保不会存在不确定状态的TP</strong>，就不会阻塞事务了。3PC是2PC的一种改进，主要是把第二阶段拆分为两个阶段，通过PRE-COMMIT消息做到所有的TP都直到其他TP已经确定可以提交。</p>
+<p>2PC在只出现机器故障的时候，它也是一定阻塞的。而3PC可以避免这个问题，如果出现通信故障，还是没法避免阻塞，可以降低阻塞的频率。实际系统中，由于阻塞的概率比较低、3PC实现负责以及性能比较低，因此使用的都是2PC。</p>
 <h3 id="协议-1">协议</h3>
 <pre><code>                       TC                              TP
                      +----+          VOTE-REQ        +----+
@@ -266,7 +267,7 @@ body{background:#faf9de;}
 </li>
 <li>
 <p>等待TP的ACK消息</p>
-<p>一段时间以后TC没有收到所有TP的ACK消息。向TP发送DO-COMMIT消息，就当所有的TP都发回了ACK消息。因为，比较所有的TP针对VOTE-REQ消息的回答是YES，说明是可以提交的。</p>
+<p>一段时间以后TC没有收到所有TP的ACK消息。向TP发送DO-COMMIT消息，就当所有的TP都发回了ACK消息。因为，毕竟所有的TP针对VOTE-REQ消息的回答是YES，说明是可以提交的。</p>
 </li>
 <li>
 <p>等待TP的DONE消息</p>
@@ -285,11 +286,15 @@ body{background:#faf9de;}
 </li>
 <li>
 <p>等待TC的PRE-PREPARE或者ABORT消息</p>
-<p><strong>阻塞</strong>，一直等待。</p>
+<p><strong>阻塞</strong>，一直等待，超时执行终止协议。</p>
 </li>
 <li>
 <p>发送ACK或者DONE消息</p>
 <p>没等待消息，没有处理。</p>
+</li>
+<li>
+<p>等待TC的DO-COMMIT消息</p>
+<p><strong>阻塞</strong>，一致等待，超时执行终止协议。这是因为，这个点上TP能够直到其他的TP都已经同意执行事务了。但是，有可能一个TP因为TC没有向它发送PRE-COMMIT就挂了，这条TP就会处于不确定状态。这样就会出现一个TP已经提交了，一个TP还不确定。如果，已经确定状态的TP都挂了，事务就没法终止。</p>
 </li>
 <li>
 <p>发送DONE消息</p>
