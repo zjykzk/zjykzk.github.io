@@ -31,12 +31,12 @@ body{background:#faf9de;}
 <p>当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。<code>storedPermits</code>代表的就是当前充足资源的数量。</p>
 <p>另外，<code>coolDownIntervalMicros()</code>返回<code>stableIntervalMicros</code>，<code>maxPermits</code>等于<code>permitsPerSecond</code>。</p>
 <p><strong>Warmup模式</strong></p>
-<pre><code>          ^ throttling
+<pre tabindex="0"><code>          ^ throttling
           |
     cold  +                  /
  interval |                 /.
           |                / .
-          |               /  .   ← &quot;warmup period&quot; is the area of the trapezoid between
+          |               /  .   ← &#34;warmup period&#34; is the area of the trapezoid between
           |              /   .     thresholdPermits and maxPermits
           |             /    .
           |            /     .

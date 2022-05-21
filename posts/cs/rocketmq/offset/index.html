@@ -25,14 +25,14 @@ body{background:#faf9de;}
 <h2 id="存储">存储</h2>
 <p><strong>本地类型</strong></p>
 <p>数据保存在<code>$storeDir/.rocketmq_offsets/$clientID/$group/offsets.json</code>中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。其中<code>$storeDir</code>是可以通过系统变量<code>rocketmq.client.localOffsetStoreDir</code>配置，如果没有指定参数就使用HOME目录。<code>$clientID</code>和<code>$group</code>分别表示消费者的id和分组。</p>
-<pre><code>// example
-{&quot;offsetTable&quot;:{{&quot;brokerName&quot;:&quot;topic&quot;,&quot;queueId&quot;:1,&quot;topic&quot;:&quot;broker&quot;}:0}}
+<pre tabindex="0"><code>// example
+{&#34;offsetTable&#34;:{{&#34;brokerName&#34;:&#34;topic&#34;,&#34;queueId&#34;:1,&#34;topic&#34;:&#34;broker&#34;}:0}}
 </code></pre><p><strong>远程类型</strong></p>
 <p>数据保存在<code>$rootPath/config/consumerOffset.json</code>文件中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。<code>offsetTable</code>中的key格式是<code>topic@group</code>，value格式<code>queueID:offset</code>。</p>
-<pre><code>// example
+<pre tabindex="0"><code>// example
 {
-    &quot;offsetTable&quot;:{
-        &quot;test@benchmark_consumer_61&quot;:{
+    &#34;offsetTable&#34;:{
+        &#34;test@benchmark_consumer_61&#34;:{
             0:5280,1:5312,2:5312,3:5312
         }
     }

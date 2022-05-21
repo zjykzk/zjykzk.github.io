@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Thu, 30 Aug 2018 16:48:26 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/algo/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Thu, 30 Aug 2018 16:48:26 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/algo/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>限流</title>
       <link>http://zjykzk.github.io/posts/cs/dist/rate-limit/</link>

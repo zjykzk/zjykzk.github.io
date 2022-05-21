@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 04 Jun 2019 16:50:10 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/program-language/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Tue, 04 Jun 2019 16:50:10 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/program-language/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>如何学习一门编程语言</title>
       <link>http://zjykzk.github.io/posts/cs/language/learn/</link>

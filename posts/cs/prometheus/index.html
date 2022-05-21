@@ -34,7 +34,7 @@ Label值允许任意的Unicode字符</p>
 <p>统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。</p>
 <p>这个度量类型有三个时间序列统计：</p>
 <ul>
-<li>&lt;base_name&gt;_bucket{le=&quot;upper inclusive bound&rdquo;}：小于某个阀值的度量事件发生的次数</li>
+<li>&lt;base_name&gt;_bucket{le=&ldquo;upper inclusive bound&rdquo;}：小于某个阀值的度量事件发生的次数</li>
 <li>&lt;base_name&gt;_sum：度量值的和</li>
 <li>&lt;base_name&gt;_count：度量事件发生的次数</li>
 </ul>
@@ -42,7 +42,7 @@ Label值允许任意的Unicode字符</p>
 <p>统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。</p>
 <p>这个度量类型有三个时间序列统计：</p>
 <ul>
-<li>&lt;base_name&gt;{quantile=&rdquo;&lt;p&gt;&rdquo;}：度量值在前百分之p的度量事件发生的次数</li>
+<li>&lt;base_name&gt;{quantile=&quot;&lt;p&gt;&quot;}：度量值在前百分之p的度量事件发生的次数</li>
 <li>&lt;base_name&gt;_sum：度量值的和</li>
 <li>&lt;base_name&gt;_count：度量事件发生的次数</li>
 </ul>
@@ -68,8 +68,8 @@ Label值允许任意的Unicode字符</p>
 </ul>
 <p>时间序列：</p>
 <ul>
-<li>up{job=&rdquo;&lt;job-name&gt;&rdquo;, instance=&rdquo;&lt;host:port&gt;&rdquo;}：1 表示监控目标活着，0表示挂了</li>
-<li>scrape_duration_seconds{job=&rdquo;&lt;job-name&gt;&rdquo;, instance=&rdquo;&lt;host:port&gt;&rdquo;}：抓取日志的时间</li>
+<li>up{job=&quot;&lt;job-name&gt;&quot;, instance=&quot;&lt;host:port&gt;&quot;}：1 表示监控目标活着，0表示挂了</li>
+<li>scrape_duration_seconds{job=&quot;&lt;job-name&gt;&quot;, instance=&quot;&lt;host:port&gt;&quot;}：抓取日志的时间</li>
 </ul>
 
 <div class="np"><a href=/posts/cs/str/>← 字符串</a> <a href=/posts/cs/bug-op/>增加bug的编程实践 →</a></div>

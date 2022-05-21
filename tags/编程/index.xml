@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 28 Mar 2017 11:22:09 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Tue, 28 Mar 2017 11:22:09 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GO 内存模型</title>
       <link>http://zjykzk.github.io/posts/cs/golang/go-memory-model/</link>

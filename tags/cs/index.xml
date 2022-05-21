@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Sun, 28 Jun 2020 15:44:46 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/cs/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 28 Jun 2020 15:44:46 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/cs/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>《A Philosophy of Software Design》笔记</title>
       <link>http://zjykzk.github.io/posts/cs/design/aposd/</link>

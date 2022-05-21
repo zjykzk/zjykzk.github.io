@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>简单设计的4个原则</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>简单设计的4个原则</strong>
+<hr> <h3 id="什么是简单设计">什么是简单设计？</h3>
+<p>首先，简单设计强调更好的设计**，而不是一个好的设计。突出了，它是一个动态的过程，强调设计随着软件开发的进展会随时调整。确保当下的设计能做到的最好设计。</p>
+<p>另外，在软件开发中有两个常识：</p>
+<ol>
+<li>需求是总是会变的。</li>
+<li>我们不能够精确预测哪些需求将会变化。</li>
+</ol>
+<p>因此，更好的设计是方便修改的设计；更好的设计是不去计划设计哪些地方将来会修改，而是采取<strong>简单设计的原则</strong>，让代码更加容易修改。那么，容易修改代码是怎么样的？</p>
+<ol>
+<li>有足够测试，这是不会改坏的信心的来源。</li>
+<li>容易找到修改的地方。</li>
+<li>修改的地方少。</li>
+</ol>
+<h3 id="简单设计的4个原则">简单设计的4个原则</h3>
+<ol>
+<li>通过测试。</li>
+<li>清晰的表达意图。</li>
+<li>尽可能少的重复。</li>
+<li>更少的代码元素。</li>
+</ol>
+<h4 id="通过测试">通过测试</h4>
+<p>作为保证代码正确性的一个手段，这是一个显而易见的问题。另外，这里还需要说明的额外的几点是：</p>
+<ol>
+<li>
+<p>测试运行的速度越快越好，越快说明你的反馈速度越快，效率越高。</p>
+</li>
+<li>
+<p>测试的名称和被测试的代码保持一种对称性，名称应该反应被测试的代码语义。</p>
+<pre tabindex="0"><code>struct World {
+	cells []Cell
+}
+
+func (w *World) isEmpty() bool {
+	return len(w.cells) == 0
+}
+
+func Test_new_world_is_empty(t *testing.T) {
+	w := &amp;World{}
+
+	// BAD
+	assert.Nil(t, w.cells)
+
+	// GOOD
+	assert.True(t, w.isEmpty())
+}
+</code></pre></li>
+<li>
+<p>不应该依赖之前的测试。</p>
+<pre tabindex="0"><code>func Test_world_is_not_empty_after_a_tick(t *testing.T) {
+	w := &amp;World{}
+	newWorld = w.tick()
+	assert.False(t, newWorld.isEmpty())
+}
+
+// 这里的w := &amp;World{}依赖的测试Test_new_world_is_empty。这样会有两个问题：
+// 1. 如果&amp;World{}的语义改了以后就会导致测试失败。
+// 2. 表达不够清晰，哪里规定了&amp;World{}就是空的呢。
+//
+// 比较好的做法是定一个返回empty world。
+func newEmptyWorld() *World {
+	return &amp;World{}
+}
+
+func Test_world_is_not_empty_after_a_tick(t *testing.T) {
+	w := newEmptyWorld()
+	newWorld = w.tick()
+	assert.False(t, newWorld.isEmpty())
+}
+</code></pre></li>
+<li>
+<p>测试应该关注行为不是状态。</p>
+<p>测试具体业务行为，而不是设计出数据结构和算法以后，针对数据结构脱离业务行为写测试。因此，在写功能的时候应该明白是为了实现哪个业务，然后针对这个业务写测试。这样的好处是我的代码是刚刚好满足当前需求的。这是非常重要的一点。因为，这样的测试在业务行为不变的情况下是不会修改，因此这个正确性的保障是稳定的。能够放心做重构，演进代码。</p>
+</li>
+<li>
+<p>不应该影响其他测试，比如：全局变量修改，资源未释放等等。</p>
+</li>
+</ol>
+<h4 id="清晰的表达意图">清晰的表达意图</h4>
+<p>需要做的事情就是<strong>命名</strong>。通过命名把业务知识映射到具体的代码，其实这里也是一个抽象的过程。</p>
+<p>什么时候需要命名？最明显的是新增代码的时候，在新代码中命名新的业务。此外，老的代码也有可能会因为新代码的添加导致原来的命名不准确，这个时候也需要做重新命名。</p>
+<p>如果做命名？是个难点。有一些启发式的方法：</p>
+<ol>
+<li>它并不定是一蹴而就，可以先给个当前足够好的，之后再改进。</li>
+<li>当命名比较难的时候，可能是职责划分不清楚，需要重新划分职责。</li>
+<li>common、util这类的意思太泛名字并不是一个好的命名，因为不够精确，最终里面会包含各种各样的东西，使用和修改的时候不好找。</li>
+</ol>
+<h4 id="尽可能少的重复">尽可能少的重复</h4>
+<p>知识重复，而不是简单的代码片段的重复。但是，有时候简单的重复可以减少依赖是可以接受的。</p>
+<p><strong>一个知识重复的例子</strong></p>
+<p>抽象了一个<code>Location</code>，里面包含<code>x</code>、<code>y</code>坐标。但是，在使用的时候还是使用了<code>x</code>、<code>y</code>坐标，而不是<code>Location</code>这个抽象。这个时候<code>x</code>、<code>y</code>表示一个位置这个知识是重复的。</p>
+<h4 id="更少的代码元素">更少的代码元素</h4>
+<p>更少代码意味着更少信息量，更少的心智负担，更少的维度成本。可以更少的几个方面：</p>
+<ol>
+<li>一些不用的代码。</li>
+<li>是否有重复的抽象。</li>
+<li>是否过度抽取概念。</li>
+</ol>
+<h4 id="4个原则间的联系">4个原则间的联系</h4>
+<p>遵循『尽可能少的重复』原则的时候会做消除重复的动作，遵循『清晰的表达意图』原则会涉及改进命名。这两点都会做代码的修改，修改的正确性需要遵循『通过测试』来保障。</p>
+<p>遵循『清晰的表达意图』原则的时候，为了准确表达代码意图有时就会对代码职责做重新的划分。这个时候就有可能出现重复的知识，因此也会使用『尽可能少的重复』原则去消除重复。另外，在表达意图的时候，除了职责划分还会有可能做更高一层的抽象，这个时候也有可能出现知识重复问题。</p>
+<p>遵循『尽可能少的重复』原则的时候，会做一些代码抽取、合并等等操作。而这些抽取、合并的代码需要有恰当的命名，也需要遵循『清晰的表达意图』。所以，『尽可能少的重复』和『清晰的表达意图』原则是一个循环的过程。这样的结果就是代码内聚性越来越高、职责越来越单一。</p>
+<p>遵循『更少的代码元素』原则可以促进『尽可能少的重复』原则的使用。</p>
+<h3 id="为什么简单对比其他设计原则">为什么简单，对比其他设计原则</h3>
+<p>设计模式是描述了某一个具体的设计。同样，其他设计原则也描述了好的代码设计的一些特征以及为什么是好的原因。但是，这些更多的是对已经完成代码的判断，而且相对抽象。在写代码的时候用起来并不容易，当然也不是不能做，只是要求比较多经验，对代码的设计有比较深的理解。相反，这4个原则用起来会简单很多，比如命名、消除重复都是一些很简单明确的动作。遵循这4个原则同样也会有和其他设计原则一样的效果。</p>
+<h4 id="solid">SOLID</h4>
+<h5 id="单一职责s">单一职责（S）</h5>
+<p>『一个类或者组件，有且只有一个理由修改』。这个原则的目标是最大化的内聚。难点在于职责界定、确定职责大小以及修改理由大小。遵循『清晰的表达意图』和『尽可能少的重复』原则的代码就是遵循单一职责。</p>
+<h5 id="开闭原则o">开闭原则（O）</h5>
+<p>『对修改关闭，对扩展开放』。道理很朴素，修改代码需要老代码的上下文，这个上下文随着业务的积累越来越大，修改容易引入bug。因此，尽可能的通过添加代码的形式添加或者修改行为。但是，遵循这个原则的时候需要防止过度设计，设计过多不必要的扩展点。遵循『尽可能少的重复』原则，让每个知识保持正交，就会比较容易的发现扩展地方。</p>
+<h5 id="里式替换l">里式替换（L）</h5>
+<p>『子类应该可以替换父类』。可以替换的前提是子类的行为和父类的行为是一致。遵循『尽可能少的重复』原则，在给子类命名的时候通过合适命名明确表达子类的行为只是对父类的增强而不是修改父类的行为。</p>
+<h5 id="接口分离i">接口分离（I）</h5>
+<p>『接口应该足够小，应该聚焦在具体某个场景』。简单来说，使用者只需要关心使用者的业务上下文相关的接口就可以了，其他接口不应该暴露给使用者。遵循『清晰的表达意图』的时候，发现命名比较困难了，往往就有接口是不是太大了。</p>
+<h5 id="依赖反转d">依赖反转（D）</h5>
+<p>『依赖抽象，不要依赖实现』。这个原则是为了防止一个模块的修改的时候，把另外一个模块也该坏了。为什么会该坏了，当然就是被改坏的模块使用了正在修改模块的具体变量或者函数，但是修改的时候又不知道。因此，通过抽象把模块的直接的沟通明确建立起来，就可以杜绝这样的问题。</p>
+<h4 id="lod">LoD</h4>
+<p>『一个方法只能访问实例变量、参数或者新创建的变量』。更简单的说『只允许一个点操作』。强调代码的封装，低耦合代码。这个原则被违反的时候，就会出现知识的重复。因为，这时需要知道另外一个对象的依赖，也就是说这个方法需要和那个对象一样知道这个依赖，是一种重复。LoD是简单有效的一个法则！</p>
+
+<div class="np"><a/> <a href=/posts/cs/os/vm/>虚拟内存技术 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

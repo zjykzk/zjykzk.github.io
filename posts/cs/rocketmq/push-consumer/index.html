@@ -49,7 +49,7 @@ body{background:#faf9de;}
 <h2 id="pullmessageservice">PullMessageService</h2>
 <p><code>PullMessageService</code>只负责拉取消息，它会调用<code>DefaultMQPushConsumerImpl.pullMessage</code>。</p>
 <p>当<code>ReblanceService</code>执行负载均衡的时候如果发现被分配了新的消息队列就会最终调用<code>PullMessage.executePullRequestImmediately</code>执行拉取消息。代码执行路径：</p>
-<pre><code>ReblanceService.run
+<pre tabindex="0"><code>ReblanceService.run
 -&gt;MQClientInstance.doReblance
 -&gt;MQConsumerInnter.doReblance[DefaultMQPushConsumerImpl.doReblance]
 -&gt;ReblanceImpl.doReblance

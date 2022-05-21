@@ -8,10 +8,22 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Thu, 11 Oct 2018 15:33:32 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/design/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Tue, 03 May 2022 23:34:49 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/design/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>简单设计的4个原则</title>
+      <link>http://zjykzk.github.io/posts/cs/design/4rules-of-simple-design/</link>
+      <pubDate>Tue, 03 May 2022 23:34:49 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/posts/cs/design/4rules-of-simple-design/</guid>
+      <description>什么是简单设计？ 首先，简单设计强调更好的设计**，而不是一个好的设计。突出了，它是一个动态的过程，强调设计随着软件开发的进展会随时调整。确保当下的设计能做到的最好设计。
+另外，在软件开发中有两个常识：
+ 需求是总是会变的。 我们不能够精确预测哪些需求将会变化。  因此，更好的设计是方便修改的设计；更好的设计是不去计划设计哪些地方将来会修改，而是采取简单设计的原则，让代码更加容易修改。那么，容易修改代码是怎么样的？
+ 有足够测试，这是不会改坏的信心的来源。 容易找到修改的地方。 修改的地方少。  简单设计的4个原则  通过测试。 清晰的表达意图。 尽可能少的重复。 更少的代码元素。  通过测试 作为保证代码正确性的一个手段，这是一个显而易见的问题。另外，这里还需要说明的额外的几点是：
+  测试运行的速度越快越好，越快说明你的反馈速度越快，效率越高。
+  测试的名称和被测试的代码保持一种对称性，名称应该反应被测试的代码语义。
+struct World { cells []Cell } func (w *World) isEmpty() bool { return len(w.cells) == 0 } func Test_new_world_is_empty(t *testing.T) { w := &amp;amp;World{} // BAD assert.Nil(t, w.cells) // GOOD assert.True(t, w.isEmpty()) }   不应该依赖之前的测试。
+func Test_world_is_not_empty_after_a_tick(t *testing.T) { w := &amp;amp;World{} newWorld = w.</description>
+    </item>
     
     <item>
       <title>guava中RateLimiter的设计</title>
@@ -27,7 +39,7 @@ Burst模式
 当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。storedPermits代表的就是当前充足资源的数量。
 另外，coolDownIntervalMicros()返回stableIntervalMicros，maxPermits等于permitsPerSecond。
 Warmup模式
- ^ throttling | cold + / interval | /. | / . | / . ← &amp;quot;warmup period&amp;quot; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | . UP . | .</description>
+ ^ throttling | cold + / interval | /. | / . | / . ← &amp;#34;warmup period&amp;#34; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | . UP . | .</description>
     </item>
     
     <item>

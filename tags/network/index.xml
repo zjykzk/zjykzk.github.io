@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 30 Apr 2019 19:18:23 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/network/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Tue, 30 Apr 2019 19:18:23 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/network/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>网关</title>
       <link>http://zjykzk.github.io/posts/cs/network/gate/</link>

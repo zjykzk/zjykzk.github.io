@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 12 Oct 2018 14:23:18 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/dist/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 12 Oct 2018 14:23:18 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/dist/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>熔断</title>
       <link>http://zjykzk.github.io/posts/cs/dist/circuit-breaker/</link>

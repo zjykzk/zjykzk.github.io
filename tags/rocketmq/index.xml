@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 25 Jan 2019 15:35:52 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/rocketmq/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 25 Jan 2019 15:35:52 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/rocketmq/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>RocketMQ HA实现</title>
       <link>http://zjykzk.github.io/posts/cs/rocketmq/ha/</link>
@@ -80,9 +76,9 @@ ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别�
 但是，代码中依然提供了接口，让用户自己指定类型，比如可以保存数据到monogodb。
 存储 本地类型
 数据保存在$storeDir/.rocketmq_offsets/$clientID/$group/offsets.json中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。其中$storeDir是可以通过系统变量rocketmq.client.localOffsetStoreDir配置，如果没有指定参数就使用HOME目录。$clientID和$group分别表示消费者的id和分组。
-// example {&amp;quot;offsetTable&amp;quot;:{{&amp;quot;brokerName&amp;quot;:&amp;quot;topic&amp;quot;,&amp;quot;queueId&amp;quot;:1,&amp;quot;topic&amp;quot;:&amp;quot;broker&amp;quot;}:0}} 远程类型
+// example {&amp;#34;offsetTable&amp;#34;:{{&amp;#34;brokerName&amp;#34;:&amp;#34;topic&amp;#34;,&amp;#34;queueId&amp;#34;:1,&amp;#34;topic&amp;#34;:&amp;#34;broker&amp;#34;}:0}} 远程类型
 数据保存在$rootPath/config/consumerOffset.json文件中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。offsetTable中的key格式是topic@group，value格式queueID:offset。
-// example { &amp;quot;offsetTable&amp;quot;:{ &amp;quot;test@benchmark_consumer_61&amp;quot;:{ 0:5280,1:5312,2:5312,3:5312 } } } 接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
+// example { &amp;#34;offsetTable&amp;#34;:{ &amp;#34;test@benchmark_consumer_61&amp;#34;:{ 0:5280,1:5312,2:5312,3:5312 } } } 接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
 load
 在消费者启动的时候，需要把消费进度载入内存。只有本地类型会载入数据。
 updateOffset

@@ -14,7 +14,7 @@ body{background:#faf9de;}
 <strong>initramfs中的init进程系统启动失败</strong>
 <hr> <h2 id="缘起">缘起</h2>
 <p>执行系统全量更新数据<code>yay -Syu</code>，更新了以下软件：</p>
-<pre><code>upgraded grub (2:2.04-4 -&gt; 2:2.04-5)
+<pre tabindex="0"><code>upgraded grub (2:2.04-4 -&gt; 2:2.04-5)
 upgraded libjpeg-turbo (2.0.3-1 -&gt; 2.0.4-1)
 upgraded imagemagick (7.0.9.10-1 -&gt; 7.0.9.13-1)
 upgraded libarchive (3.4.0-3 -&gt; 3.4.1-1)
@@ -26,10 +26,10 @@ upgraded opencl-nvidia (440.44-1 -&gt; 440.44-2)
 upgraded openvpn (2.4.8-1 -&gt; 2.4.8-3)
 upgraded s-nail (14.9.15-3 -&gt; 14.9.16-1)
 </code></pre><p>系统重启，启动失败。显示：</p>
-<pre><code>[Firmware Bug]: TSC_DEADLINE disabled due to Errata; please update microcode to version: 0x22 (or later)
+<pre tabindex="0"><code>[Firmware Bug]: TSC_DEADLINE disabled due to Errata; please update microcode to version: 0x22 (or later)
 </code></pre><h2 id="解决">解决</h2>
 <p>google结果提示安装<code>intel-ucode</code>。烧个live cd进去执行命令<code>pacman -S intel-ucode</code>安装完毕，重启。失败，显示：</p>
-<pre><code>Failed to execute /init (error -2)
+<pre tabindex="0"><code>Failed to execute /init (error -2)
 Console: switching to colour frame buffer device 175x65
 .....
 </code></pre><p>命令<code>/init</code>位于initramfs这个rootfs中。简单说来initramfs是启动系统过程中用于其他系统的中间过程。上面显示的问题原因是启动的时候失败了。</p>

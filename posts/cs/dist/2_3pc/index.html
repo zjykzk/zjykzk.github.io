@@ -22,7 +22,7 @@ body{background:#faf9de;}
 <p><strong>2PC本质：在提交之前确保所有的TP都已经准备完毕。</strong></p>
 <h3 id="协议">协议</h3>
 <p>2pc包含两个阶段。准备阶段和提交（终止）阶段，TC和TP的通信如下。</p>
-<pre><code>                       TC                              TP
+<pre tabindex="0"><code>                       TC                              TP
                      +----+  REQUEST-TO-PREPARE      +----+
                      |    | -----------------------&gt; |    |
                      |    |         PREPARE          |    |
@@ -120,7 +120,7 @@ body{background:#faf9de;}
 <h4 id="恢复">恢复</h4>
 <p>当TC或者TP宕机重启以后需要日志辅助事务的恢复。如果没有日志，事务就没法正常结束了。</p>
 <p><strong>日志</strong></p>
-<pre><code>                     TC                                             TP
+<pre tabindex="0"><code>                     TC                                             TP
             +-------------------+                          +-------------------+
         1 ===&gt;                  |                          |                   |
             |log start-two-phase|                          |                   |
@@ -196,7 +196,7 @@ body{background:#faf9de;}
 <p>2PC之所以会阻塞是因为通信失败的原因会发生当一个TP处在不确定状态时，不确定其他TP是否已经终止或者提交，从而使TP一直阻塞。<strong>如果能够确保任何TP提交时确保不会存在不确定状态的TP</strong>，就不会阻塞事务了。3PC是2PC的一种改进，主要是把第二阶段拆分为两个阶段，通过PRE-COMMIT消息做到所有的TP都直到其他TP已经确定可以提交。</p>
 <p>2PC在只出现机器故障的时候，它也是一定阻塞的。而3PC可以避免这个问题，如果出现通信故障，还是没法避免阻塞，可以降低阻塞的频率。实际系统中，由于阻塞的概率比较低、3PC实现负责以及性能比较低，因此使用的都是2PC。</p>
 <h3 id="协议-1">协议</h3>
-<pre><code>                       TC                              TP
+<pre tabindex="0"><code>                       TC                              TP
                      +----+          VOTE-REQ        +----+
                      |    | -----------------------&gt; |    |
                      |    |           YES            |    |
@@ -304,7 +304,7 @@ body{background:#faf9de;}
 <h4 id="恢复-1">恢复</h4>
 <p><strong>日志</strong></p>
 <p>日志内容和2PC是一样的。</p>
-<pre><code>                     TC                                             TP
+<pre tabindex="0"><code>                     TC                                             TP
             +---------------------+                          +-------------------+
         1 ===&gt;                    |                          |                   |
             |log start-three-phase|                          |                   |

@@ -18,7 +18,7 @@ body{background:#faf9de;}
 <p>内存中的数据结构核心是B+树，它根据key组织在一起。B+树中的每个结点，对应数据结构<a href="#node">node</a>，其中的内部信息通过数据结构<a href="#inode">inode</a>来描述。内存中其他主要数据结构还包括<a href="#meta">meta</a>和<a href="#freelist">freelist</a>。</p>
 <p>描述磁盘中的数据结构是<a href="#page">page</a>，它的数据来自于<a href="#node">node</a>、<a href="#meta">meta</a>或者<a href="#freelist">freelist</a>。对应者一块内存，大小为os的page size的倍数。</p>
 <h3 id="node">node</h3>
-<pre><code>type node struct {
+<pre tabindex="0"><code>type node struct {
   bucket     *Bucket      // 这个结点所在的的bucket
   isLeaf     bool         // 是否是叶子结点
   unbalanced bool         // 是否平衡，删除的时候做标记
@@ -31,7 +31,7 @@ body{background:#faf9de;}
 }
 </code></pre><h4 id="inode">inode</h4>
 <p>通过<a href="#branchPageElement">branchPageElement</a>或者<a href="#leafPageElement">leafPageElement</a>来获取数据。</p>
-<pre><code>type inode struct {
+<pre tabindex="0"><code>type inode struct {
   flags uint32            // 标记，用来区分支结点和叶子结点
   pgid  pgid              // 所在页的id
   key   []byte
@@ -39,7 +39,7 @@ body{background:#faf9de;}
 }
 </code></pre><h3 id="page">page</h3>
 <p>代表一个页或者连续的几个页。</p>
-<pre><code>type page struct {
+<pre tabindex="0"><code>type page struct {
   id       pgid           // 64位的id
   flags    uint16         // 页的标记，表示存储的数据类型，包括分支、叶子，元数据和描述空闲页的数据
   count    uint16         // 包含数据的元素个数
@@ -48,14 +48,14 @@ body{background:#faf9de;}
 }
 </code></pre><h4 id="bucketpageelement">bucketPageElement</h4>
 <p>B+树中分支结点保存的数据元信息。</p>
-<pre><code>type branchPageElement struct {
+<pre tabindex="0"><code>type branchPageElement struct {
   pos   uint32            // 本元素的地址到key的起始地址的距离
   ksize uint32            // key的大小
   pgid  pgid              // 页id
 }
 </code></pre><h4 id="leafpageelement">leafPageElement</h4>
 <p>B+树中叶子结点保存的数据元信息。</p>
-<pre><code>type leafPageElement struct {
+<pre tabindex="0"><code>type leafPageElement struct {
   flags uint32            // 标识这里主要用于区分是bucket还是一个普通的value
   pos   uint32            // 本元素的地址到key的起始地址的距离
   ksize uint32            // key的大小
@@ -64,12 +64,11 @@ body{background:#faf9de;}
 </code></pre><p>以上三者之间的关系如下图</p>
 <p><img src="/imgs/bolt/page-branch-leaf.jpg" alt="page-branch-leaf"></p>
 <h3 id="freelist">freelist</h3>
-<pre><code>type freelist struct {
+<pre tabindex="0"><code>type freelist struct {
   ids     []pgid          // 空闲页的id数组
   pending map[txid][]pgid // 每个写事务spill的时候释放的页，这些页在commit的时候会被释放掉
   cache   map[pgid]bool   // 帮助快速查询空闲页和等待释放页的一个cache，仅仅是用来检查是否重复释放的bug
 }
-
 </code></pre><p>bolt数据库采用了<a href="https://github.com/boltdb/bolt/blob/master/node.go#L359-L362">写时复制</a>的策略，因此数据更新的时候，会新建一个页保存更新以后的数据，那么原来的页就可以重复利用了。这些页通过freelist管理。因为<a href="#page">page</a>数据结构count地址的限制，它能保存的最大值是0xFFFF，所以空闲页数量大于0xFFFF的时候，需要添加一个长度头来表示有多少空闲页。</p>
 <p>pending的page需要确保没有被其他事务引用时才能释放被重新使用。所以，bolt的处理方式是在开始<a href="https://github.com/boltdb/bolt/blob/master/db.go#L537">写事务的时候</a>找到最小的事务id，然后把小于该事务id引用的page给释放掉。</p>
 <p>它和page的存储关系如下：</p>
@@ -78,7 +77,7 @@ body{background:#faf9de;}
 <p>类似关系型数据库中的表。它可以包含子bucket。bolt中有一个根bucket，所有的数据和bucket都保存在这个根bucket中。每个bucket对应一棵B+树。</p>
 <p>bucket的数据很少时会做一个优化。这个条件是bucket对应的根数据页是叶子结点，同时它的数量(pageHeaderSize+leafPageElementSize+key size+value size)小于page size的1/4。</p>
 <p>通过bucket可以设置在B+树中与它相对应结点的分裂阀值。如果写操作几乎是追加操作可以提高这个值，否则还是不要太大了。这是因为，如果更新很频繁化，阀值很大情况下就会有更多脏的page。这会增加写的压力。</p>
-<pre><code>type Bucket struct {
+<pre tabindex="0"><code>type Bucket struct {
   *bucket                     // 保存在文件中的数据信息
   tx       *Tx                // 事务
   buckets  map[string]*Bucket // 子bucket cache
@@ -101,7 +100,7 @@ type bucket struct {
 <h3 id="cursor">Cursor</h3>
 <p>有序遍历的游标，读写的时候用。只在一个事务中有效。遍历的时候如果修改了数据，它返回的数据是不确定的。</p>
 <p>通过栈的方式记录遍历的每层结点，栈顶是叶子结点。每次访问数据的时候需要遍历到叶子结点。因为叶子之间没有指针，所以需要回溯分支结点。</p>
-<pre><code>type Cursor struct {
+<pre tabindex="0"><code>type Cursor struct {
   bucket *Bucket                  // 当前的bucket
   stack  []elemRef                // 遍历的堆栈
 }
@@ -113,7 +112,7 @@ type elemRef struct {
   index int                       // 分支结点或者叶子结点中inodes的下标
 }
 </code></pre><h3 id="tx">Tx</h3>
-<pre><code>type Tx struct {
+<pre tabindex="0"><code>type Tx struct {
   writable       bool             // 是否是包含写操作事务
   managed        bool             // 一个标志，防止事务被提交或者回滚
   db             *DB              // 数据库实例
@@ -129,7 +128,7 @@ type elemRef struct {
 }
 </code></pre><h3 id="meta">meta</h3>
 <p>数据库的元信息。</p>
-<pre><code>type meta struct {
+<pre tabindex="0"><code>type meta struct {
   magic    uint32                 // 魔数0xED0CDAED
   version  uint32                 // 版本
   pageSize uint32                 // 页大小

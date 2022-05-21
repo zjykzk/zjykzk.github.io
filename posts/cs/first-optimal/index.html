@@ -18,18 +18,18 @@ body{background:#faf9de;}
 <table>
 <thead>
 <tr>
-<th align="center">发送线程数量</th>
-<th align="center">消费线程数量</th>
-<th align="center">发送TPS</th>
-<th align="center">消费TPS</th>
+<th style="text-align:center">发送线程数量</th>
+<th style="text-align:center">消费线程数量</th>
+<th style="text-align:center">发送TPS</th>
+<th style="text-align:center">消费TPS</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">3</td>
-<td align="center">3</td>
-<td align="center">200-400</td>
-<td align="center">20-60</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">200-400</td>
+<td style="text-align:center">20-60</td>
 </tr>
 </tbody>
 </table>
@@ -77,8 +77,8 @@ body{background:#faf9de;}
 </ol>
 <h3 id="mongodb">mongodb</h3>
 <p>通过命令 <code>mongostat</code> 查看mongodb的运行状态，发现随着消费线程并发的提高锁的百分比越来越高最后超过的90%。查看mongodb的版本是2.4.9，它用的数据库锁。换个mongodb版本，避免锁的开销，通过了解公司线上使用的版本3.0.15，并使用wireTiger存储引擎。果断按照这个环境进行benchmark，结果仍然不尽任意。查看<strong>profiler</strong>，一个类似mysql的慢查询的命令。通过以下命令加上专家的讲解，从<strong>信息 nscannedObjects : 71040</strong>，发现扫描对象比较多，从代码确认是缺少了一个索引。</p>
-<pre><code>&gt; db.setProfilingLevel(2);
-{&quot;was&quot; : 0 , &quot;slowms&quot; : 100, &quot;ok&quot; : 1}       // &quot;was&quot; 表示旧的设置
+<pre tabindex="0"><code>&gt; db.setProfilingLevel(2);
+{&#34;was&#34; : 0 , &#34;slowms&#34; : 100, &#34;ok&#34; : 1}       // &#34;was&#34; 表示旧的设置
 &gt; db.system.profile.find().sort({millis:-1}) // 列出耗时的操作，按照操作耗时排序，这条语句会列出扫描的对象数量，锁等关键信息
 </code></pre><p>在程序里面加上索引，再次benchmark达到预期。</p>
 <h2 id="总结">总结</h2>

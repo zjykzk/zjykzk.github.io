@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/method/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/method/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>技术选型</title>
       <link>http://zjykzk.github.io/posts/cs/select-tech/</link>

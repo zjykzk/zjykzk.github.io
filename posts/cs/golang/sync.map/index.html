@@ -19,10 +19,10 @@ body{background:#faf9de;}
 </ol>
 <p>在这两种情况下，相比一个<code>Mutex</code>或者<code>RWMutex</code>加上普通的map，锁的竞争要少的多。那为什么呢？</p>
 <h3 id="数据结构">数据结构</h3>
-<pre><code>type Map struct {
+<pre tabindex="0"><code>type Map struct {
   mu Mutex
 
-  // read contains the portion of the map's contents that are safe for
+  // read contains the portion of the map&#39;s contents that are safe for
   // concurrent access (with or without mu held).
   //
   // The read field itself is always safe to load, but must only be stored with
@@ -33,7 +33,7 @@ body{background:#faf9de;}
   // map and unexpunged with mu held.
   read atomic.Value // readOnly
 
-  // dirty contains the portion of the map's contents that require mu to be
+  // dirty contains the portion of the map&#39;s contents that require mu to be
   // held. To ensure that the dirty map can be promoted to the read map quickly,
   // it also includes all of the non-expunged entries in the read map.
   //
@@ -76,8 +76,8 @@ type entry struct {
   // next created, it will atomically replace nil with expunged and leave
   // m.dirty[key] unset.
   //
-  // An entry's associated value can be updated by atomic replacement, provided
-  // p != expunged. If p == expunged, an entry's associated value can be updated
+  // An entry&#39;s associated value can be updated by atomic replacement, provided
+  // p != expunged. If p == expunged, an entry&#39;s associated value can be updated
   // only after first setting m.dirty[key] = e so that lookups using the dirty
   // map find the entry.
   p unsafe.Pointer // *interface{}
@@ -95,7 +95,7 @@ type entry struct {
 <p><code>sync.Map</code>包含五个接口：<code>Load</code>、<code>Store</code>、<code>LoadOrStore</code>、<code>Delete</code>和<code>Range</code>。</p>
 <h4 id="loadstoreloadorstore和delete">Load、Store、LoadOrStore和Delete</h4>
 <p>这几个接口都有类似的模式：</p>
-<pre><code>read, _ := m.read.Load().(readOnly)
+<pre tabindex="0"><code>read, _ := m.read.Load().(readOnly)
 if e, ok := read.m[key]; ok {
 	ret := do_the_operation()
 	if ret is success {

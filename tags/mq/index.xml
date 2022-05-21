@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 25 Jan 2019 15:35:52 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/mq/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 25 Jan 2019 15:35:52 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/mq/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>RocketMQ HA实现</title>
       <link>http://zjykzk.github.io/posts/cs/rocketmq/ha/</link>

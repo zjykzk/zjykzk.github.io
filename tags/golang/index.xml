@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 29 May 2019 14:44:31 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 29 May 2019 14:44:31 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>sync.Map实现分析</title>
       <link>http://zjykzk.github.io/posts/cs/golang/sync.map/</link>
@@ -21,7 +17,7 @@
       <guid>http://zjykzk.github.io/posts/cs/golang/sync.map/</guid>
       <description>golang的SDK中提供线程安全的map实现sync.Map。它是针对RWMutex+map的实现方案中存在cache line的false share提出来的。主要适用于两个场景：
  针对一个key一次写多次读。 多个goroutine并发读写修改的key是没有交集。  在这两种情况下，相比一个Mutex或者RWMutex加上普通的map，锁的竞争要少的多。那为什么呢？
-数据结构 type Map struct { mu Mutex // read contains the portion of the map&#39;s contents that are safe for // concurrent access (with or without mu held). // // The read field itself is always safe to load, but must only be stored with // mu held. // // Entries stored in read may be updated concurrently without mu, but updating // a previously-expunged entry requires that the entry be copied to the dirty // map and unexpunged with mu held.</description>
+数据结构 type Map struct { mu Mutex // read contains the portion of the map&amp;#39;s contents that are safe for // concurrent access (with or without mu held). // // The read field itself is always safe to load, but must only be stored with // mu held. // // Entries stored in read may be updated concurrently without mu, but updating // a previously-expunged entry requires that the entry be copied to the dirty // map and unexpunged with mu held.</description>
     </item>
     
     <item>
@@ -31,7 +27,7 @@
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</guid>
       <description>来一个hello, world!。
-package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5 编译调试。
+package main func main() { println(&amp;#34;hello, world!&amp;#34;) } // line 5 编译调试。
 # go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?? () (gdb) s 216 if atomic.</description>
     </item>
     
@@ -44,9 +40,9 @@ package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 
       <description>在golang中，为了性能的目的，当前执行的g是保存在当前线程的TLS中的，而TLS的地址在结构体m里面。问题是怎么放进去的呢？
 可以从程序的启动入手，顺藤摸瓜。
 编写一个打印hello,world的程序
-// hello.go package main func main() { print(&amp;quot;hello, world&amp;quot;) } 编译生成可执行文件
+// hello.go package main func main() { print(&amp;#34;hello, world&amp;#34;) } 编译生成可执行文件
 go build -o hello hello.go 用gdb进行调试，找到程序的入口 _rt0_amd64_linux
-gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;quot;textflag.h&amp;quot; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12 发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
+gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;#34;textflag.h&amp;#34; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12 发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
     </item>
     
     <item>
@@ -57,7 +53,7 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
       <guid>http://zjykzk.github.io/posts/cs/golang/map/</guid>
       <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
 // file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap 显然，makemap 返回的是指针。
-数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用  count int // map标记:  // 1. key和value是否包指针  // 2. 是否正在扩容  // 3. 是否是同样大小的扩容  // 4. 是否正在 `range`方式访问当前的buckets  // 5. 是否有 `range`方式访问旧的bucket  flags uint8 B uint8 // log_2(B) == bucket数量  noverflow uint16 // overflow bucket的数量，是个近似值  hash0 uint32 // hash种子  buckets unsafe.</description>
+数据结构 hashmap // hash map type hmap struct {  // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用  count int   // map标记:  // 1. key和value是否包指针  // 2. 是否正在扩容  // 3. 是否是同样大小的扩容  // 4. 是否正在 `range`方式访问当前的buckets  // 5. 是否有 `range`方式访问旧的bucket  flags uint8  B uint8 // log_2(B) == bucket数量  noverflow uint16 // overflow bucket的数量，是个近似值  hash0 uint32 // hash种子   buckets unsafe.</description>
     </item>
     
     <item>

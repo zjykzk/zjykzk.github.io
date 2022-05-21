@@ -30,30 +30,30 @@ body{background:#faf9de;}
 <table>
 <thead>
 <tr>
-<th align="left">unicode范围</th>
-<th align="left">utf8编码</th>
+<th style="text-align:left">unicode范围</th>
+<th style="text-align:left">utf8编码</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">十六进制表示</td>
-<td align="left">二进制表示</td>
+<td style="text-align:left">十六进制表示</td>
+<td style="text-align:left">二进制表示</td>
 </tr>
 <tr>
-<td align="left">000000 - 00007F</td>
-<td align="left">0zzzzzzz</td>
+<td style="text-align:left">000000 - 00007F</td>
+<td style="text-align:left">0zzzzzzz</td>
 </tr>
 <tr>
-<td align="left">000080 - 0007FF</td>
-<td align="left">110zzzzz 10zzzzzz</td>
+<td style="text-align:left">000080 - 0007FF</td>
+<td style="text-align:left">110zzzzz 10zzzzzz</td>
 </tr>
 <tr>
-<td align="left">000800 - 00D7FF/00E000 - 00FFFF</td>
-<td align="left">1110zzzz 10zzzzzz 10zzzzzz</td>
+<td style="text-align:left">000800 - 00D7FF/00E000 - 00FFFF</td>
+<td style="text-align:left">1110zzzz 10zzzzzz 10zzzzzz</td>
 </tr>
 <tr>
-<td align="left">010000 - 10FFFF</td>
-<td align="left">11110zzz 10zzzzzz 10zzzzzz 10zzzzzz</td>
+<td style="text-align:left">010000 - 10FFFF</td>
+<td style="text-align:left">11110zzz 10zzzzzz 10zzzzzz 10zzzzzz</td>
 </tr>
 </tbody>
 </table>
@@ -66,27 +66,27 @@ body{background:#faf9de;}
 <h4 id="字符类型">字符类型</h4>
 <p>分为byte字符串(str)和unicode(unicode)，前者的内容是字节，后者的内容是unicode中的编号。默认的是byte字符串。</p>
 <h4 id="重要方法">重要方法</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># &lt;type &#39;str&#39;&gt; to &lt;type &#39;unicode&#39;&gt;</span>
-<span style="color:#75715e"># 如果 s 是&#39;unicode&#39;类型，python会先通过encode函数把s转换成&#39;str&#39;类型</span>
-<span style="color:#75715e"># encode函数的encoding是sys.getdefaultencoding()的值</span>
-s<span style="color:#f92672">.</span>decode(encoding)
-
-<span style="color:#75715e"># &lt;type &#39;unicode&#39;&gt; to &lt;type &#39;str&#39;&gt;</span>
-<span style="color:#75715e"># 如果u是&#39;str&#39;类型，python会通过decode函数把u转换成&#39;unicode&#39;类型</span>
-<span style="color:#75715e"># decode函数的encoding是sys.getdefaultencoding()的值</span>
-u<span style="color:#f92672">.</span>encode(encoding)
-
-<span style="color:#75715e"># 获取系统默认的编码</span>
-sys<span style="color:#f92672">.</span>getdefaultencoding()
-
-<span style="color:#75715e"># 修改系统的默认编码</span>
-sys<span style="color:#f92672">.</span>setdefaultencoding(encoding)
-
-<span style="color:#75715e"># 修改代码</span>
-<span style="color:#f92672">import</span> sys
-reload(sys) <span style="color:#75715e"># 因为python初始化的时候会把setdefaultencoding方法给删除掉</span>
-sys<span style="color:#f92672">.</span>setdefaultencoding(<span style="color:#e6db74">&#39;utf8&#39;</span>)
-</code></pre></div><h4 id="codecs">codecs</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># &lt;type &#39;str&#39;&gt; to &lt;type &#39;unicode&#39;&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 如果 s 是&#39;unicode&#39;类型，python会先通过encode函数把s转换成&#39;str&#39;类型</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># encode函数的encoding是sys.getdefaultencoding()的值</span>
+</span></span><span style="display:flex;"><span>s<span style="color:#f92672">.</span>decode(encoding)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># &lt;type &#39;unicode&#39;&gt; to &lt;type &#39;str&#39;&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 如果u是&#39;str&#39;类型，python会通过decode函数把u转换成&#39;unicode&#39;类型</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># decode函数的encoding是sys.getdefaultencoding()的值</span>
+</span></span><span style="display:flex;"><span>u<span style="color:#f92672">.</span>encode(encoding)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 获取系统默认的编码</span>
+</span></span><span style="display:flex;"><span>sys<span style="color:#f92672">.</span>getdefaultencoding()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 修改系统的默认编码</span>
+</span></span><span style="display:flex;"><span>sys<span style="color:#f92672">.</span>setdefaultencoding(encoding)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 修改代码</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span>reload(sys) <span style="color:#75715e"># 因为python初始化的时候会把setdefaultencoding方法给删除掉</span>
+</span></span><span style="display:flex;"><span>sys<span style="color:#f92672">.</span>setdefaultencoding(<span style="color:#e6db74">&#39;utf8&#39;</span>)
+</span></span></code></pre></div><h4 id="codecs">codecs</h4>
 <p>指定encoding参数生成file-object-like对象，利用：</p>
 <ol>
 <li>函数 <code>read</code> 读取byte字符串，按照encoding的编码返回unicode</li>

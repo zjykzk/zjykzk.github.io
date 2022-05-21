@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/program/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/program/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>技术选型</title>
       <link>http://zjykzk.github.io/posts/cs/select-tech/</link>
@@ -45,7 +41,7 @@ Burst模式
 当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。storedPermits代表的就是当前充足资源的数量。
 另外，coolDownIntervalMicros()返回stableIntervalMicros，maxPermits等于permitsPerSecond。
 Warmup模式
- ^ throttling | cold + / interval | /. | / . | / . ← &amp;quot;warmup period&amp;quot; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | . UP . | .</description>
+ ^ throttling | cold + / interval | /. | / . | / . ← &amp;#34;warmup period&amp;#34; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | . UP . | .</description>
     </item>
     
     <item>
@@ -129,7 +125,7 @@ DIP能够减少类、模块之间的耦合，提供系统的稳定性，提高�
       <guid>http://zjykzk.github.io/posts/cs/golang/map/</guid>
       <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
 // file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap 显然，makemap 返回的是指针。
-数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用  count int // map标记:  // 1. key和value是否包指针  // 2. 是否正在扩容  // 3. 是否是同样大小的扩容  // 4. 是否正在 `range`方式访问当前的buckets  // 5. 是否有 `range`方式访问旧的bucket  flags uint8 B uint8 // log_2(B) == bucket数量  noverflow uint16 // overflow bucket的数量，是个近似值  hash0 uint32 // hash种子  buckets unsafe.</description>
+数据结构 hashmap // hash map type hmap struct {  // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用  count int   // map标记:  // 1. key和value是否包指针  // 2. 是否正在扩容  // 3. 是否是同样大小的扩容  // 4. 是否正在 `range`方式访问当前的buckets  // 5. 是否有 `range`方式访问旧的bucket  flags uint8  B uint8 // log_2(B) == bucket数量  noverflow uint16 // overflow bucket的数量，是个近似值  hash0 uint32 // hash种子   buckets unsafe.</description>
     </item>
     
     <item>
@@ -181,9 +177,9 @@ label表示一个系统指标的维度，可以按照这个维度进行查询统
 Gauge 统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。
 Histogram 统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。
 这个度量类型有三个时间序列统计：
- &amp;lt;base_name&amp;gt;_bucket{le=&amp;quot;upper inclusive bound&amp;rdquo;}：小于某个阀值的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Summary 统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。
+ &amp;lt;base_name&amp;gt;_bucket{le=&amp;ldquo;upper inclusive bound&amp;rdquo;}：小于某个阀值的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Summary 统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。
 这个度量类型有三个时间序列统计：
- &amp;lt;base_name&amp;gt;{quantile=&amp;rdquo;&amp;lt;p&amp;gt;&amp;rdquo;}：度量值在前百分之p的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Job &amp;amp; Instance 在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如 一个支付进程。Job代表一个监控的逻辑单位。 比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。
+ &amp;lt;base_name&amp;gt;{quantile=&amp;quot;&amp;lt;p&amp;gt;&amp;quot;}：度量值在前百分之p的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Job &amp;amp; Instance 在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如 一个支付进程。Job代表一个监控的逻辑单位。 比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。
  job: payment-server  instance 1: 1.2.3.4:5678 instance 2: 1.2.3.5:5689 instance 3: 1.2.3.6:5689    自动生成的label和时间序列 当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。
 label:
  job: 配置好的job名字 instance:&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;格式的url  时间序列：</description>

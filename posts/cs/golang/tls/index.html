@@ -15,17 +15,17 @@ body{background:#faf9de;}
 <hr> <p>在golang中，为了性能的目的，当前执行的<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332"><code>g</code></a>是保存在当前线程的TLS中的，而TLS的地址在结构体<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412"><code>m</code></a>里面。问题是怎么放进去的呢？</p>
 <p>可以从程序的启动入手，顺藤摸瓜。</p>
 <p>编写一个打印<code>hello,world</code>的程序</p>
-<pre><code>// hello.go
+<pre tabindex="0"><code>// hello.go
 
 package main
 
 func main() {
-        print(&quot;hello, world&quot;)
+        print(&#34;hello, world&#34;)
 }
 </code></pre><p>编译生成可执行文件</p>
-<pre><code>go build -o hello hello.go
+<pre tabindex="0"><code>go build -o hello hello.go
 </code></pre><p>用gdb进行调试，找到程序的入口 <a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L7"><code>_rt0_amd64_linux</code></a></p>
-<pre><code>gdb hello
+<pre tabindex="0"><code>gdb hello
 (gdb) info files
 ...
 Entry point: 0x448f20
@@ -34,7 +34,7 @@ Entry point: 0x448f20
 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8)
 3       // license that can be found in the LICENSE file.
 4
-5       #include &quot;textflag.h&quot;
+5       #include &#34;textflag.h&#34;
 6
 7       TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8
 8               LEAQ    8(SP), SI // argv
@@ -43,10 +43,10 @@ Entry point: 0x448f20
 11              JMP     AX
 12
 </code></pre><p>发现<code>_rt0_amd64_linux</code>调用了<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/rt0_linux_amd64.s#L72"><code>main</code></a>函数，后者调用了<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/asm_amd64.s#L10"><code>runtime.rt0_go</code></a>。而在函数<code>runtime.rt0_go</code>中</p>
-<pre><code>127 	LEAQ	runtime·m0+m_tls(SB), DI
+<pre tabindex="0"><code>127 	LEAQ	runtime·m0+m_tls(SB), DI
 128 	CALL	runtime·settls(SB)
 </code></pre><p>把<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/proc.go#L79"><code>m0.tls</code></a>的地址放到寄存器<code>DI</code>，并调用了函数<code>runtime.settls</code>，查看<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/sys_linux_amd64.s#L496"><code>runtime.settls</code></a>核心代码</p>
-<pre><code>503 	ADDQ	$8, DI	// ELF wants to use -8(FS)
+<pre tabindex="0"><code>503 	ADDQ	$8, DI	// ELF wants to use -8(FS)
 504 #endif
 505 	MOVQ	DI, SI
 506 	MOVQ	$0x1002, DI	// ARCH_SET_FS

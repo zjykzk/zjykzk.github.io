@@ -8,10 +8,22 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 16 Dec 2020 16:58:31 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Tue, 03 May 2022 23:34:49 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>简单设计的4个原则</title>
+      <link>http://zjykzk.github.io/posts/cs/design/4rules-of-simple-design/</link>
+      <pubDate>Tue, 03 May 2022 23:34:49 +0800</pubDate>
+      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <guid>http://zjykzk.github.io/posts/cs/design/4rules-of-simple-design/</guid>
+      <description>什么是简单设计？ 首先，简单设计强调更好的设计**，而不是一个好的设计。突出了，它是一个动态的过程，强调设计随着软件开发的进展会随时调整。确保当下的设计能做到的最好设计。
+另外，在软件开发中有两个常识：
+ 需求是总是会变的。 我们不能够精确预测哪些需求将会变化。  因此，更好的设计是方便修改的设计；更好的设计是不去计划设计哪些地方将来会修改，而是采取简单设计的原则，让代码更加容易修改。那么，容易修改代码是怎么样的？
+ 有足够测试，这是不会改坏的信心的来源。 容易找到修改的地方。 修改的地方少。  简单设计的4个原则  通过测试。 清晰的表达意图。 尽可能少的重复。 更少的代码元素。  通过测试 作为保证代码正确性的一个手段，这是一个显而易见的问题。另外，这里还需要说明的额外的几点是：
+  测试运行的速度越快越好，越快说明你的反馈速度越快，效率越高。
+  测试的名称和被测试的代码保持一种对称性，名称应该反应被测试的代码语义。
+struct World { cells []Cell } func (w *World) isEmpty() bool { return len(w.cells) == 0 } func Test_new_world_is_empty(t *testing.T) { w := &amp;amp;World{} // BAD assert.Nil(t, w.cells) // GOOD assert.True(t, w.isEmpty()) }   不应该依赖之前的测试。
+func Test_world_is_not_empty_after_a_tick(t *testing.T) { w := &amp;amp;World{} newWorld = w.</description>
+    </item>
     
     <item>
       <title>虚拟内存技术</title>
@@ -169,7 +181,7 @@ sdk方面。一般需要熟悉最常用的，比如列表、哈希、并发相�
       <guid>http://zjykzk.github.io/posts/cs/golang/sync.map/</guid>
       <description>golang的SDK中提供线程安全的map实现sync.Map。它是针对RWMutex+map的实现方案中存在cache line的false share提出来的。主要适用于两个场景：
  针对一个key一次写多次读。 多个goroutine并发读写修改的key是没有交集。  在这两种情况下，相比一个Mutex或者RWMutex加上普通的map，锁的竞争要少的多。那为什么呢？
-数据结构 type Map struct { mu Mutex // read contains the portion of the map&#39;s contents that are safe for // concurrent access (with or without mu held). // // The read field itself is always safe to load, but must only be stored with // mu held. // // Entries stored in read may be updated concurrently without mu, but updating // a previously-expunged entry requires that the entry be copied to the dirty // map and unexpunged with mu held.</description>
+数据结构 type Map struct { mu Mutex // read contains the portion of the map&amp;#39;s contents that are safe for // concurrent access (with or without mu held). // // The read field itself is always safe to load, but must only be stored with // mu held. // // Entries stored in read may be updated concurrently without mu, but updating // a previously-expunged entry requires that the entry be copied to the dirty // map and unexpunged with mu held.</description>
     </item>
     
     <item>
@@ -286,9 +298,9 @@ ConsumeMessageService 消费服务分并发消费和顺序消费，主要区别�
 但是，代码中依然提供了接口，让用户自己指定类型，比如可以保存数据到monogodb。
 存储 本地类型
 数据保存在$storeDir/.rocketmq_offsets/$clientID/$group/offsets.json中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。其中$storeDir是可以通过系统变量rocketmq.client.localOffsetStoreDir配置，如果没有指定参数就使用HOME目录。$clientID和$group分别表示消费者的id和分组。
-// example {&amp;quot;offsetTable&amp;quot;:{{&amp;quot;brokerName&amp;quot;:&amp;quot;topic&amp;quot;,&amp;quot;queueId&amp;quot;:1,&amp;quot;topic&amp;quot;:&amp;quot;broker&amp;quot;}:0}} 远程类型
+// example {&amp;#34;offsetTable&amp;#34;:{{&amp;#34;brokerName&amp;#34;:&amp;#34;topic&amp;#34;,&amp;#34;queueId&amp;#34;:1,&amp;#34;topic&amp;#34;:&amp;#34;broker&amp;#34;}:0}} 远程类型
 数据保存在$rootPath/config/consumerOffset.json文件中，里面的数据是非标准json数据，用的是阿里的fastjson这个库。offsetTable中的key格式是topic@group，value格式queueID:offset。
-// example { &amp;quot;offsetTable&amp;quot;:{ &amp;quot;test@benchmark_consumer_61&amp;quot;:{ 0:5280,1:5312,2:5312,3:5312 } } } 接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
+// example { &amp;#34;offsetTable&amp;#34;:{ &amp;#34;test@benchmark_consumer_61&amp;#34;:{ 0:5280,1:5312,2:5312,3:5312 } } } 接口 通过接口类型org.apache.rocketmq.client.consumer.store.OffsetStore抽象了消费进度的相关操作。
 load
 在消费者启动的时候，需要把消费进度载入内存。只有本地类型会载入数据。
 updateOffset
@@ -314,7 +326,7 @@ updateConsumeOffsetToBroker
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/golang/how-main-goroutine-is-terminator/</guid>
       <description>来一个hello, world!。
-package main func main() { println(&amp;quot;hello, world!&amp;quot;) } // line 5 编译调试。
+package main func main() { println(&amp;#34;hello, world!&amp;#34;) } // line 5 编译调试。
 # go build -o debug_main main.go // 编译 # gdb debug_main // 开始调试 (gdb) b 5 // 在第5行打断点 (gdb) r // 执行，这时代码停在第5行，还在main函数中，其实在二进制文件里面它符号是main_main (gdb) s // 单步往下走，进入runtime.main代码 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 207 if atomic.Load(&amp;amp;runningPanicDefers) != 0 { (gdb) bt // 查看调用栈 #0 runtime.main () at /home/zenk/tools/goroot/src/runtime/proc.go:207 #1 0x0000000000446891 in runtime.goexit () at /home/zenk/tools/goroot/src/runtime/asm_amd64.s:2361 #2 0x0000000000000000 in ?? () (gdb) s 216 if atomic.</description>
     </item>
     
@@ -407,7 +419,7 @@ Burst模式
 当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。storedPermits代表的就是当前充足资源的数量。
 另外，coolDownIntervalMicros()返回stableIntervalMicros，maxPermits等于permitsPerSecond。
 Warmup模式
- ^ throttling | cold + / interval | /. | / . | / . ← &amp;quot;warmup period&amp;quot; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | . UP . | .</description>
+ ^ throttling | cold + / interval | /. | / . | / . ← &amp;#34;warmup period&amp;#34; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | . UP . | .</description>
     </item>
     
     <item>
@@ -555,9 +567,9 @@ DIP能够减少类、模块之间的耦合，提供系统的稳定性，提高�
       <description>在golang中，为了性能的目的，当前执行的g是保存在当前线程的TLS中的，而TLS的地址在结构体m里面。问题是怎么放进去的呢？
 可以从程序的启动入手，顺藤摸瓜。
 编写一个打印hello,world的程序
-// hello.go package main func main() { print(&amp;quot;hello, world&amp;quot;) } 编译生成可执行文件
+// hello.go package main func main() { print(&amp;#34;hello, world&amp;#34;) } 编译生成可执行文件
 go build -o hello hello.go 用gdb进行调试，找到程序的入口 _rt0_amd64_linux
-gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;quot;textflag.h&amp;quot; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12 发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
+gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x448f20 is in _rt0_amd64_linux (/home/zenk/tools/goroot/src/runtime/rt0_linux_amd64.s:8) 3 // license that can be found in the LICENSE file. 4 5 #include &amp;#34;textflag.h&amp;#34; 6 7 TEXT _rt0_amd64_linux(SB),NOSPLIT,$-8 8 LEAQ 8(SP), SI // argv 9 MOVQ 0(SP), DI // argc 10 MOVQ $main(SB), AX 11 JMP AX 12 发现_rt0_amd64_linux调用了main函数，后者调用了runtime.</description>
     </item>
     
     <item>
@@ -577,7 +589,7 @@ gdb hello (gdb) info files ... Entry point: 0x448f20 ... (gdb) list *0x448f20 0x
       <pubDate>Wed, 10 Jan 2018 18:16:35 +0800</pubDate>
       <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/vim-tips/</guid>
-      <description> 在命令模式使用函数  :%s/ab(.*)c/\=submatch(1) . &#39;test&#39;/gc 窗口间切换  跳转至某个窗口：窗口number + c-w + w： 跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h 跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l 跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j 跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k 全文缩进  gg=G 把数字替换成原来的数字减一  :%s/(\d+)/\=submatch(1)-1/gc 移动屏幕  H // 把当前行的位置移到最上面 M // 把当前行的位置移到屏幕中间 L // 把当前的位置移到屏幕底部 全局操作g  :{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果 移动窗口  CTRL-W [K/J/H/L/T] // 把窗口移到最上面、下面、左边、右边、新标签 跳到某个字符的左（右）边  t{char} // 跳转到左边 T{char} // 跳转到右边 在vim8的终端滚动  Ctrl-w N </description>
+      <description> 在命令模式使用函数  :%s/ab(.*)c/\=submatch(1) . &amp;#39;test&amp;#39;/gc 窗口间切换  跳转至某个窗口：窗口number + c-w + w： 跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h 跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l 跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j 跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k 全文缩进  gg=G 把数字替换成原来的数字减一  :%s/(\d+)/\=submatch(1)-1/gc 移动屏幕  H // 把当前行的位置移到最上面 M // 把当前行的位置移到屏幕中间 L // 把当前的位置移到屏幕底部 全局操作g  :{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果 移动窗口  CTRL-W [K/J/H/L/T] // 把窗口移到最上面、下面、左边、右边、新标签 跳到某个字符的左（右）边  t{char} // 跳转到左边 T{char} // 跳转到右边 在vim8的终端滚动  Ctrl-w N </description>
     </item>
     
     <item>
@@ -649,7 +661,7 @@ ${rootpath}/consumequeue └── 0%default // topic ├── 0 // queue 0 │
       <guid>http://zjykzk.github.io/posts/cs/golang/map/</guid>
       <description>类型 golang中的map是一个 指针。当执行语句 make(map[string]string) 的时候，其实是调用了 makemap 函数：
 // file: runtime/hashmap.go:L222 func makemap(t *maptype, hint64, h *hmap, bucket unsafe.Pointer) *hmap 显然，makemap 返回的是指针。
-数据结构 hashmap // hash map type hmap struct { // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用  count int // map标记:  // 1. key和value是否包指针  // 2. 是否正在扩容  // 3. 是否是同样大小的扩容  // 4. 是否正在 `range`方式访问当前的buckets  // 5. 是否有 `range`方式访问旧的bucket  flags uint8 B uint8 // log_2(B) == bucket数量  noverflow uint16 // overflow bucket的数量，是个近似值  hash0 uint32 // hash种子  buckets unsafe.</description>
+数据结构 hashmap // hash map type hmap struct {  // 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用  count int   // map标记:  // 1. key和value是否包指针  // 2. 是否正在扩容  // 3. 是否是同样大小的扩容  // 4. 是否正在 `range`方式访问当前的buckets  // 5. 是否有 `range`方式访问旧的bucket  flags uint8  B uint8 // log_2(B) == bucket数量  noverflow uint16 // overflow bucket的数量，是个近似值  hash0 uint32 // hash种子   buckets unsafe.</description>
     </item>
     
     <item>
@@ -717,9 +729,9 @@ label表示一个系统指标的维度，可以按照这个维度进行查询统
 Gauge 统计度量的单个值。适用于可以增减的度量，比如当前的内存使用情况。
 Histogram 统计度量事件发生的次数以及度量值的和。还支持统计小于某个阀值的度量事件发生的次数。
 这个度量类型有三个时间序列统计：
- &amp;lt;base_name&amp;gt;_bucket{le=&amp;quot;upper inclusive bound&amp;rdquo;}：小于某个阀值的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Summary 统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。
+ &amp;lt;base_name&amp;gt;_bucket{le=&amp;ldquo;upper inclusive bound&amp;rdquo;}：小于某个阀值的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Summary 统计度量时间发生的次数以及度量值的和。还支持统计某个百分比内的度量事件发生的次数。
 这个度量类型有三个时间序列统计：
- &amp;lt;base_name&amp;gt;{quantile=&amp;rdquo;&amp;lt;p&amp;gt;&amp;rdquo;}：度量值在前百分之p的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Job &amp;amp; Instance 在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如 一个支付进程。Job代表一个监控的逻辑单位。 比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。
+ &amp;lt;base_name&amp;gt;{quantile=&amp;quot;&amp;lt;p&amp;gt;&amp;quot;}：度量值在前百分之p的度量事件发生的次数 &amp;lt;base_name&amp;gt;_sum：度量值的和 &amp;lt;base_name&amp;gt;_count：度量事件发生的次数  Job &amp;amp; Instance 在prometheus里面对监控的对象分成Job和Instance。Instance代表一个监控的实例。比如 一个支付进程。Job代表一个监控的逻辑单位。 比如支付服务，它在多台机器上面部署着，每台机器对应一个Instance。
  job: payment-server  instance 1: 1.2.3.4:5678 instance 2: 1.2.3.5:5689 instance 3: 1.2.3.6:5689    自动生成的label和时间序列 当prometheus抓取一个目标的时候，会自动生成时间序列以及label，用来标识抓取的目标状态。
 label:
  job: 配置好的job名字 instance:&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;格式的url  时间序列：</description>

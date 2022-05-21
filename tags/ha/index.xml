@@ -8,11 +8,7 @@
     <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
     <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 02 Nov 2018 15:38:24 +0800</lastBuildDate>
-    
-	<atom:link href="http://zjykzk.github.io/tags/ha/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 02 Nov 2018 15:38:24 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/ha/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>高可用</title>
       <link>http://zjykzk.github.io/posts/cs/dist/ha/</link>

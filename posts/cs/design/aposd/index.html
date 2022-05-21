@@ -96,7 +96,7 @@ body{background:#faf9de;}
 <h4 id="深度模块">深度模块</h4>
 <p>深度模块中的“深”是模块的接口简单，实现的功能强大。因为简单的接口意味着较少的依赖和容易懂，也就意味较低的复杂度。但是，提供的功能却是强大的。因此，从复杂的角度来说就是以较少的复杂度实现了较强的功能，具有高性价比。总之，越深越好。下面几小节介绍让模块变深的方法。</p>
 <p>Unix中的文件I/O是一个很好的深度模块的例子。它包含以下5个签名简单的接口：</p>
-<pre><code>int open(const char* path, int flags, mode_t permissions);
+<pre tabindex="0"><code>int open(const char* path, int flags, mode_t permissions);
 ssize_t read(int fd, void* buffer, size_t count);
 ssize_t write(int fd, const void* buffer, size_t count);
 off_t lseek(int fd, off_t offset, int referencePosition);
@@ -124,10 +124,10 @@ int close(fd);
 <h4 id="通用化">通用化</h4>
 <p>平时开发经常会遇到写一个接口时候，考虑将来会遇到什么问题，然后按照预想方式来设计相对通用的接口，这样后面就可以不用改接口了，毕竟改接口是比较麻烦的事情。还一种说法是写接口的时候不要预测将来，因为大部分情况下预测都是不靠谱的，因此应该按照当前的需求来设计，这样符合增量迭代的思路。</p>
 <p>但是应该适度通用，做一定的抽象，不仅仅满足当前的需求；同时不过度抽象，当实现当前需求时感到难用。比如：文本编辑器中插入、删除字符串。比较合适的设计的是</p>
-<pre><code>void insert(Position s, String s)
+<pre tabindex="0"><code>void insert(Position s, String s)
 void delete(Position s, Position e)
 </code></pre><p>比设计成</p>
-<pre><code>void insert(Cursor c, String s)
+<pre tabindex="0"><code>void insert(Cursor c, String s)
 void delete(Cursor s, Cursor e)
 </code></pre><p>要好，因为前者需要的信息是本身固有的，可以用在其他不是UI的场景，更加通用。而后者只能在UI的基础上使用。</p>
 <p>通用化的模块是更容易变得深度以及隐藏信息。</p>
@@ -345,7 +345,7 @@ void delete(Cursor s, Cursor e)
 </li>
 <li>
 <p>了解一些操作的延时，以下是Google大神的总结。</p>
-<pre><code>Latency Comparison Numbers (~2012)
+<pre tabindex="0"><code>Latency Comparison Numbers (~2012)
 ----------------------------------
 L1 cache reference                           0.5 ns
 Branch mispredict                            5   ns
@@ -361,7 +361,7 @@ Read 1 MB sequentially from SSD*     1,000,000   ns    1,000 us    1 ms  ~1GB/se
 Disk seek                           10,000,000   ns   10,000 us   10 ms  20x datacenter roundtrip
 Read 1 MB sequentially from disk    20,000,000   ns   20,000 us   20 ms  80x memory, 20X SSD
 Send packet CA-&gt;Netherlands-&gt;CA    150,000,000   ns  150,000 us  150 ms
-   
+
 Notes
 -----
 1 ns = 10^-9 seconds

@@ -16,11 +16,11 @@ body{background:#faf9de;}
 <p>封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。</p>
 <h2 id="排查过程">排查过程</h2>
 <p>查看boots-broker日志，发现问题日志：</p>
-<pre><code>[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0
+<pre tabindex="0"><code>[TIMEOUT_CLEAN_QUEUE]broker busy, start flow control for a while, period in queue: 1008ms, size of queue: 0
 </code></pre><p>说明，RocketMQ处理发送消息比较慢。可是，从<code>size of queue</code>可以看出，堆积的消息为0。</p>
 <p>查看机器资源消耗情况，发现资源都是充裕的。</p>
 <p>查看RocketMQ日志，发现store.log中有异常，master中的store.log周期性的发生以下日志：</p>
-<pre><code>2018-10-22 15:44:07 INFO AcceptSocketService - HAService receive new connection, /10.38.34.27:54052
+<pre tabindex="0"><code>2018-10-22 15:44:07 INFO AcceptSocketService - HAService receive new connection, /10.38.34.27:54052
 2018-10-22 15:44:07 INFO ReadSocketService - ReadSocketService service started
 2018-10-22 15:44:07 INFO WriteSocketService - WriteSocketService service started
 2018-10-22 15:44:08 INFO WriteSocketService - WriteSocketService service end
@@ -30,7 +30,7 @@ body{background:#faf9de;}
 2018-10-22 15:44:33 INFO ReadSocketService - ReadSocketService service end
 </code></pre><p>从上可以看出，slave主动向master建立连接，5s之后发送自己当前同步的进度，master收到以后向slave发送同步数据，最后master由于slave的连接过期，主动断开连接。</p>
 <p>slave中的store.log周期性的发生以下日志：</p>
-<pre><code>2018-10-22 15:44:07 WARN HAClient - HAClient, housekeeping, found this connection[10.38.33.22:10912] expired, 1540194247979
+<pre tabindex="0"><code>2018-10-22 15:44:07 WARN HAClient - HAClient, housekeeping, found this connection[10.38.33.22:10912] expired, 1540194247979
 2018-10-22 15:44:07 WARN HAClient - HAClient, master not response some time, so close connection
 2018-10-22 15:44:33 INFO HAClient - HAClient, processReadEvent read socket &lt; 0
 </code></pre><p>从上可以看出，slave也发现和master的连接超时，断开连接。</p>

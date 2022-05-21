@@ -26,7 +26,7 @@ body{background:#faf9de;}
 <p>一个基于x86_64平台的JIT代码， 通过系统调用<code>write</code>实现打印<code>hello,world！</code>。</p>
 <h3 id="基于x86_64平台的jit代码">基于x86_64平台的JIT代码</h3>
 <p>linux下面系统调用通过软中断来实现，参数通过寄存器来传递。寄存器的使用情况如下：</p>
-<pre><code>+----------+--------+--------+--------+--------+--------+--------+
+<pre tabindex="0"><code>+----------+--------+--------+--------+--------+--------+--------+
 | Syscall #| Param 1| Param 2| Param 3| Param 4| Param 5| Param 6|
 +----------+--------+--------+--------+--------+--------+--------+
 | rax      |  rdi   |  rsi   |   rdx  |   r10  |   r8   |   r9   |
@@ -38,7 +38,7 @@ body{background:#faf9de;}
 <li>参数<code>count</code>:输出的字节数</li>
 </ul>
 <p>因此，x86_64平台下调用<code>write</code>的机器码为</p>
-<pre><code>0:  48 c7 c0 01 00 00 00    mov    rax,0x1
+<pre tabindex="0"><code>0:  48 c7 c0 01 00 00 00    mov    rax,0x1
 7:  48 c7 c7 01 00 00 00    mov    rdi,0x1
 e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc
 15: 48 8d 35 03 00 00 00    lea    rsi,[rip+0x4]        # 0x1f
@@ -54,7 +54,7 @@ e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc
 </ol>
 <h3 id="执行代码-1">执行代码</h3>
 <p>通过系统调用<a href="http://man7.org/linux/man-pages/man2/mmap.2.html">void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)</a>创建内存映射，确保这块内存可以执行，通过参数<code>prot</code>指定，其中<code>PROT_EXEC</code>可执行，<code>PROT_READ</code>可读，<code>PROD_WRITE</code>可写。</p>
-<pre><code>unsigned short code[] = {
+<pre tabindex="0"><code>unsigned short code[] = {
     0x48c7, 0xc001, 0x0,          // mov %rax,$0x1
     0x48, 0xc7c7, 0x100, 0x0,     // mov %rdi,$0x1
     0x48c7, 0xc20c, 0x0,          // mov 0x12, %rdx
@@ -70,13 +70,13 @@ e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc
 
 void *m = mmap(NULL, sizeof(code), PROTS, FLAGS, -1, 0);
 </code></pre><p>接下来，把机器码复制到刚刚映射的内存中，注意为了显示方便机器码保存在了<code>unsigned short</code>数组中，加上x86_64平台字节顺序按照小端来存储，需要把机器码字节顺序调换。</p>
-<pre><code>for (int i = 0; i &lt; sizeof(code)/sizeof(code[0]); i++) {
+<pre tabindex="0"><code>for (int i = 0; i &lt; sizeof(code)/sizeof(code[0]); i++) {
     *((unsigned short *)m+i) = (unsigned short)(((code[i]&gt;&gt;8) | (code[i]&lt;&lt;8)) &amp; 0xffff);
 }
 </code></pre><p>最后，调用一个没有参数以及没有返回值的函数：<code>void (*)()</code></p>
-<pre><code>((void (*)())m)();
+<pre tabindex="0"><code>((void (*)())m)();
 </code></pre><h3 id="完整代码">完整代码</h3>
-<pre><code>#include &lt;stdio.h&gt;
+<pre tabindex="0"><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;sys/mman.h&gt;
 #include &lt;sys/types.h&gt;
@@ -99,7 +99,7 @@ int main(void) {
 
   void *m = mmap(NULL, sizeof(code), PROTS, FLAGS, -1, 0);
   if (m == MAP_FAILED) {
-      printf(&quot;mmap error&quot;);
+      printf(&#34;mmap error&#34;);
       return -1;
   }
 
