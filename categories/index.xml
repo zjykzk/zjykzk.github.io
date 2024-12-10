@@ -4,46 +4,45 @@
     <title>Categories on 老K随笔</title>
     <link>http://zjykzk.github.io/categories/</link>
     <description>Recent content in Categories on 老K随笔</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
-    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <generator>Hugo</generator>
+    <language>zh</language>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 03 May 2022 23:34:49 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 01 Jul 2024 18:13:21 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>cs</title>
+      <title>Cs</title>
       <link>http://zjykzk.github.io/categories/cs/</link>
-      <pubDate>Tue, 03 May 2022 23:34:49 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
+      <pubDate>Mon, 01 Jul 2024 18:13:21 +0800</pubDate>
       <guid>http://zjykzk.github.io/categories/cs/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>design</title>
+      <title>Engineering</title>
+      <link>http://zjykzk.github.io/categories/engineering/</link>
+      <pubDate>Mon, 01 Jul 2024 18:13:21 +0800</pubDate>
+      <guid>http://zjykzk.github.io/categories/engineering/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Design</title>
       <link>http://zjykzk.github.io/categories/design/</link>
       <pubDate>Sun, 28 Jun 2020 15:44:46 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/categories/design/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>linux</title>
+      <title>Linux</title>
       <link>http://zjykzk.github.io/categories/linux/</link>
       <pubDate>Tue, 14 Jan 2020 11:11:37 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/categories/linux/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>buddhism</title>
+      <title>Buddhism</title>
       <link>http://zjykzk.github.io/categories/buddhism/</link>
       <pubDate>Sun, 04 Feb 2018 17:13:52 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/categories/buddhism/</guid>
       <description></description>
     </item>
-    
   </channel>
 </rss>

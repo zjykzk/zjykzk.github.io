@@ -1,39 +1,27 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>db on 老K随笔</title>
+    <title>Db on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/db/</link>
-    <description>Recent content in db on 老K随笔</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
-    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <description>Recent content in Db on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 12 Feb 2020 10:41:51 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/db/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 12 Feb 2020 10:41:51 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/db/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>mysql连接中的serverTimezone参数解析</title>
       <link>http://zjykzk.github.io/posts/cs/db/mysql-servertimezone/</link>
       <pubDate>Wed, 12 Feb 2020 10:41:51 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/db/mysql-servertimezone/</guid>
-      <description>在mysql连接的选项中参数serverTimezone用来指定服务器的时区.它的作用主要用于当我们传递时间类型的参数以及获取时间类型的数值时,转换成程序运行所在环境的时区所对应的时间.注意:如果传递字符串是没问题的,因为jdbc会把参数都转成字符串类型的sql传递到服务区上去.
-如果不指定的情况下,会通过连接获取mysq服务器上面的时区.先获取变量time_zone值,如果是SYSTEM,就获取system_time_zone的值.参考代码:com.mysql.cj.protocol.a.NativeProtocol.configureTimezone.
-因此,关于system_time_zone值的设置的目的是为了解决你写入和读取的时间值一致性.如果你是读别人写的数据,那么需要把它设置成写入的时候指定的时区.</description>
+      <description>&lt;p&gt;在mysql连接的选项中参数&lt;code&gt;serverTimezone&lt;/code&gt;用来指定服务器的时区.它的作用主要用于当我们传递时间类型的参数以及获取时间类型的数值时,转换成程序运行所在环境的时区所对应的时间.注意:如果传递字符串是没问题的,因为jdbc会把参数都转成字符串类型的sql传递到服务区上去.&lt;/p&gt;&#xA;&lt;p&gt;如果不指定的情况下,会通过连接获取mysq服务器上面的时区.先获取变量&lt;code&gt;time_zone&lt;/code&gt;值,如果是&lt;code&gt;SYSTEM&lt;/code&gt;,就获取&lt;code&gt;system_time_zone&lt;/code&gt;的值.参考代码:&lt;code&gt;com.mysql.cj.protocol.a.NativeProtocol.configureTimezone&lt;/code&gt;.&lt;/p&gt;&#xA;&lt;p&gt;因此,关于&lt;code&gt;system_time_zone&lt;/code&gt;值的设置的目的是为了解决你写入和读取的时间值一致性.如果你是读别人写的数据,那么需要把它设置成写入的时候指定的时区.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>bolt源码分析</title>
       <link>http://zjykzk.github.io/posts/cs/db/bolt/</link>
       <pubDate>Sun, 19 Jan 2020 11:39:24 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/db/bolt/</guid>
-      <description>bolt数据库是golang开发的简单的kv数据库。代码十分精简，总共3000+行，学习数据库一个比较好的起点。
-数据结构 bolt使用的数据结构按照数据保存的位置划分两类：内存和磁盘。
-内存中的数据结构核心是B+树，它根据key组织在一起。B+树中的每个结点，对应数据结构node，其中的内部信息通过数据结构inode来描述。内存中其他主要数据结构还包括meta和freelist。
-描述磁盘中的数据结构是page，它的数据来自于node、meta或者freelist。对应者一块内存，大小为os的page size的倍数。
-node type node struct { bucket *Bucket // 这个结点所在的的bucket isLeaf bool // 是否是叶子结点 unbalanced bool // 是否平衡，删除的时候做标记 spilled bool // 是否已经分裂 key []byte // 对应着第一个inode中的key pgid pgid // 所在页的id parent *node // 父结点 children nodes // 子结点 inodes inodes // 结点中key或者key&amp;amp;value，如果是分支结点只有key，叶子结点还有value } inode 通过branchPageElement或者leafPageElement来获取数据。
-type inode struct { flags uint32 // 标记，用来区分支结点和叶子结点 pgid pgid // 所在页的id key []byte value []byte } page 代表一个页或者连续的几个页。
-type page struct { id pgid // 64位的id flags uint16 // 页的标记，表示存储的数据类型，包括分支、叶子，元数据和描述空闲页的数据 count uint16 // 包含数据的元素个数 overflow uint32 // 后面还有的页数 ptr uintptr // 只是一个标记字段，标记数据的起始位置 } bucketPageElement B+树中分支结点保存的数据元信息。</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/boltdb/bolt&#34;&gt;bolt&lt;/a&gt;数据库是golang开发的简单的kv数据库。代码十分精简，总共3000+行，学习数据库一个比较好的起点。&lt;/p&gt;&#xA;&lt;h2 id=&#34;数据结构&#34;&gt;数据结构&lt;/h2&gt;&#xA;&lt;p&gt;bolt使用的数据结构按照数据保存的位置划分两类：内存和磁盘。&lt;/p&gt;&#xA;&lt;p&gt;内存中的数据结构核心是B+树，它根据key组织在一起。B+树中的每个结点，对应数据结构&lt;a href=&#34;#node&#34;&gt;node&lt;/a&gt;，其中的内部信息通过数据结构&lt;a href=&#34;#inode&#34;&gt;inode&lt;/a&gt;来描述。内存中其他主要数据结构还包括&lt;a href=&#34;#meta&#34;&gt;meta&lt;/a&gt;和&lt;a href=&#34;#freelist&#34;&gt;freelist&lt;/a&gt;。&lt;/p&gt;&#xA;&lt;p&gt;描述磁盘中的数据结构是&lt;a href=&#34;#page&#34;&gt;page&lt;/a&gt;，它的数据来自于&lt;a href=&#34;#node&#34;&gt;node&lt;/a&gt;、&lt;a href=&#34;#meta&#34;&gt;meta&lt;/a&gt;或者&lt;a href=&#34;#freelist&#34;&gt;freelist&lt;/a&gt;。对应者一块内存，大小为os的page size的倍数。&lt;/p&gt;&#xA;&lt;h3 id=&#34;node&#34;&gt;node&lt;/h3&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;type node struct {&#xA;  bucket     *Bucket      // 这个结点所在的的bucket&#xA;  isLeaf     bool         // 是否是叶子结点&#xA;  unbalanced bool         // 是否平衡，删除的时候做标记&#xA;  spilled    bool         // 是否已经分裂&#xA;  key        []byte       // 对应着第一个inode中的key&#xA;  pgid       pgid         // 所在页的id&#xA;  parent     *node        // 父结点&#xA;  children   nodes        // 子结点&#xA;  inodes     inodes       // 结点中key或者key&amp;amp;value，如果是分支结点只有key，叶子结点还有value&#xA;}&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;inode&#34;&gt;inode&lt;/h4&gt;&#xA;&lt;p&gt;通过&lt;a href=&#34;#branchPageElement&#34;&gt;branchPageElement&lt;/a&gt;或者&lt;a href=&#34;#leafPageElement&#34;&gt;leafPageElement&lt;/a&gt;来获取数据。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;type inode struct {&#xA;  flags uint32            // 标记，用来区分支结点和叶子结点&#xA;  pgid  pgid              // 所在页的id&#xA;  key   []byte&#xA;  value []byte&#xA;}&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;page&#34;&gt;page&lt;/h3&gt;&#xA;&lt;p&gt;代表一个页或者连续的几个页。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;type page struct {&#xA;  id       pgid           // 64位的id&#xA;  flags    uint16         // 页的标记，表示存储的数据类型，包括分支、叶子，元数据和描述空闲页的数据&#xA;  count    uint16         // 包含数据的元素个数&#xA;  overflow uint32         // 后面还有的页数&#xA;  ptr      uintptr        // 只是一个标记字段，标记数据的起始位置&#xA;}&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;bucketpageelement&#34;&gt;bucketPageElement&lt;/h4&gt;&#xA;&lt;p&gt;B+树中分支结点保存的数据元信息。&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

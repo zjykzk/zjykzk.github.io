@@ -90,24 +90,24 @@ body{background:#faf9de;}
 </ol>
 <p>其测试数据如下：</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:center">装载因子</th>
-<th style="text-align:center">%overflow</th>
-<th style="text-align:center">bytes/entry</th>
-<th style="text-align:center">hitprobe</th>
-<th style="text-align:center">missprobe</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">6.5</td>
-<td style="text-align:center">20.90</td>
-<td style="text-align:center">10.79</td>
-<td style="text-align:center">4.25</td>
-<td style="text-align:center">6.5</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center">装载因子</th>
+          <th style="text-align: center">%overflow</th>
+          <th style="text-align: center">bytes/entry</th>
+          <th style="text-align: center">hitprobe</th>
+          <th style="text-align: center">missprobe</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">6.5</td>
+          <td style="text-align: center">20.90</td>
+          <td style="text-align: center">10.79</td>
+          <td style="text-align: center">4.25</td>
+          <td style="text-align: center">6.5</td>
+      </tr>
+  </tbody>
 </table>
 <h1 id="hash函数">hash函数</h1>
 <p>map中的key对应着一个hash函数，用于定位bucket。在golang的hash函数是固定的，用户无法修改。golang中的预定义基本类型，像 <code>int32/int64/string/interface</code> 等等都有一个hash函数与之对应，代码在runtime/alg.go中。对于struct/数组/slice，如果它每个字段或者元素都是有hash函数，那么该类型就有hash函数，hash值由每个字段的hash值来定义，代码在reflect/type.go函数<code>StructOf</code>中。</p>

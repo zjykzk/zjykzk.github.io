@@ -1,42 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>network on 老K随笔</title>
+    <title>Network on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/network/</link>
-    <description>Recent content in network on 老K随笔</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
-    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <description>Recent content in Network on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 30 Apr 2019 19:18:23 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/network/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 30 Apr 2019 19:18:23 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/network/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>网关</title>
       <link>http://zjykzk.github.io/posts/cs/network/gate/</link>
       <pubDate>Tue, 30 Apr 2019 19:18:23 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/network/gate/</guid>
-      <description>解决跨网段访问。
-发包的目的地址和本机地址不在同一个网段的时候就会把包发给网关。网关把MAC头和IP头拿下来，根据IP地址和路由规则决定发往哪个结点。
-网关一般是路由器。
-路由方式  192.168.1.1/24|====| 192.168.56.1/24 192.168.56.2/24 |====| 192.168.4.1/24 +----------&amp;gt;| G1 |-----------------------------------&amp;gt;| G2 |--------+ | |====| |====| | | V |--+--| |--+--| | A | 192.168.1.101/24 | B | 192.168.4.101/24 |--+--| |--+--| 静态路由
-路由器配置跳转规则。它不修改IP地址，只修改MAC地址。这种类型的网关叫转发网关。
-A向B发消息的链路为：
-A-&amp;gt;G1-&amp;gt;G2-&amp;gt;B.
-A-&amp;gt;G1的地址内容：
- MAC源地址：A的MAC地址。 MAC目的地址：G1中192.168.1.1网口的MAC地址。 IP源地址：192.168.1.101。 IP目的地址：192.168.4.101。
- G1-&amp;gt;G2的地址内容：
- MAC源地址：G1中192.168.56.1网口的地址。 MAC目的地址：G2中192.168.56.2网口的地址。 IP源地址：192.168.1.101。 IP目的地址：192.168.4.101。
- G2-&amp;gt;B的地址内容：
- MAC源地址：G2中192.168.4.1网口的地址。 MAC目的地址：B的MAC地址。 IP源地址：192.168.1.101。 IP目的地址：192.168.4.101。
- 问题：
-不同局域网内的ip地址会冲突。比如，你需要访问的地址和你局域网内的地址是一样的。怎么办，看看动态路由！
-动态路由
-路由器同样需要配置跳转规则。为了解决静态路由的问题，需要内网机器一个不会冲突的ip地址，这个地址保证了在外面不会冲突外，为了区分局域网地址，这个地址叫外网地址。这样访问另外一台内网机器的时候，ip地址是外网地址。它需要它会同时修改IP地址和MAC地址，这样才能把数据发回来。这种类型的网关叫NAT网关。
-A向B发消息的链路为：
-A-&amp;gt;G1-&amp;gt;G2-&amp;gt;B.
-A-&amp;gt;G1的地址内容：
- MAC源地址：A的MAC地址。 MAC目的地址：G1中192.168.1.1网口的MAC地址。 IP源地址：192.168.1.101。 IP目的地址：192.168.56.2。</description>
+      <description>&lt;p&gt;解决跨网段访问。&lt;/p&gt;&#xA;&lt;p&gt;发包的目的地址和本机地址不在同一个网段的时候就会把包发给网关。网关把MAC头和IP头拿下来，根据IP地址和路由规则决定发往哪个结点。&lt;/p&gt;&#xA;&lt;p&gt;网关一般是路由器。&lt;/p&gt;&#xA;&lt;h4 id=&#34;路由方式&#34;&gt;路由方式&lt;/h4&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;     192.168.1.1/24|====| 192.168.56.1/24    192.168.56.2/24 |====| 192.168.4.1/24&#xA;       +----------&amp;gt;| G1 |-----------------------------------&amp;gt;| G2 |--------+&#xA;       |           |====|                                    |====|        |&#xA;       |                                                                   V&#xA;    |--+--|                                                             |--+--|&#xA;    |  A  | 192.168.1.101/24                                            |  B  | 192.168.4.101/24&#xA;    |--+--|                                                             |--+--|&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;静态路由&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;路由器配置跳转规则。它不修改IP地址，只修改MAC地址。这种类型的网关叫转发网关。&lt;/p&gt;&#xA;&lt;p&gt;A向B发消息的链路为：&lt;/p&gt;&#xA;&lt;p&gt;A-&amp;gt;G1-&amp;gt;G2-&amp;gt;B.&lt;/p&gt;&#xA;&lt;p&gt;A-&amp;gt;G1的地址内容：&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;MAC源地址：A的MAC地址。&#xA;MAC目的地址：G1中192.168.1.1网口的MAC地址。&#xA;IP源地址：192.168.1.101。&#xA;IP目的地址：192.168.4.101。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;G1-&amp;gt;G2的地址内容：&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;MAC源地址：G1中192.168.56.1网口的地址。&#xA;MAC目的地址：G2中192.168.56.2网口的地址。&#xA;IP源地址：192.168.1.101。&#xA;IP目的地址：192.168.4.101。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;G2-&amp;gt;B的地址内容：&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;MAC源地址：G2中192.168.4.1网口的地址。&#xA;MAC目的地址：B的MAC地址。&#xA;IP源地址：192.168.1.101。&#xA;IP目的地址：192.168.4.101。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;问题：&lt;/p&gt;&#xA;&lt;p&gt;不同局域网内的ip地址会冲突。比如，你需要访问的地址和你局域网内的地址是一样的。怎么办，看看动态路由！&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;动态路由&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;路由器同样需要配置跳转规则。为了解决静态路由的问题，需要内网机器一个不会冲突的ip地址，这个地址保证了在外面不会冲突外，为了区分局域网地址，这个地址叫外网地址。这样访问另外一台内网机器的时候，ip地址是外网地址。它需要它会同时修改IP地址和MAC地址，这样才能把数据发回来。这种类型的网关叫NAT网关。&lt;/p&gt;&#xA;&lt;p&gt;A向B发消息的链路为：&lt;/p&gt;&#xA;&lt;p&gt;A-&amp;gt;G1-&amp;gt;G2-&amp;gt;B.&lt;/p&gt;&#xA;&lt;p&gt;A-&amp;gt;G1的地址内容：&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;MAC源地址：A的MAC地址。&#xA;MAC目的地址：G1中192.168.1.1网口的MAC地址。&#xA;IP源地址：192.168.1.101。&#xA;IP目的地址：192.168.56.2。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;G1-&amp;gt;G2的地址内容：&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;MAC源地址：G1中192.168.56.1网口的地址。&#xA;MAC目的地址：G2中192.168.56.2网口的地址。&#xA;IP源地址：192.168.56.1。&#xA;IP目的地址：192.168.56.2。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;G2-&amp;gt;B的地址内容：&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;MAC源地址：G2中192.168.4.1网口的地址。&#xA;MAC目的地址：B的MAC地址。&#xA;IP源地址：192.168.56.1。&#xA;IP目的地址：192.168.4.101。&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

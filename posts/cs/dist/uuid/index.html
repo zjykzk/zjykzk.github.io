@@ -47,52 +47,52 @@ body{background:#faf9de;}
 <p>UUID类型常用的有是<strong>IETF</strong>和微软兼容的类型，UUID类型编号分别是<code>10x</code>和<code>110</code>，x是任意值。以下讨论的是IETF。</p>
 <p>UUID总共有5个版本，每个版本数据源和算法各有差异。</p>
 <table>
-<thead>
-<tr>
-<th>版本</th>
-<th>时间戳</th>
-<th>时钟序列</th>
-<th>结点编号</th>
-<th>版本号</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>自1582年10月15号，100纳秒数</td>
-<td>随机数。<!-- raw HTML omitted -->如果时间戳回退，这个值需要在上一个序列上面递增</td>
-<td>mac地址</td>
-<td>1</td>
-</tr>
-<tr>
-<td>2</td>
-<td>自1582年10月15号，100纳秒数，同时会把低4个字节替换成GID或者UID（根据domain值）</td>
-<td>随机数。但是最低位会被替换成domain</td>
-<td>mac地址</td>
-<td>2</td>
-</tr>
-<tr>
-<td>3</td>
-<td>给定命名空间和字符串通过MD5计算散列值</td>
-<td>散列值</td>
-<td>散列值</td>
-<td>3</td>
-</tr>
-<tr>
-<td>4</td>
-<td>随机数</td>
-<td>随机数</td>
-<td>随机数</td>
-<td>4</td>
-</tr>
-<tr>
-<td>5</td>
-<td>给定命名空间和字符串通过SHA-1计算散列值</td>
-<td>散列值</td>
-<td>散列值</td>
-<td>5</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>版本</th>
+          <th>时间戳</th>
+          <th>时钟序列</th>
+          <th>结点编号</th>
+          <th>版本号</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>自1582年10月15号，100纳秒数</td>
+          <td>随机数。<!-- raw HTML omitted -->如果时间戳回退，这个值需要在上一个序列上面递增</td>
+          <td>mac地址</td>
+          <td>1</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>自1582年10月15号，100纳秒数，同时会把低4个字节替换成GID或者UID（根据domain值）</td>
+          <td>随机数。但是最低位会被替换成domain</td>
+          <td>mac地址</td>
+          <td>2</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td>给定命名空间和字符串通过MD5计算散列值</td>
+          <td>散列值</td>
+          <td>散列值</td>
+          <td>3</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>随机数</td>
+          <td>随机数</td>
+          <td>随机数</td>
+          <td>4</td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>给定命名空间和字符串通过SHA-1计算散列值</td>
+          <td>散列值</td>
+          <td>散列值</td>
+          <td>5</td>
+      </tr>
+  </tbody>
 </table>
 <p>最常用的还是版本1和4。显然，两个版本都无法保证绝对唯一。版本1在100纳秒里面就会重复，而版本4就是概率问题了。</p>
 <h2 id="mongodb的objectid">mongodb的ObjectID</h2>

@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>vim on 老K随笔</title>
+    <title>Vim on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/vim/</link>
-    <description>Recent content in vim on 老K随笔</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
-    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <description>Recent content in Vim on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 10 Jan 2018 18:16:35 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/vim/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 10 Jan 2018 18:16:35 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/vim/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>vim常用操作</title>
       <link>http://zjykzk.github.io/posts/cs/vim-tips/</link>
       <pubDate>Wed, 10 Jan 2018 18:16:35 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/vim-tips/</guid>
-      <description> 在命令模式使用函数  :%s/ab(.*)c/\=submatch(1) . &amp;#39;test&amp;#39;/gc 窗口间切换  跳转至某个窗口：窗口number + c-w + w： 跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h 跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l 跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j 跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k 全文缩进  gg=G 把数字替换成原来的数字减一  :%s/(\d+)/\=submatch(1)-1/gc 移动屏幕  H // 把当前行的位置移到最上面 M // 把当前行的位置移到屏幕中间 L // 把当前的位置移到屏幕底部 全局操作g  :{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果 移动窗口  CTRL-W [K/J/H/L/T] // 把窗口移到最上面、下面、左边、右边、新标签 跳到某个字符的左（右）边  t{char} // 跳转到左边 T{char} // 跳转到右边 在vim8的终端滚动  Ctrl-w N </description>
+      <description>&lt;ol&gt;&#xA;&lt;li&gt;在命令模式使用函数&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;:%s/ab(.*)c/\=submatch(1) . &amp;#39;test&amp;#39;/gc&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;2&#34;&gt;&#xA;&lt;li&gt;窗口间切换&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;跳转至某个窗口：窗口number + c-w + w：&#xA;跳至当前位置的左边某个窗口：c-w &amp;lt;number&amp;gt;h&#xA;跳至当前位置的右边某个窗口：c-w &amp;lt;number&amp;gt;l&#xA;跳至当前位置的上边某个窗口：c-w &amp;lt;number&amp;gt;j&#xA;跳至当前位置的下边某个窗口：c-w &amp;lt;number&amp;gt;k&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;3&#34;&gt;&#xA;&lt;li&gt;全文缩进&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;gg=G&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;4&#34;&gt;&#xA;&lt;li&gt;把数字替换成原来的数字减一&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;:%s/(\d+)/\=submatch(1)-1/gc&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;5&#34;&gt;&#xA;&lt;li&gt;移动屏幕&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;H // 把当前行的位置移到最上面&#xA;M // 把当前行的位置移到屏幕中间&#xA;L // 把当前的位置移到屏幕底部&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;6&#34;&gt;&#xA;&lt;li&gt;全局操作&lt;code&gt;g&lt;/code&gt;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;:{range}g/patten/{range}/cmd // 后面的range是基于前面查询的结果&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;7&#34;&gt;&#xA;&lt;li&gt;移动窗口&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;CTRL-W [K/J/H/L/T] //  把窗口移到最上面、下面、左边、右边、新标签&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;8&#34;&gt;&#xA;&lt;li&gt;跳到某个字符的左（右）边&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;t{char} // 跳转到左边&#xA;T{char} // 跳转到右边&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;9&#34;&gt;&#xA;&lt;li&gt;在vim8的终端滚动&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Ctrl-w N&#xA;&lt;/code&gt;&lt;/pre&gt;</description>
     </item>
-    
   </channel>
 </rss>

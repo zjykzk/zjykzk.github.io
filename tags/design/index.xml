@@ -1,97 +1,41 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>design on 老K随笔</title>
+    <title>Design on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/design/</link>
-    <description>Recent content in design on 老K随笔</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
-    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <description>Recent content in Design on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 03 May 2022 23:34:49 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/design/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 03 May 2022 23:34:49 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/design/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>简单设计的4个原则</title>
       <link>http://zjykzk.github.io/posts/cs/design/4rules-of-simple-design/</link>
       <pubDate>Tue, 03 May 2022 23:34:49 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/design/4rules-of-simple-design/</guid>
-      <description>什么是简单设计？ 首先，简单设计强调更好的设计**，而不是一个好的设计。突出了，它是一个动态的过程，强调设计随着软件开发的进展会随时调整。确保当下的设计能做到的最好设计。
-另外，在软件开发中有两个常识：
- 需求是总是会变的。 我们不能够精确预测哪些需求将会变化。  因此，更好的设计是方便修改的设计；更好的设计是不去计划设计哪些地方将来会修改，而是采取简单设计的原则，让代码更加容易修改。那么，容易修改代码是怎么样的？
- 有足够测试，这是不会改坏的信心的来源。 容易找到修改的地方。 修改的地方少。  简单设计的4个原则  通过测试。 清晰的表达意图。 尽可能少的重复。 更少的代码元素。  通过测试 作为保证代码正确性的一个手段，这是一个显而易见的问题。另外，这里还需要说明的额外的几点是：
-  测试运行的速度越快越好，越快说明你的反馈速度越快，效率越高。
-  测试的名称和被测试的代码保持一种对称性，名称应该反应被测试的代码语义。
-struct World { cells []Cell } func (w *World) isEmpty() bool { return len(w.cells) == 0 } func Test_new_world_is_empty(t *testing.T) { w := &amp;amp;World{} // BAD assert.Nil(t, w.cells) // GOOD assert.True(t, w.isEmpty()) }   不应该依赖之前的测试。
-func Test_world_is_not_empty_after_a_tick(t *testing.T) { w := &amp;amp;World{} newWorld = w.</description>
+      <description>&lt;h3 id=&#34;什么是简单设计&#34;&gt;什么是简单设计？&lt;/h3&gt;&#xA;&lt;p&gt;首先，简单设计强调更好的设计**，而不是一个好的设计。突出了，它是一个动态的过程，强调设计随着软件开发的进展会随时调整。确保当下的设计能做到的最好设计。&lt;/p&gt;&#xA;&lt;p&gt;另外，在软件开发中有两个常识：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;需求是总是会变的。&lt;/li&gt;&#xA;&lt;li&gt;我们不能够精确预测哪些需求将会变化。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;因此，更好的设计是方便修改的设计；更好的设计是不去计划设计哪些地方将来会修改，而是采取&lt;strong&gt;简单设计的原则&lt;/strong&gt;，让代码更加容易修改。那么，容易修改代码是怎么样的？&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;有足够测试，这是不会改坏的信心的来源。&lt;/li&gt;&#xA;&lt;li&gt;容易找到修改的地方。&lt;/li&gt;&#xA;&lt;li&gt;修改的地方少。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h3 id=&#34;简单设计的4个原则&#34;&gt;简单设计的4个原则&lt;/h3&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;通过测试。&lt;/li&gt;&#xA;&lt;li&gt;清晰的表达意图。&lt;/li&gt;&#xA;&lt;li&gt;尽可能少的重复。&lt;/li&gt;&#xA;&lt;li&gt;更少的代码元素。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h4 id=&#34;通过测试&#34;&gt;通过测试&lt;/h4&gt;&#xA;&lt;p&gt;作为保证代码正确性的一个手段，这是一个显而易见的问题。另外，这里还需要说明的额外的几点是：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;测试运行的速度越快越好，越快说明你的反馈速度越快，效率越高。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;测试的名称和被测试的代码保持一种对称性，名称应该反应被测试的代码语义。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;struct World {&#xA;&#x9;cells []Cell&#xA;}&#xA;&#xA;func (w *World) isEmpty() bool {&#xA;&#x9;return len(w.cells) == 0&#xA;}&#xA;&#xA;func Test_new_world_is_empty(t *testing.T) {&#xA;&#x9;w := &amp;amp;World{}&#xA;&#xA;&#x9;// BAD&#xA;&#x9;assert.Nil(t, w.cells)&#xA;&#xA;&#x9;// GOOD&#xA;&#x9;assert.True(t, w.isEmpty())&#xA;}&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;不应该依赖之前的测试。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;func Test_world_is_not_empty_after_a_tick(t *testing.T) {&#xA;&#x9;w := &amp;amp;World{}&#xA;&#x9;newWorld = w.tick()&#xA;&#x9;assert.False(t, newWorld.isEmpty())&#xA;}&#xA;&#xA;// 这里的w := &amp;amp;World{}依赖的测试Test_new_world_is_empty。这样会有两个问题：&#xA;// 1. 如果&amp;amp;World{}的语义改了以后就会导致测试失败。&#xA;// 2. 表达不够清晰，哪里规定了&amp;amp;World{}就是空的呢。&#xA;//&#xA;// 比较好的做法是定一个返回empty world。&#xA;func newEmptyWorld() *World {&#xA;&#x9;return &amp;amp;World{}&#xA;}&#xA;&#xA;func Test_world_is_not_empty_after_a_tick(t *testing.T) {&#xA;&#x9;w := newEmptyWorld()&#xA;&#x9;newWorld = w.tick()&#xA;&#x9;assert.False(t, newWorld.isEmpty())&#xA;}&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;测试应该关注行为不是状态。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>guava中RateLimiter的设计</title>
       <link>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</link>
       <pubDate>Thu, 11 Oct 2018 15:33:32 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/design/guava-ratelimiter/</guid>
-      <description>guava中的RateLimiter实现了比较有意思的功能：
- 平滑。 记录未使用的信息。 保存下次请求被满足的时间。  平滑 通过令牌桶算法实现。
-记录未使用信息 实现中通过storedPermits表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：
- 资源充足。这个实现是Burst模式。 资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。  storedPermits的计算公式：min(maxPermits, timeNotUsedMicros/coolDownIntervalMicros())，其中coolDownIntervalMicros()和maxPermits在不同模式下面计算方式不同。
-Burst模式
-当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。storedPermits代表的就是当前充足资源的数量。
-另外，coolDownIntervalMicros()返回stableIntervalMicros，maxPermits等于permitsPerSecond。
-Warmup模式
- ^ throttling | cold + / interval | /. | / . | / . ← &amp;#34;warmup period&amp;#34; is the area of the trapezoid between | / . thresholdPermits and maxPermits | / . | / . | / . stable +----------/ WARM . interval | . UP . | .</description>
+      <description>&lt;p&gt;guava中的&lt;a href=&#34;https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131&#34;&gt;RateLimiter&lt;/a&gt;实现了比较有意思的功能：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;平滑。&lt;/li&gt;&#xA;&lt;li&gt;记录未使用的信息。&lt;/li&gt;&#xA;&lt;li&gt;保存下次请求被满足的时间。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;平滑&#34;&gt;平滑&lt;/h2&gt;&#xA;&lt;p&gt;通过令牌桶算法实现。&lt;/p&gt;&#xA;&lt;h2 id=&#34;记录未使用信息&#34;&gt;记录未使用信息&lt;/h2&gt;&#xA;&lt;p&gt;实现中通过&lt;code&gt;storedPermits&lt;/code&gt;表示有多长时间没有被使用了。这个信息可以处理资源的两种情况：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;资源充足。这个实现是Burst模式。&lt;/li&gt;&#xA;&lt;li&gt;资源超载。比如说缓存过期，导致请求处理变慢。这个实现是Warmup模式。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;&lt;code&gt;storedPermits&lt;/code&gt;的计算公式：&lt;code&gt;min(maxPermits, timeNotUsedMicros/coolDownIntervalMicros())&lt;/code&gt;，其中&lt;code&gt;coolDownIntervalMicros()&lt;/code&gt;和&lt;code&gt;maxPermits&lt;/code&gt;在不同模式下面计算方式不同。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;Burst模式&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;当RateLimiter发现资源没有没使用一段时间以后，任务现在资源的十分充分的，当请求过来的时候直接可以满足。&lt;code&gt;storedPermits&lt;/code&gt;代表的就是当前充足资源的数量。&lt;/p&gt;&#xA;&lt;p&gt;另外，&lt;code&gt;coolDownIntervalMicros()&lt;/code&gt;返回&lt;code&gt;stableIntervalMicros&lt;/code&gt;，&lt;code&gt;maxPermits&lt;/code&gt;等于&lt;code&gt;permitsPerSecond&lt;/code&gt;。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;Warmup模式&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;          ^ throttling&#xA;          |&#xA;    cold  +                  /&#xA; interval |                 /.&#xA;          |                / .&#xA;          |               /  .   ← &amp;#34;warmup period&amp;#34; is the area of the trapezoid between&#xA;          |              /   .     thresholdPermits and maxPermits&#xA;          |             /    .&#xA;          |            /     .&#xA;          |           /      .&#xA;   stable +----------/  WARM .&#xA; interval |          .   UP  .&#xA;          |          . PERIOD.&#xA;          |          .       .&#xA;        0 +----------+-------+--------------→ storedPermits&#xA;          0 thresholdPermits maxPermits&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上图是warmup模式消耗&lt;code&gt;storedPermits&lt;/code&gt;所需要时间的建模。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>接口在哪里定义？</title>
       <link>http://zjykzk.github.io/posts/cs/design/interface-owner/</link>
       <pubDate>Sun, 15 Jul 2018 15:11:11 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/design/interface-owner/</guid>
-      <description>接口放在哪里决定了源代码依赖问题。因此，依赖是接口定义唯一考量，其他问题都可以归结为依赖问题，而定义的包永远是被依赖包。
-接口定义的位置有三种情况：
- 使用者 实现者 单独一个第三方位置  放在使用者这边，那么实现者依赖使用者的接口定义。
-好处：可以并行开发，尤其是类似golang这样的语言，实现一接口不需要引用具体的接口定义，即使在必须引用的开发语言里面也只需要实现相关的接口，集成的时候加上是很简单的。
-坏处：在实现者依赖接口定义源代码的情况下，实现者代码要提出来重用，必须要得要包含使用者的接口定义
-这样的方式比较适合多个使用者，单个实现者的情况。
-放在实现者这边，那么使用者依赖实现者的接口定义。
-好处：实现者是一个独立的包，可以很方便的重用。
-坏处：使用者开发的时候需要引用实现者的接口定义，增加并行开发的难度，这里可以自己mock接口，集成的时候改成实现者的接口即可。
-这样的方式适合单个使用者，多个实现者情况。
-单独放在第三方位置
-好处：定义完接口以后，使用者和实现者都可以并行开发，同时实现者包的重用和使用者解耦。
-坏处：包的管理变得复杂，包含接口的包会变得很薄
-这样的方式适合多个使用者，多个实现者情况。
- </description>
+      <description>&lt;p&gt;接口放在哪里决定了源代码依赖问题。因此，依赖是接口定义唯一考量，其他问题都可以归结为依赖问题，而定义的包永远是被依赖包。&lt;/p&gt;&#xA;&lt;p&gt;接口定义的位置有三种情况：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;使用者&lt;/li&gt;&#xA;&lt;li&gt;实现者&lt;/li&gt;&#xA;&lt;li&gt;单独一个第三方位置&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;&lt;strong&gt;放在使用者这边&lt;/strong&gt;，那么实现者依赖使用者的接口定义。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;好处&lt;/strong&gt;：可以并行开发，尤其是类似golang这样的语言，实现一接口不需要引用具体的接口定义，即使在必须引用的开发语言里面也只需要实现相关的接口，集成的时候加上是很简单的。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;坏处&lt;/strong&gt;：在实现者依赖接口定义源代码的情况下，实现者代码要提出来重用，必须要得要包含使用者的接口定义&lt;/p&gt;&#xA;&lt;p&gt;这样的方式比较适合多个使用者，单个实现者的情况。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;放在实现者这边&lt;/strong&gt;，那么使用者依赖实现者的接口定义。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;好处&lt;/strong&gt;：实现者是一个独立的包，可以很方便的重用。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;坏处&lt;/strong&gt;：使用者开发的时候需要引用实现者的接口定义，增加并行开发的难度，这里可以自己mock接口，集成的时候改成实现者的接口即可。&lt;/p&gt;&#xA;&lt;p&gt;这样的方式适合单个使用者，多个实现者情况。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;单独放在第三方位置&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;好处&lt;/strong&gt;：定义完接口以后，使用者和实现者都可以并行开发，同时实现者包的重用和使用者解耦。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;坏处&lt;/strong&gt;：包的管理变得复杂，包含接口的包会变得很薄&lt;/p&gt;&#xA;&lt;p&gt;这样的方式适合多个使用者，多个实现者情况。&lt;/p&gt;&#xA;&lt;h2 id=&#34;heading&#34;&gt;&lt;/h2&gt;</description>
     </item>
-    
     <item>
       <title>常用面向对象设计原则</title>
       <link>http://zjykzk.github.io/posts/cs/design/soild/</link>
       <pubDate>Wed, 04 Jul 2018 22:28:20 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/design/soild/</guid>
-      <description>设计 软件的复杂来源于需求的易变，意味着软件本身容易修改。好设计的目的就是提供软件的可修改能力，也就是可维护性、扩展性。SOILD原则就是在设计过程中达到这个目标的一些原则。
-单一职责原则 又名SRP（Single Responsibility Principle）。针对一个函数、类、组件、架构的修改有且只有一个理由，而理由的来自于使用者。
-这样的好处是把拥有相同修改理由的函数、类、组件组织在一起，不同的分开，达到修改的时候不会影响其他代码，增强了可维护性。
-这是一个定义简单，实操不容易正确的原则。原因在于：
- 职责无法度量。 因为团队、项目背景等待原因，在具体实现的细节中很难做到SRP。  因此，在设计的时候接口一定做到SRP，实现尽量SRP。
-注：
-组件层面的SRP，叫做Component common closure，架构层面的SRP叫做axis of change responsibility for creation of architecture boundary。
-开闭原则 又名OCP（Open-Close Principle）。对扩展开发，对修改关闭。
-通过这样的方式达到添加一个功能时，尽可能少的修改现有源代码、模块、二进制文件，尽可能的通过添加代码来实现。这样减少原来的功能被破坏的概率，达到软件的可维护性、可扩展性、可复用性。因此，它是其他面向对象设计原则的核心。
-遵守OCP原则的手段是抽象。一个功能的抽象，更依赖于使用者，而非实现者。只有使用者才明白需要抽象什么内容。抽象的难点是找到易变的部分，一个指导原则是“快速失败，下不为例”，有以下几条参考实践：
- TDD，先写测试代码。 更短的开发周期。 先开发特性，后开发基础设施代码，并经常给使用者review。 先开发重要功能。 经常并尽早发布，尽可能让用户和使用者使用。  抽象的对象一般是类、模块以及组件。几个比较的好的实践：
- 在函数参数、类抽象中提供稳定的接口定义。 通过元数据抽象逻辑，比如通过配置的形式表达逻辑。 定义项目章程，建立团队文化，沉淀优秀的习惯，提高开发效率。 在架构层面，分析功能变化的来源、时机以及原因，把功能划分为不同的组件，底层组件依赖高层组件，高层组件不会受到底层组件变化的影响，同时避免循环依赖。 抽象的时候需要避免过度抽象，带来不必要的复杂度。  里氏替换原则 又名LSP（Liskov Substitutiion Principle）。基类能够被子类代替，并且保证程序行为不变。
-OCP的实现需要使用抽象和多态，静态语言中继承是多态的一个重要实现方式。LSP就是解决继承带来的一些问题，比如侵入性、耦合性、缺乏灵活性。遵守LSP能够更加容易遵守OCP，因为子类可以替换基类，达到不修改原来代码，通过扩展的方式，添加逻辑。提高程序的健壮性，版本升级的兼容性。
-继承中常说的IS-A，强调的是方法的行为，子类中的方法行为要和基类中的一致，而不是性质一致。这个行为需要从设计的使用者角度来判断模块。模块逻辑的一致性，说的就是这个行为需要一致。所以，IS-A语义是子类替换时，保证程序行为一致。
-虽然这里LSP强调代码中的继承，其实LSP也适用于其他约定的服务、组件，这些内容修改、替换以后都不应该影响原来程序的行为。
-几个比较好的实践：
- 当子类中override的方法工作比较少时，可能违反LSP。 采用DBC（design by contract）编程方法。约定方法的前置条件和后置条件，在LSP下，子类中的前置条件只能比基类的弱，而子类中的后置条件只能比基类的强。因为，如果子类中的前置条件强，那么替换以后原来基类的前置条件下的输入就没法满足了，同样如果子类的后置条件弱，那么方法的输出在一些情况下程序行为就会和原来的不一样。  依赖反转原则 又名DIP（Dependence Inversion Principle）。高层不依赖底层，依赖抽象，底层也只依赖抽象；抽象不依赖细节，细节依赖抽象。
-反转（inversion）包含两层含义：
- 控制流和源代码依赖相反，a模块执行时会调用b模块函数，但是源代码层面来说b模块会依赖a模块。 接口所有者，原先a模块使用b模块定义的接口，而现在接口放在了a模块中，从而从源代码层面来说b模块依赖a模块。  为什么要依赖抽象？显然抽象比实现细节稳定。从编程语言角度上来说，接口变了实现不变，而实现变了，接口不一定变，显然接口更加稳定。因此，接口的稳定也十分重要。
-DIP能够减少类、模块之间的耦合，提供系统的稳定性，提高代码的复用性、可扩展性、可读性和可维护性。它是其他OO设计技巧的基础。</description>
+      <description>&lt;h2 id=&#34;设计&#34;&gt;设计&lt;/h2&gt;&#xA;&lt;p&gt;软件的复杂来源于需求的易变，意味着软件本身容易修改。好设计的目的就是提供软件的可修改能力，也就是可维护性、扩展性。SOILD原则就是在设计过程中达到这个目标的一些原则。&lt;/p&gt;&#xA;&lt;h2 id=&#34;单一职责原则&#34;&gt;单一职责原则&lt;/h2&gt;&#xA;&lt;p&gt;又名SRP（Single Responsibility Principle）。针对一个函数、类、组件、架构的修改有且只有一个理由，而理由的来自于使用者。&lt;/p&gt;&#xA;&lt;p&gt;这样的好处是把拥有相同修改理由的函数、类、组件组织在一起，不同的分开，达到修改的时候不会影响其他代码，增强了可维护性。&lt;/p&gt;&#xA;&lt;p&gt;这是一个定义简单，实操不容易正确的原则。原因在于：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&lt;strong&gt;职责&lt;/strong&gt;无法度量。&lt;/li&gt;&#xA;&lt;li&gt;因为团队、项目背景等待原因，在具体实现的细节中很难做到SRP。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;因此，在设计的时候接口一定做到SRP，实现尽量SRP。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;注：&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;组件层面的SRP，叫做Component common closure，架构层面的SRP叫做axis of change responsibility for creation of architecture boundary。&lt;/p&gt;&#xA;&lt;h2 id=&#34;开闭原则&#34;&gt;开闭原则&lt;/h2&gt;&#xA;&lt;p&gt;又名OCP（Open-Close Principle）。对扩展开发，对修改关闭。&lt;/p&gt;&#xA;&lt;p&gt;通过这样的方式达到添加一个功能时，尽可能少的修改现有源代码、模块、二进制文件，尽可能的通过添加代码来实现。这样减少原来的功能被破坏的概率，达到软件的可维护性、可扩展性、可复用性。因此，它是其他面向对象设计原则的核心。&lt;/p&gt;&#xA;&lt;p&gt;遵守OCP原则的手段是&lt;strong&gt;抽象&lt;/strong&gt;。一个功能的抽象，更依赖于使用者，而非实现者。只有使用者才明白需要抽象什么内容。抽象的难点是找到易变的部分，一个指导原则是“快速失败，下不为例”，有以下几条参考实践：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;TDD，先写测试代码。&lt;/li&gt;&#xA;&lt;li&gt;更短的开发周期。&lt;/li&gt;&#xA;&lt;li&gt;先开发特性，后开发基础设施代码，并经常给使用者review。&lt;/li&gt;&#xA;&lt;li&gt;先开发重要功能。&lt;/li&gt;&#xA;&lt;li&gt;经常并尽早发布，尽可能让用户和使用者使用。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;抽象的对象一般是类、模块以及组件。几个比较的好的实践：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;在函数参数、类抽象中提供稳定的接口定义。&lt;/li&gt;&#xA;&lt;li&gt;通过元数据抽象逻辑，比如通过配置的形式表达逻辑。&lt;/li&gt;&#xA;&lt;li&gt;定义项目章程，建立团队文化，沉淀优秀的习惯，提高开发效率。&lt;/li&gt;&#xA;&lt;li&gt;在架构层面，分析功能变化的来源、时机以及原因，把功能划分为不同的组件，底层组件依赖高层组件，高层组件不会受到底层组件变化的影响，同时避免循环依赖。&lt;/li&gt;&#xA;&lt;li&gt;抽象的时候需要避免过度抽象，带来不必要的复杂度。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;里氏替换原则&#34;&gt;里氏替换原则&lt;/h2&gt;&#xA;&lt;p&gt;又名LSP（Liskov Substitutiion Principle）。基类能够被子类代替，并且保证程序行为不变。&lt;/p&gt;&#xA;&lt;p&gt;OCP的实现需要使用抽象和多态，静态语言中继承是多态的一个重要实现方式。LSP就是解决继承带来的一些问题，比如侵入性、耦合性、缺乏灵活性。遵守LSP能够更加容易遵守OCP，因为子类可以替换基类，达到不修改原来代码，通过扩展的方式，添加逻辑。提高程序的健壮性，版本升级的兼容性。&lt;/p&gt;&#xA;&lt;p&gt;继承中常说的IS-A，强调的是方法的行为，子类中的方法行为要和基类中的一致，而不是性质一致。这个行为需要从设计的使用者角度来判断模块。模块逻辑的一致性，说的就是这个行为需要一致。所以，IS-A语义是子类替换时，保证程序行为一致。&lt;/p&gt;&#xA;&lt;p&gt;虽然这里LSP强调代码中的继承，其实LSP也适用于其他约定的服务、组件，这些内容修改、替换以后都不应该影响原来程序的行为。&lt;/p&gt;&#xA;&lt;p&gt;几个比较好的实践：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;当子类中override的方法工作比较少时，可能违反LSP。&lt;/li&gt;&#xA;&lt;li&gt;采用DBC（design by contract）编程方法。约定方法的前置条件和后置条件，在LSP下，子类中的前置条件只能比基类的弱，而子类中的后置条件只能比基类的强。因为，如果子类中的前置条件强，那么替换以后原来基类的前置条件下的输入就没法满足了，同样如果子类的后置条件弱，那么方法的输出在一些情况下程序行为就会和原来的不一样。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;依赖反转原则&#34;&gt;依赖反转原则&lt;/h2&gt;&#xA;&lt;p&gt;又名DIP（Dependence Inversion Principle）。高层不依赖底层，依赖抽象，底层也只依赖抽象；抽象不依赖细节，细节依赖抽象。&lt;/p&gt;&#xA;&lt;p&gt;反转（inversion）包含两层含义：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;控制流和源代码依赖相反，a模块执行时会调用b模块函数，但是源代码层面来说b模块会依赖a模块。&lt;/li&gt;&#xA;&lt;li&gt;接口所有者，原先a模块使用b模块定义的接口，而现在接口放在了a模块中，从而从源代码层面来说b模块依赖a模块。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;为什么要依赖抽象？显然抽象比实现细节稳定。从编程语言角度上来说，接口变了实现不变，而实现变了，接口不一定变，显然接口更加稳定。因此，接口的稳定也十分重要。&lt;/p&gt;&#xA;&lt;p&gt;DIP能够减少类、模块之间的耦合，提供系统的稳定性，提高代码的复用性、可扩展性、可读性和可维护性。它是其他OO设计技巧的基础。&lt;/p&gt;&#xA;&lt;p&gt;建立依赖的方式：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;构造函数传递依赖对象。&lt;/li&gt;&#xA;&lt;li&gt;setter方法传递对象。&lt;/li&gt;&#xA;&lt;li&gt;接口声明依赖对象，接口中的方法参数、返回值中引用其他接口。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;几个比较好的实践：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;每个类尽量有接口或者抽象类。&lt;/li&gt;&#xA;&lt;li&gt;变量的表面类型尽量是接口、抽象类型或者是不易变的类。&lt;/li&gt;&#xA;&lt;li&gt;任何类不从易变的具体类派生。在维护代码的时候这个实践经常会被破坏。&lt;/li&gt;&#xA;&lt;li&gt;尽量不要override基类的方法。&lt;/li&gt;&#xA;&lt;li&gt;创建对象时考虑使用工厂模式。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;接口分离原则&#34;&gt;接口分离原则&lt;/h2&gt;&#xA;&lt;p&gt;又名ISP（Interface Segregation Principles）。使用者不应该依赖它不使用的方法。所以，分离的使用者意味着分离的接口。&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

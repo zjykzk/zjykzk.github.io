@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>jit on 老K随笔</title>
+    <title>Jit on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/jit/</link>
-    <description>Recent content in jit on 老K随笔</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
-    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <description>Recent content in Jit on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Wed, 03 Jan 2018 15:12:25 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/jit/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 03 Jan 2018 15:12:25 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/jit/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>jit的基本原理以及实现</title>
       <link>http://zjykzk.github.io/posts/cs/jit/</link>
       <pubDate>Wed, 03 Jan 2018 15:12:25 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/jit/</guid>
-      <description>基本原理 JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：
- 生成可以执行的代码 执行代码  生成代码 生成的代码是平台相关，一般就是一些机器码。
-执行代码 生成的代码如果要被执行，必须要确保代码所在的内存拥有可执行的标志。在linux下面通过mmap系统调用映射一块可执行的内存，然后把相关的代码复制到这块内存中。最后，把内存首地址转换成函数地址并进行调用。
-Hello，World 一个基于x86_64平台的JIT代码， 通过系统调用write实现打印hello,world！。
-基于x86_64平台的JIT代码 linux下面系统调用通过软中断来实现，参数通过寄存器来传递。寄存器的使用情况如下：
-+----------+--------+--------+--------+--------+--------+--------+ | Syscall #| Param 1| Param 2| Param 3| Param 4| Param 5| Param 6| +----------+--------+--------+--------+--------+--------+--------+ | rax | rdi | rsi | rdx | r10 | r8 | r9 | +----------+--------+--------+--------+--------+--------+--------+ 系统调用write(int fd, const void *buf, size_t count)
- 参数fd:文件描述符号 参数buf:输出的内存起始地址 参数count:输出的字节数  因此，x86_64平台下调用write的机器码为
-0: 48 c7 c0 01 00 00 00 mov rax,0x1 7: 48 c7 c7 01 00 00 00 mov rdi,0x1 e: 48 c7 c2 0c 00 00 00 mov rdx,0xc 15: 48 8d 35 03 00 00 00 lea rsi,[rip+0x4] # 0x1f 1c: 0f 05 syscall 1e: c3 cc ret 1f: 48 65 6c 6c 6f 20 57 6f 72 6c 64 21 // Hello World!</description>
+      <description>&lt;h2 id=&#34;基本原理&#34;&gt;基本原理&lt;/h2&gt;&#xA;&lt;p&gt;JIT（Just-In-Time）是指程序运行的过程中生成可执行的代码。这里有两个工作：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;生成可以执行的代码&lt;/li&gt;&#xA;&lt;li&gt;执行代码&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h3 id=&#34;生成代码&#34;&gt;生成代码&lt;/h3&gt;&#xA;&lt;p&gt;生成的代码是平台相关，一般就是一些机器码。&lt;/p&gt;&#xA;&lt;h3 id=&#34;执行代码&#34;&gt;执行代码&lt;/h3&gt;&#xA;&lt;p&gt;生成的代码如果要被执行，必须要确保代码所在的内存拥有可执行的标志。在linux下面通过&lt;code&gt;mmap&lt;/code&gt;系统调用映射一块可执行的内存，然后把相关的代码复制到这块内存中。最后，把内存首地址转换成函数地址并进行调用。&lt;/p&gt;&#xA;&lt;h2 id=&#34;helloworld&#34;&gt;Hello，World&lt;/h2&gt;&#xA;&lt;p&gt;一个基于x86_64平台的JIT代码， 通过系统调用&lt;code&gt;write&lt;/code&gt;实现打印&lt;code&gt;hello,world！&lt;/code&gt;。&lt;/p&gt;&#xA;&lt;h3 id=&#34;基于x86_64平台的jit代码&#34;&gt;基于x86_64平台的JIT代码&lt;/h3&gt;&#xA;&lt;p&gt;linux下面系统调用通过软中断来实现，参数通过寄存器来传递。寄存器的使用情况如下：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;+----------+--------+--------+--------+--------+--------+--------+&#xA;| Syscall #| Param 1| Param 2| Param 3| Param 4| Param 5| Param 6|&#xA;+----------+--------+--------+--------+--------+--------+--------+&#xA;| rax      |  rdi   |  rsi   |   rdx  |   r10  |   r8   |   r9   |&#xA;+----------+--------+--------+--------+--------+--------+--------+&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;系统调用&lt;a href=&#34;http://man7.org/linux/man-pages/man2/write.2.html&#34;&gt;write(int fd, const void *buf, size_t count)&lt;/a&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;参数&lt;code&gt;fd&lt;/code&gt;:文件描述符号&lt;/li&gt;&#xA;&lt;li&gt;参数&lt;code&gt;buf&lt;/code&gt;:输出的内存起始地址&lt;/li&gt;&#xA;&lt;li&gt;参数&lt;code&gt;count&lt;/code&gt;:输出的字节数&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;因此，x86_64平台下调用&lt;code&gt;write&lt;/code&gt;的机器码为&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;0:  48 c7 c0 01 00 00 00    mov    rax,0x1&#xA;7:  48 c7 c7 01 00 00 00    mov    rdi,0x1&#xA;e:  48 c7 c2 0c 00 00 00    mov    rdx,0xc&#xA;15: 48 8d 35 03 00 00 00    lea    rsi,[rip+0x4]        # 0x1f&#xA;1c: 0f 05                   syscall&#xA;1e: c3 cc                   ret&#xA;1f: 48 65 6c 6c 6f 20 57 6f 72 6c 64 21   // Hello World!&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其中：&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

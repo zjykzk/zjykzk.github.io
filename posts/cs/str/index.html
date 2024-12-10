@@ -28,34 +28,34 @@ body{background:#faf9de;}
 </code></pre>
 <p>下表表示了utf8的编码，z表示用于编码的bit</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">unicode范围</th>
-<th style="text-align:left">utf8编码</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">十六进制表示</td>
-<td style="text-align:left">二进制表示</td>
-</tr>
-<tr>
-<td style="text-align:left">000000 - 00007F</td>
-<td style="text-align:left">0zzzzzzz</td>
-</tr>
-<tr>
-<td style="text-align:left">000080 - 0007FF</td>
-<td style="text-align:left">110zzzzz 10zzzzzz</td>
-</tr>
-<tr>
-<td style="text-align:left">000800 - 00D7FF/00E000 - 00FFFF</td>
-<td style="text-align:left">1110zzzz 10zzzzzz 10zzzzzz</td>
-</tr>
-<tr>
-<td style="text-align:left">010000 - 10FFFF</td>
-<td style="text-align:left">11110zzz 10zzzzzz 10zzzzzz 10zzzzzz</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: left">unicode范围</th>
+          <th style="text-align: left">utf8编码</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">十六进制表示</td>
+          <td style="text-align: left">二进制表示</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">000000 - 00007F</td>
+          <td style="text-align: left">0zzzzzzz</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">000080 - 0007FF</td>
+          <td style="text-align: left">110zzzzz 10zzzzzz</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">000800 - 00D7FF/00E000 - 00FFFF</td>
+          <td style="text-align: left">1110zzzz 10zzzzzz 10zzzzzz</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">010000 - 10FFFF</td>
+          <td style="text-align: left">11110zzz 10zzzzzz 10zzzzzz 10zzzzzz</td>
+      </tr>
+  </tbody>
 </table>
 <h1 id="环境中的编码">环境中的编码</h1>
 <p>一个程序读取字符的输入的时候，读取的是二进制的数据。如果程序需要理解这个字符串是什么意思，必须了解字符的编码。同理，程序输出字符串的时候必须告知字符串的编码，不然使用者就无法理解程序的输出。程序中遇到乱码的问题，都是因为一个程序输出的字符串的编码和另一个程序接受字符串时使用的编码不一致导致的。因此，在解决编码的问题的思路就是搞清楚涉及到了哪几个环境。</p>

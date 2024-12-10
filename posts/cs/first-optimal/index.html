@@ -16,22 +16,22 @@ body{background:#faf9de;}
 <!-- raw HTML omitted -->
 <p>最近，做一个项目：封装一个MQ，提供发送、拉取、查询的基本功能，需要保证一条消息只被消费一次。写完了基本功能以后，开始做benchmark。结果超级糟糕：</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:center">发送线程数量</th>
-<th style="text-align:center">消费线程数量</th>
-<th style="text-align:center">发送TPS</th>
-<th style="text-align:center">消费TPS</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">3</td>
-<td style="text-align:center">3</td>
-<td style="text-align:center">200-400</td>
-<td style="text-align:center">20-60</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center">发送线程数量</th>
+          <th style="text-align: center">消费线程数量</th>
+          <th style="text-align: center">发送TPS</th>
+          <th style="text-align: center">消费TPS</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">3</td>
+          <td style="text-align: center">3</td>
+          <td style="text-align: center">200-400</td>
+          <td style="text-align: center">20-60</td>
+      </tr>
+  </tbody>
 </table>
 <p>而且，随着消费线程的数量增加发送&amp;消费的TPS都下降。</p>
 <h1 id="排查">排查</h1>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset=utf-8>
+<title>TDD底层逻辑</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+img{max-width:100%;height:auto}
+pre{max-width:100%;height:auto;white-space:pre-wrap}
+.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
+body{background:#faf9de;}
+</style>
+<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
+<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
+<strong>TDD底层逻辑</strong>
+<hr> <h1 id="一些开发常见问题">一些开发常见问题</h1>
+<ol>
+<li>
+<p>当前架构无法满足新需求，不敢修改或者新增抽象。</p>
+</li>
+<li>
+<p>一段代码变得很长，难以理解，不敢修改代码。</p>
+</li>
+<li>
+<p>开发过程中通过『跑下看看』、『打断点』的方式来测试、定位问题，效率低下（隐式QA）。</p>
+</li>
+<li>
+<p>有功能忘记写了。</p>
+</li>
+</ol>
+<p>以上的问题概括起来说，代码和架构不容易维护和扩展、开发效率低。TDD作为极限编程（XP）的核心实践之一，能够比较好的解决了这些问题。</p>
+<h1 id="测试驱动开发tdd">测试驱动开发（TDD）</h1>
+<p>从上一节TDD可以解决的问题视角可以看出，TDD不是『如何写测试的技术』、『怎么消除QA』、『增加开发人员』的编码技巧。它是把测试作为里程碑的开发流程，把无计划的测试变成自动化测试提升开发效率，结合重构技巧保证代码和架构的可维护性和扩展性。</p>
+<h2 id="测试也就是t字母">测试（也就是T字母）</h2>
+<p>首先，不是传统的单元测试，也就是不涉及被测试进程之外组件的测试，而是单元级别的<strong>功能测试</strong>。所以，也可能是传统的集成测试，但是绝对不是端到端测试；）。</p>
+<p>『功能』是指用户视角的需求拆分以后的功能，是从业务视角出发，而不是代码中的某个类、函数等。比如，『账号密码的登入』这么一个需求可以拆分成两个功能，以及对应的测试：</p>
+<ol>
+<li>
+<p>账号密码正确登入成功。</p>
+</li>
+<li>
+<p>账号或者密码错误登入失败。</p>
+</li>
+</ol>
+<p>但是，TDD不教你怎么写测试，写测试是TDD的必要技能，常见包括：状态验证、行为验证、怎么识别有效无效测试、怎么使用mock&amp;stub等等，好测试的核心是：</p>
+<ul>
+<li>
+<p>发现问题：覆盖足够多的代码，尤其是核心代码</p>
+</li>
+<li>
+<p>稳定：代码重构的时候不会误报（错误的失败），不用修改</p>
+</li>
+<li>
+<p>快速执行</p>
+</li>
+<li>
+<p>容易维护：容易执行、容易理解。</p>
+</li>
+</ul>
+<h2 id="驱动也就是第一个d字母">驱动（也就是第一个D字母）</h2>
+<h3 id="驱动的是架构">驱动的是『架构』</h3>
+<p>软件开发工程师开发软件首要的是：理解需求，明白架构。</p>
+<p>『理解需求』TDD无法驱动，但是能够验证是否做到了：写出测试，说明理解需求。</p>
+<p>理解需求并完成分解可以成<em>测试的TODO项</em>之后，进入执行『红-绿-重构循环』这一TDD的核心三步骤：</p>
+<blockquote>
+<p>红绿来自jUnit这个测试框架，失败的UT显示红色，成功的UT显示绿色。</p>
+</blockquote>
+<ol>
+<li>
+<p>红：针对单元功能编写一个失败的小测试，无法编译的也没关系；</p>
+</li>
+<li>
+<p>绿：让这个测试快速通过，任何手段都可以，甚至是错误的实现；</p>
+</li>
+<li>
+<p>重构：消除上一步中产生的坏味道。</p>
+</li>
+</ol>
+<p>『红』锚定了需要实现的需求，『绿』在<strong>当前架构下面（如果有）的合适组件</strong>下面实现刚刚锚定的需求，『重构』消除上一步中产生的各种坏味道，比如消除重复（合并组件），降低耦合（重新划分组件的职责）等等。</p>
+<p>从『驱动』视角可以看出，他并不是教你怎么编码的技术，而是一个架构技术，是以逐步演进的方式驱动架构，是一种实效主义编码架构风格（不做PPT架构师；））。</p>
+<h3 id="极限">极限</h3>
+<p>如果不会写某个测试对应的实现，TDD能驱动吗？不能！TDD无法驱动小于单元功能测试对应的需求，也无法驱动内部实现。但是，作为架构技术TDD能让你知道实现应该放在哪里，可以继续迭代其他需求，同样保持着一个有序可度量的研发节奏。至于这个需求怎么做可以找人帮忙做。</p>
+<h2 id="执行">执行</h2>
+<h3 id="基本原则">基本原则</h3>
+<ol>
+<li>
+<p>当且仅当存在失败的自动化测试时，才开始编写生产代码；</p>
+</li>
+<li>
+<p>消除坏味道。</p>
+</li>
+</ol>
+<h3 id="开发咒语">开发咒语</h3>
+<ul>
+<li>
+<p>红：针对单元功能编写一个失败的小测试，无法编译的也没关系；</p>
+</li>
+<li>
+<p>绿：让这个测试快速通过，任何手段都可以，甚至是错误的实现；</p>
+</li>
+<li>
+<p>重构：消除上一步中产生的坏味道。</p>
+</li>
+</ul>
+<h3 id="任务分解法写出测试">任务分解法（写出测试）</h3>
+<blockquote>
+<p>来自徐昊</p>
+</blockquote>
+<ol>
+<li>
+<p>首先将需求分解为功能点，也就是将需求转化为一系列可验证的里程碑点；</p>
+</li>
+<li>
+<p>如果已经存在架构或架构愿景，则依据架构中定义的组件与交互，将功能点分解为不同的功能上下文；</p>
+</li>
+<li>
+<p>如果尚不存在架构愿景，则可以将功能点作为功能上下文；</p>
+</li>
+<li>
+<p>将功能点按照功能上下文，分解为任务项。也就是进一步将可验证的里程碑点，分解为功能上下文中可验证的任务项；</p>
+</li>
+<li>
+<p>将任务项转化为自动化测试，进入红 / 绿 / 重构循环，驱动功能上下文内的功能实现；</p>
+</li>
+<li>
+<p>如果重构涉及功能上下文的重新划分，即提取 / 合并组件，即视作对于架构的重构与梳理。需调整后续功能点中对于功能上下文以及任务项的划分。</p>
+</li>
+<li>
+<p>如此往复，直到所有功能完成。</p>
+</li>
+</ol>
+<p><img src="/imgs/tdd.jpeg" alt="tdd progres"></p>
+<h2 id="如何学习">如何学习</h2>
+<ol>
+<li>
+<p>练，属于不可言说知识，以上内容都看懂了也不会；</p>
+</li>
+<li>
+<p>锻炼分析能力，它是支撑拆解任务基础；</p>
+</li>
+<li>
+<p>使用具有重构能力的IDE，不然变成重写。</p>
+</li>
+</ol>
+
+<div class="np"><a/> <a href=/posts/cs/design/4rules-of-simple-design/>简单设计的4个原则 →</a></div>
+<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script charset="utf-8">
+    const gitalk = new Gitalk({
+        clientID: '94870b3efea9c642b0e7',
+        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
+        repo: 'zjykzk.github.io',
+        owner: 'zjykzk',
+        admin: ['zjykzk'],
+        id: location.pathname, 
+        distractionFreeMode: false 
+      })
+
+    ;(function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
+            return
+
+        }
+        gitalk.render('gitalk-container')
+    })();
+</script>
+
+
+</html>

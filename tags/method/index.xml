@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>method on 老K随笔</title>
+    <title>Method on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/method/</link>
-    <description>Recent content in method on 老K随笔</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
-    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <description>Recent content in Method on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/method/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 19 Apr 2019 16:19:31 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/method/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>技术选型</title>
       <link>http://zjykzk.github.io/posts/cs/select-tech/</link>
       <pubDate>Fri, 19 Apr 2019 16:19:31 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/posts/cs/select-tech/</guid>
-      <description>因数 项目因数 规模 小：可以选用新技术 大：使用成熟技术
-时间 紧：买商用的 宽裕：自己搞
-成本 有钱：买现成的 没钱：自己撸
-非功能性需求 高并发、低延迟、高可用、数据一致性、安全性。
-团队因数 当前团队成员的技术栈 选大家都熟悉的：方便开发，排查问题。
-领导需要前瞻性。
-分析和实验 征求团队意见，大家讨论分析实验。
-版权因数 选择合适的开源协议的软件：GPL/BSD/LGPL。考虑因数：商用、闭源、修改。
-技术因数 标准功能 我们需要的功能，比如说我们需要一个MQ，标准功能就是发拉消息，pub/sub。
-非标准功能    特性 描述     可伸缩性 产品在性能上必须能容易且有效地伸缩以满足业务需求增长的需求。   灵活性 产品必须易于适应新的需求。   可操作性 产品必须被设计成易于与共享的数据和广泛可得的系统通讯。   可扩展性 产品功能必须在供应商很少介入的情况下能够定制和快速地增强。   可使用性 只需很少的培训就能使让顾客使用产品和他的任何特性，产品应该被设计成其目标使用者的技术水平很匹配。   高效率 产品应能在各种性能水平上工作，能够应付应用对效率的要求。   可靠性 产品必须有被证实可在预定环境中工作的功能与特性。   可管理性 产品必须能被配置、部署、监控和优化以确保其在预定的环境中工作良好   安全 产品必须保护信息和事务的完整性   高可用 通常来描述一个系统经过专门的设计，从而减少停工时间，而保持其服务的高度可用性。    技术标准</description>
+      <description>&lt;h2 id=&#34;因数&#34;&gt;因数&lt;/h2&gt;&#xA;&lt;h3 id=&#34;项目因数&#34;&gt;项目因数&lt;/h3&gt;&#xA;&lt;h4 id=&#34;规模&#34;&gt;规模&lt;/h4&gt;&#xA;&lt;p&gt;小：可以选用新技术&#xA;大：使用成熟技术&lt;/p&gt;&#xA;&lt;h4 id=&#34;时间&#34;&gt;时间&lt;/h4&gt;&#xA;&lt;p&gt;紧：买商用的&#xA;宽裕：自己搞&lt;/p&gt;&#xA;&lt;h4 id=&#34;成本&#34;&gt;成本&lt;/h4&gt;&#xA;&lt;p&gt;有钱：买现成的&#xA;没钱：自己撸&lt;/p&gt;&#xA;&lt;h4 id=&#34;非功能性需求&#34;&gt;非功能性需求&lt;/h4&gt;&#xA;&lt;p&gt;高并发、低延迟、高可用、数据一致性、安全性。&lt;/p&gt;&#xA;&lt;h3 id=&#34;团队因数&#34;&gt;团队因数&lt;/h3&gt;&#xA;&lt;h4 id=&#34;当前团队成员的技术栈&#34;&gt;当前团队成员的技术栈&lt;/h4&gt;&#xA;&lt;p&gt;选大家都熟悉的：方便开发，排查问题。&lt;/p&gt;&#xA;&lt;p&gt;领导需要前瞻性。&lt;/p&gt;&#xA;&lt;h4 id=&#34;分析和实验&#34;&gt;分析和实验&lt;/h4&gt;&#xA;&lt;p&gt;征求团队意见，大家讨论分析实验。&lt;/p&gt;&#xA;&lt;h3 id=&#34;版权因数&#34;&gt;版权因数&lt;/h3&gt;&#xA;&lt;p&gt;选择合适的开源协议的软件：GPL/BSD/LGPL。考虑因数：商用、闭源、修改。&lt;/p&gt;&#xA;&lt;h3 id=&#34;技术因数&#34;&gt;技术因数&lt;/h3&gt;&#xA;&lt;h4 id=&#34;标准功能&#34;&gt;标准功能&lt;/h4&gt;&#xA;&lt;p&gt;我们需要的功能，比如说我们需要一个MQ，标准功能就是发拉消息，pub/sub。&lt;/p&gt;&#xA;&lt;h4 id=&#34;非标准功能&#34;&gt;非标准功能&lt;/h4&gt;&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th&gt;特性&lt;/th&gt;&#xA;          &lt;th&gt;描述&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;可伸缩性&lt;/td&gt;&#xA;          &lt;td&gt;产品在性能上必须能容易且有效地伸缩以满足业务需求增长的需求。&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;灵活性&lt;/td&gt;&#xA;          &lt;td&gt;产品必须易于适应新的需求。&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;可操作性&lt;/td&gt;&#xA;          &lt;td&gt;产品必须被设计成易于与共享的数据和广泛可得的系统通讯。&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;可扩展性&lt;/td&gt;&#xA;          &lt;td&gt;产品功能必须在供应商很少介入的情况下能够定制和快速地增强。&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;可使用性&lt;/td&gt;&#xA;          &lt;td&gt;只需很少的培训就能使让顾客使用产品和他的任何特性，产品应该被设计成其目标使用者的技术水平很匹配。&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;高效率&lt;/td&gt;&#xA;          &lt;td&gt;产品应能在各种性能水平上工作，能够应付应用对效率的要求。&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;可靠性&lt;/td&gt;&#xA;          &lt;td&gt;产品必须有被证实可在预定环境中工作的功能与特性。&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;可管理性&lt;/td&gt;&#xA;          &lt;td&gt;产品必须能被配置、部署、监控和优化以确保其在预定的环境中工作良好&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;安全&lt;/td&gt;&#xA;          &lt;td&gt;产品必须保护信息和事务的完整性&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;高可用&lt;/td&gt;&#xA;          &lt;td&gt;通常来描述一个系统经过专门的设计，从而减少停工时间，而保持其服务的高度可用性。&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;p&gt;技术标准&lt;/p&gt;&#xA;&lt;p&gt;通讯协议，API标准，实现语言和兼容语言，是否可以扩展。&lt;/p&gt;&#xA;&lt;h3 id=&#34;技术支持&#34;&gt;技术支持&lt;/h3&gt;&#xA;&lt;p&gt;厂商、社区支持粒度活跃度、服务质量及成本和厂商服务质量。&lt;/p&gt;&#xA;&lt;h3 id=&#34;其他&#34;&gt;其他&lt;/h3&gt;&#xA;&lt;p&gt;文档质量，开发效率，学习曲线，项目健康程度，是否容易招人，社区热度，书籍热度。项目相关的需求，比如Web项目框架，还需要考虑是否支持国际化，自动化验证，测试方便程度，扩张性。&lt;/p&gt;&#xA;&lt;h2 id=&#34;步骤&#34;&gt;步骤&lt;/h2&gt;&#xA;&lt;p&gt;必要因数：必须满足的，比如团队技术栈和版权因数&#xA;可量化因数：非功能特性、技术标准&lt;/p&gt;&#xA;&lt;h3 id=&#34;可量化因数及权重&#34;&gt;可量化因数及权重&lt;/h3&gt;&#xA;&lt;h4 id=&#34;选出可量化因数&#34;&gt;选出可量化因数&lt;/h4&gt;&#xA;&lt;p&gt;选出哪些可以量化因数，有奇数位专家投票选出，超过半数确定。&lt;/p&gt;&#xA;&lt;p&gt;两轮：&#xA;第一轮从所有因数中投票&#xA;第二轮从没有超过半数的因数中重新投票&lt;/p&gt;&#xA;&lt;h5 id=&#34;算出可量化因数的权重&#34;&gt;算出可量化因数的权重&lt;/h5&gt;&#xA;&lt;p&gt;每个专家对上面选出的因数分配权重，总和位100%。然后，对每项因数获得权重求平均值，得到可量化因数的权重。&lt;/p&gt;&#xA;&lt;h3 id=&#34;候选技术&#34;&gt;候选技术&lt;/h3&gt;&#xA;&lt;p&gt;大范围的选择可以使用的技术，两个角度：&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

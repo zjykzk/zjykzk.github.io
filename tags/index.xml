@@ -4,226 +4,192 @@
     <title>Tags on 老K随笔</title>
     <link>http://zjykzk.github.io/tags/</link>
     <description>Recent content in Tags on 老K随笔</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <managingEditor>zhangkai.zju@gmail.com (zenk)</managingEditor>
-    <webMaster>zhangkai.zju@gmail.com (zenk)</webMaster>
+    <generator>Hugo</generator>
+    <language>zh</language>
     <copyright>(c) 2017 zenk.</copyright>
-    <lastBuildDate>Tue, 03 May 2022 23:34:49 +0800</lastBuildDate><atom:link href="http://zjykzk.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 01 Jul 2024 18:13:21 +0800</lastBuildDate>
+    <atom:link href="http://zjykzk.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>design</title>
+      <title>Engineering</title>
+      <link>http://zjykzk.github.io/tags/engineering/</link>
+      <pubDate>Mon, 01 Jul 2024 18:13:21 +0800</pubDate>
+      <guid>http://zjykzk.github.io/tags/engineering/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tdd</title>
+      <link>http://zjykzk.github.io/tags/tdd/</link>
+      <pubDate>Mon, 01 Jul 2024 18:13:21 +0800</pubDate>
+      <guid>http://zjykzk.github.io/tags/tdd/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Design</title>
       <link>http://zjykzk.github.io/tags/design/</link>
       <pubDate>Tue, 03 May 2022 23:34:49 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/design/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>os</title>
+      <title>Os</title>
       <link>http://zjykzk.github.io/tags/os/</link>
       <pubDate>Wed, 16 Dec 2020 16:58:31 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/os/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>cs</title>
+      <title>Cs</title>
       <link>http://zjykzk.github.io/tags/cs/</link>
       <pubDate>Sun, 28 Jun 2020 15:44:46 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/cs/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>分布式</title>
       <link>http://zjykzk.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</link>
       <pubDate>Fri, 17 Apr 2020 15:12:22 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>事务</title>
       <link>http://zjykzk.github.io/tags/%E4%BA%8B%E5%8A%A1/</link>
       <pubDate>Fri, 17 Apr 2020 15:12:22 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/%E4%BA%8B%E5%8A%A1/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>db</title>
+      <title>Db</title>
       <link>http://zjykzk.github.io/tags/db/</link>
       <pubDate>Wed, 12 Feb 2020 10:41:51 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/db/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>mysql</title>
+      <title>Mysql</title>
       <link>http://zjykzk.github.io/tags/mysql/</link>
       <pubDate>Wed, 12 Feb 2020 10:41:51 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/mysql/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>linux</title>
+      <title>Linux</title>
       <link>http://zjykzk.github.io/tags/linux/</link>
       <pubDate>Tue, 14 Jan 2020 11:11:37 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/linux/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>program language</title>
+      <title>Program Language</title>
       <link>http://zjykzk.github.io/tags/program-language/</link>
       <pubDate>Tue, 04 Jun 2019 16:50:10 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/program-language/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>golang</title>
+      <title>Golang</title>
       <link>http://zjykzk.github.io/tags/golang/</link>
       <pubDate>Wed, 29 May 2019 14:44:31 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/golang/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>network</title>
+      <title>Network</title>
       <link>http://zjykzk.github.io/tags/network/</link>
       <pubDate>Tue, 30 Apr 2019 19:18:23 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/network/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>method</title>
+      <title>Method</title>
       <link>http://zjykzk.github.io/tags/method/</link>
       <pubDate>Fri, 19 Apr 2019 16:19:31 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/method/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>program</title>
+      <title>Program</title>
       <link>http://zjykzk.github.io/tags/program/</link>
       <pubDate>Fri, 19 Apr 2019 16:19:31 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/program/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>mq</title>
+      <title>Mq</title>
       <link>http://zjykzk.github.io/tags/mq/</link>
       <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/mq/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>rocketmq</title>
+      <title>Rocketmq</title>
       <link>http://zjykzk.github.io/tags/rocketmq/</link>
       <pubDate>Fri, 25 Jan 2019 15:35:52 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/rocketmq/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>arch</title>
+      <title>Arch</title>
       <link>http://zjykzk.github.io/tags/arch/</link>
       <pubDate>Fri, 02 Nov 2018 15:38:24 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/arch/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>ha</title>
+      <title>Ha</title>
       <link>http://zjykzk.github.io/tags/ha/</link>
       <pubDate>Fri, 02 Nov 2018 15:38:24 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/ha/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>dist</title>
+      <title>Dist</title>
       <link>http://zjykzk.github.io/tags/dist/</link>
       <pubDate>Fri, 12 Oct 2018 14:23:18 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/dist/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>algo</title>
+      <title>Algo</title>
       <link>http://zjykzk.github.io/tags/algo/</link>
       <pubDate>Thu, 30 Aug 2018 16:48:26 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/algo/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>mongodb</title>
+      <title>Mongodb</title>
       <link>http://zjykzk.github.io/tags/mongodb/</link>
       <pubDate>Fri, 20 Jul 2018 16:18:23 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/mongodb/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>zazen</title>
+      <title>Zazen</title>
       <link>http://zjykzk.github.io/tags/zazen/</link>
       <pubDate>Sun, 04 Feb 2018 17:13:52 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/zazen/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>vim</title>
+      <title>Vim</title>
       <link>http://zjykzk.github.io/tags/vim/</link>
       <pubDate>Wed, 10 Jan 2018 18:16:35 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/vim/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>jit</title>
+      <title>Jit</title>
       <link>http://zjykzk.github.io/tags/jit/</link>
       <pubDate>Wed, 03 Jan 2018 15:12:25 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/jit/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>编程</title>
       <link>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</link>
       <pubDate>Tue, 28 Mar 2017 11:22:09 +0800</pubDate>
-      <author>zhangkai.zju@gmail.com (zenk)</author>
       <guid>http://zjykzk.github.io/tags/%E7%BC%96%E7%A8%8B/</guid>
       <description></description>
     </item>
-    
   </channel>
 </rss>
