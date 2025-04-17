@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>补码</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>补码</strong>
-<hr> <h2 id="加法">加法</h2>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="计算机通过补码来表示整数，其实补码是比较通用的一种表示数字方式。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">补码</h3>
+            
+            <small class="text-muted">Published May 30, 2017</small>
+        </div>
+
+        <article>
+            <h2 id="加法">加法</h2>
 <p>2个十进制数字的非正式算法：两个数字中相同位置的数相加，如果结果超过10产生进位，该进位在下一位数相加时加上。直到两个数字的所有位数都加完为止。</p>
 <p>考虑十进制的2位数加法，例如：16 + 26。</p>
 <pre tabindex="0"><code>    1 6
@@ -77,32 +137,21 @@ body{background:#faf9de;}
 </code></pre><p>最高位的转化取负数，其他会取正数，然后求和正好是十进制的数。</p>
 <p>这个结果对计算机来说非常有价值，因为计算机组件有一些逻辑门构成，而逻辑门只能处理真假两个值，这正好可以用01来表示，取反，加1都能很方便的用逻辑门来实现，达到了加法和减法统一，简化逻辑电路的设计。</p>
 
-<div class="np"><a href=/posts/cs/golang/map/>← map 内部实现</a> <a href=/posts/cs/golang/go-memory-model/>GO 内存模型 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

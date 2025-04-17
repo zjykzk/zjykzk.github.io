@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>熔断</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>熔断</strong>
-<hr> <h2 id="缘起">缘起</h2>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="熔断原理与实例。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">熔断</h3>
+            
+            <small class="text-muted">Published October 12, 2018</small>
+        </div>
+
+        <article>
+            <h2 id="缘起">缘起</h2>
 <p>在分布式系统中，会有很多的RPC调用，当某个服务超载时候，继续接收请求只会让系统变得不可用，甚至会导致多个系统的连锁反应。因此在这样的情况下，最好是把后续的请求挡住，直接返回错误。等到系统恢复正常以后再处理请求。熔断借鉴了电闸中的保险丝功能，当因为某个意外原因（比如插座进水导致短路）导致线路中的电流过大而产生大量热量，保险丝就会被融化掉，从而中断线路中的电流，防止事故发生。</p>
 <h2 id="设计">设计</h2>
 <p>通俗来说，它是一个服务代理（逻辑上说），监测服务的状态，决定是否处理当前的请求，如果不处理返回错误。</p>
@@ -24,7 +84,7 @@ body{background:#faf9de;}
 <li>打开（Open）状态：在这个状态下，熔断器会直接拒绝请求，返回错误，而不去调用后端服务。同时，会有一个定时器，时间到的时候会变成<strong>半打开</strong>状态。目的假设服务会在一段时间内恢复正常。</li>
 <li>半打开（Half Open）状态：在这个状态下，熔断器会尝试把部分请求转发给后端服务，目的是为了探测后端服务是否恢复。当请求失败的情况下会进入<strong>打开</strong>状态，成功情况下会进入<strong>关闭</strong>状态，同时重置计数。</li>
 </ol>
-<p><img src="/imgs/circuit-breaker.png" alt="circuit breaker"></p>
+<p><img src="../../../../imgs/circuit-breaker.png" alt="circuit breaker"></p>
 <h2 id="设计重点">设计重点</h2>
 <p>在设计过程中需要考虑以下几个点。</p>
 <ol>
@@ -39,7 +99,7 @@ body{background:#faf9de;}
 </ol>
 <h2 id="实现">实现</h2>
 <p>Netflix中的<a href="https://github.com/Netflix/Hystrix/wiki/How-it-Works#CircuitBreaker">Hystrix</a>有一个完整的实现。</p>
-<p><img src="/imgs/hystrix-circuit-breaker-1280.png" alt="hystrix circuit breaker，图片来自hystrix的github wiki"></p>
+<p><img src="../../../../imgs/hystrix-circuit-breaker-1280.png" alt="hystrix circuit breaker，图片来自hystrix的github wiki"></p>
 <p>流程如下：</p>
 <ol>
 <li><code>allowRequest()</code>通过函数<code>isOpen()</code>判断是否处理请求。</li>
@@ -55,32 +115,21 @@ body{background:#faf9de;}
 </ol>
 <p>Hystrix维护了10个时间间隔为1秒的桶，用于记录请求处理结果成功、失败、超时、拒绝的数量。每过1秒就会创建一个新的桶，如果桶的数量超过10个，最旧的那个会被删除掉。</p>
 
-<div class="np"><a href=/posts/cs/rocketmq/slave-sync-from-master-disconnect/>← slave和master同步连接经常重连，导致发送消息失败</a> <a href=/posts/cs/design/guava-ratelimiter/>guava中RateLimiter的设计 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

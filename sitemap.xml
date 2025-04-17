@@ -2,19 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://zjykzk.github.io/posts/</loc>
+    <lastmod>2025-02-10T20:02:06+08:00</lastmod>
+  </url><url>
+    <loc>http://zjykzk.github.io/</loc>
+    <lastmod>2025-02-10T20:02:06+08:00</lastmod>
+  </url><url>
     <loc>http://zjykzk.github.io/categories/</loc>
     <lastmod>2024-07-01T18:13:21+08:00</lastmod>
   </url><url>
     <loc>http://zjykzk.github.io/categories/cs/</loc>
     <lastmod>2024-07-01T18:13:21+08:00</lastmod>
   </url><url>
-    <loc>http://zjykzk.github.io/tags/engineering/</loc>
-    <lastmod>2024-07-01T18:13:21+08:00</lastmod>
-  </url><url>
     <loc>http://zjykzk.github.io/categories/engineering/</loc>
     <lastmod>2024-07-01T18:13:21+08:00</lastmod>
   </url><url>
-    <loc>http://zjykzk.github.io/posts/</loc>
+    <loc>http://zjykzk.github.io/tags/engineering/</loc>
     <lastmod>2024-07-01T18:13:21+08:00</lastmod>
   </url><url>
     <loc>http://zjykzk.github.io/tags/</loc>
@@ -24,9 +27,6 @@
     <lastmod>2024-07-01T18:13:21+08:00</lastmod>
   </url><url>
     <loc>http://zjykzk.github.io/posts/cs/engineering/tdd/</loc>
-    <lastmod>2024-07-01T18:13:21+08:00</lastmod>
-  </url><url>
-    <loc>http://zjykzk.github.io/</loc>
     <lastmod>2024-07-01T18:13:21+08:00</lastmod>
   </url><url>
     <loc>http://zjykzk.github.io/tags/design/</loc>
@@ -77,10 +77,10 @@
     <loc>http://zjykzk.github.io/posts/cs/linux/fix-bad-init/</loc>
     <lastmod>2020-01-14T11:11:37+08:00</lastmod>
   </url><url>
-    <loc>http://zjykzk.github.io/tags/linux/</loc>
+    <loc>http://zjykzk.github.io/categories/linux/</loc>
     <lastmod>2020-01-14T11:11:37+08:00</lastmod>
   </url><url>
-    <loc>http://zjykzk.github.io/categories/linux/</loc>
+    <loc>http://zjykzk.github.io/tags/linux/</loc>
     <lastmod>2020-01-14T11:11:37+08:00</lastmod>
   </url><url>
     <loc>http://zjykzk.github.io/tags/program-language/</loc>
@@ -92,7 +92,7 @@
     <loc>http://zjykzk.github.io/tags/golang/</loc>
     <lastmod>2019-05-29T14:44:31+08:00</lastmod>
   </url><url>
-    <loc>http://zjykzk.github.io/posts/cs/golang/sync.map/</loc>
+    <loc>http://zjykzk.github.io/posts/cs/golang/sync/</loc>
     <lastmod>2019-05-29T14:44:31+08:00</lastmod>
   </url><url>
     <loc>http://zjykzk.github.io/tags/network/</loc>

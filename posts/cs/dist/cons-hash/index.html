@@ -1,59 +1,108 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>一致性hash算法</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>一致性hash算法</strong>
-<hr> <h2 id="一致性hash">一致性hash</h2>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="一致性hash算法介绍。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">一致性hash算法</h3>
+            
+            <small class="text-muted">Published April 28, 2018</small>
+        </div>
+
+        <article>
+            <h2 id="一致性hash">一致性hash</h2>
 <h3 id="目标">目标</h3>
 <p>缓存的机器扩容、缩容时，尽量保持数据的命中率。常规的hash算法，<code>hash(key)mod N</code> （N表示缓存结点），当N变化时同一个key查询的缓存结点都会变化，导致缓存没有命中，造成很大的数据库压力。</p>
 <h3 id="原理">原理</h3>
 <p>hash函数值大小32位，因此输出的范围是<code>0~2^32-1</code>。把这个范围形成一个环，同时对数据进行hash计算以外，对缓存的机器也做hash计算。这些计算出来的值在这个环上都有对应的一个点。</p>
 <p>假设数据的hash值分别为<code>K1</code>,<code>K2</code>,<code>K3</code>,<code>K4</code>,<code>K5</code>,<code>K6</code>，以及缓存结点的hash值<code>H1</code>,<code>H2</code>,<code>H3</code>,大小关系为<code>H1&lt;K3&lt;K4&lt;K5&lt;H2&lt;K6&lt;H3&lt;K1&lt;K2</code>。</p>
 <p>每个数据所在的缓存结点是在这个环上顺时针方向遇到的第一个缓存结点既是。</p>
-<p><img src="/imgs/dist/ch1.png" alt=""></p>
+<p><img src="../../../../imgs/dist/ch1.png" alt=""></p>
 <p>因此<code>K1</code>,<code>K2</code>落在<code>H1</code>,<code>K3</code>,<code>K4</code>,<code>K5</code>落在<code>H2</code>,<code>K6</code>落在<code>H3</code>。</p>
 <p>添加一个新的缓存结点<code>H4</code>，它的hash值落在<code>K4</code>和<code>K5</code>之间。按照规则，<code>K3</code>,<code>K4</code>将落在<code>H4</code>，也就是说<code>K3</code>,<code>K4</code>将会失效而其他的数据不会影响。</p>
-<p><img src="/imgs/dist/ch2.png" alt=""></p>
+<p><img src="../../../../imgs/dist/ch2.png" alt=""></p>
 <p>减少缓存结点<code>H3</code>，<code>K6</code>会受到影响，它将落在缓存结点<code>H1</code>。</p>
-<p><img src="/imgs/dist/ch3.png" alt=""></p>
+<p><img src="../../../../imgs/dist/ch3.png" alt=""></p>
 <p>在次基础上可以抽象出一层缓存的虚拟缓存结点，这样的好处是可以事先确定缓存结点数量，让数据均匀的分布在每个虚拟缓存结点上面。每个物理缓存结点对应一个或者多个缓存结点。如下图中，有个4个虚拟缓存结点<code>VH1/VH2/VH3/VH4</code>，两个物理缓存结点<code>H1/H2</code>，分别对应<code>VH1/VH2和VH3/VH4</code>。</p>
-<p><img src="/imgs/dist/ch4.png" alt=""></p>
+<p><img src="../../../../imgs/dist/ch4.png" alt=""></p>
 
-<div class="np"><a href=/posts/cs/design/soild/>← 常用面向对象设计原则</a> <a href=/posts/cs/golang/tls/>golang中的tls →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>为什么main函数是终结者</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>为什么main函数是终结者</strong>
-<hr> <p>来一个<code>hello, world!</code>。</p>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="为什么main函数退出以后不管是否有其他goroutine程序就直接退出了。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">为什么main函数是终结者</h3>
+            
+            <small class="text-muted">Published November 16, 2018</small>
+        </div>
+
+        <article>
+            <p>来一个<code>hello, world!</code>。</p>
 <pre tabindex="0"><code>package main
 
 func main() {
@@ -76,32 +136,21 @@ runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
 2364     BYTE    $0x90   // NOP
 </code></pre><p>因为压入goroutine栈的值是<code>runtime.goexit+sys.PCQuantum(=1)</code>，因此goroutine函数返回的时候会执行第<code>2361</code>行代码。</p>
 
-<div class="np"><a href=/posts/cs/rocketmq/offset/>← RocketMQ offset管理</a> <a href=/posts/cs/dist/ha/>高可用 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

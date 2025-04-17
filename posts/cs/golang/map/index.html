@@ -1,47 +1,107 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>map 内部实现</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>map 内部实现</strong>
-<hr> <h1 id="类型">类型</h1>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="golang 中map的实现细节，它是一个典型的hashmap。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">map 内部实现</h3>
+            
+            <small class="text-muted">Published June 15, 2017</small>
+        </div>
+
+        <article>
+            <h1 id="类型">类型</h1>
 <p>golang中的map是一个 <strong>指针</strong>。当执行语句 <code>make(map[string]string)</code> 的时候，其实是调用了 <code>makemap</code> 函数：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// file: runtime/hashmap.go:L222
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">makemap</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">maptype</span>, <span style="color:#a6e22e">hint64</span>, <span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">hmap</span>, <span style="color:#a6e22e">bucket</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">hmap</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// file: runtime/hashmap.go:L222</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">makemap</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">maptype</span>, <span style="color:#a6e22e">hint64</span>, <span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">hmap</span>, <span style="color:#a6e22e">bucket</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">hmap</span>
 </span></span></code></pre></div><p>显然，<code>makemap</code> 返回的是指针。</p>
 <h1 id="数据结构">数据结构</h1>
 <h2 id="hashmap">hashmap</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// hash map
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">hmap</span> <span style="color:#66d9ef">struct</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">count</span>     <span style="color:#66d9ef">int</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// hash map</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">hmap</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 元素的个数 == len()返回的值，必须放在第一个位置因为 len函数需要使用</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">count</span>     <span style="color:#66d9ef">int</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// map标记:
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 1. key和value是否包指针
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 2. 是否正在扩容
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 3. 是否是同样大小的扩容
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 4. 是否正在 `range`方式访问当前的buckets
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 5. 是否有 `range`方式访问旧的bucket
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">flags</span>     <span style="color:#66d9ef">uint8</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">B</span>         <span style="color:#66d9ef">uint8</span>  <span style="color:#75715e">// log_2(B) == bucket数量
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">noverflow</span> <span style="color:#66d9ef">uint16</span> <span style="color:#75715e">// overflow bucket的数量，是个近似值
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">hash0</span>     <span style="color:#66d9ef">uint32</span> <span style="color:#75715e">// hash种子
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">buckets</span>    <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span> <span style="color:#75715e">// bucket slice指针，如果count == 0，这里的值为 nil
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">oldbuckets</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span> <span style="color:#75715e">// bucket slice指针，仅当在扩容的时候不为nil
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">nevacuate</span>  <span style="color:#66d9ef">uintptr</span>        <span style="color:#75715e">// 扩容时已经移到新的map中的bucket数量
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 当key和value的类型不包含指针的时候，key和value就会做inline处理(怎么处理的)
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 保证overflow的bucket活着，不被gc回收
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">overflow</span> <span style="color:#f92672">*</span>[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">*</span>[]<span style="color:#f92672">*</span><span style="color:#a6e22e">bmap</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// map标记:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 1. key和value是否包指针</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 2. 是否正在扩容</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 3. 是否是同样大小的扩容</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 4. 是否正在 `range`方式访问当前的buckets</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 5. 是否有 `range`方式访问旧的bucket</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">flags</span>     <span style="color:#66d9ef">uint8</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">B</span>         <span style="color:#66d9ef">uint8</span>  <span style="color:#75715e">// log_2(B) == bucket数量</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">noverflow</span> <span style="color:#66d9ef">uint16</span> <span style="color:#75715e">// overflow bucket的数量，是个近似值</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">hash0</span>     <span style="color:#66d9ef">uint32</span> <span style="color:#75715e">// hash种子</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">buckets</span>    <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span> <span style="color:#75715e">// bucket slice指针，如果count == 0，这里的值为 nil</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">oldbuckets</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span> <span style="color:#75715e">// bucket slice指针，仅当在扩容的时候不为nil</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">nevacuate</span>  <span style="color:#66d9ef">uintptr</span>        <span style="color:#75715e">// 扩容时已经移到新的map中的bucket数量</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 当key和value的类型不包含指针的时候，key和value就会做inline处理(怎么处理的)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 保证overflow的bucket活着，不被gc回收</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">overflow</span> <span style="color:#f92672">*</span>[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">*</span>[]<span style="color:#f92672">*</span><span style="color:#a6e22e">bmap</span>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h2 id="bucket">bucket</h2>
 <p>每个bucket固定包含8个key和value。实现上面是一个固定的大小连续内存块，分成四部分：</p>
@@ -52,14 +112,14 @@ body{background:#faf9de;}
 <li>指向下个bucket的指针</li>
 </ol>
 <p>数据结构定义如下：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// bucket
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">bmap</span> <span style="color:#66d9ef">struct</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 每个条目的状态，tophash[0]表示当前bucket中的条目是否已经完全移到新的bucket中去了
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">tophash</span> [<span style="color:#a6e22e">bucketCnt</span>]<span style="color:#66d9ef">uint8</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// keys
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// values
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// Followed by an overflow pointer.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// bucket</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">bmap</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 每个条目的状态，tophash[0]表示当前bucket中的条目是否已经完全移到新的bucket中去了</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">tophash</span> [<span style="color:#a6e22e">bucketCnt</span>]<span style="color:#66d9ef">uint8</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// keys</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// values</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Followed by an overflow pointer.</span>
+</span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h3 id="条目状态">条目状态</h3>
 <p>. <code>0</code> 空，可以被使用</p>
 <p>. <code>1</code> 空，bucket中的内容已经被移到了新的bucket中</p>
@@ -137,32 +197,21 @@ body{background:#faf9de;}
 </ol>
 <p>每次获取一个元素的时候调用函数<code>mapiternext</code></p>
 
-<div class="np"><a href=/posts/cs/first-optimal/>← 记一次mongo数据库优化经历</a> <a href=/posts/cs/complement/>补码 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>虚拟内存技术</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>虚拟内存技术</strong>
-<hr> <h2 id="缘起">缘起</h2>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="OSTE内存管理笔记" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">虚拟内存技术</h3>
+            
+            <small class="text-muted">Published December 16, 2020</small>
+        </div>
+
+        <article>
+            <h2 id="缘起">缘起</h2>
 <p>最开始，操作系统的内存管理非常简陋。只是简单把物理内存分为两部分：低地址部分，64K分给操作系统，高地址部分分给用户程序。而且每次只执行一个程序。执行完后要重新装载程序，再执行其他程序。接着，由于那是机器非常昂贵，人们希望能够<strong>充分利用机器资源</strong>。出现了<strong>多任务</strong>的操作系统。这时操作系统能够支持一次自动执行多个任务，在某些程序执行IO的时候，CPU能够执行其他程序，这样就提升了机器资源的利用率。后来，又有了希望能够和程序<strong>及时交互</strong>。这样就能方便知道程序执行的状态了，这个对程序员来说太重要了。不然，每次都要等程序执行完才能知道结果。于是有了<strong>分时</strong>的操作系统，也就是每个进程执行一小部分时间。但是，这里就出现了安全问题，一个进程随意的读写另外一个进程的数据，甚至是操作系统的数据！由此，内存的虚拟化就出现了，它为每个程序提供一个统一抽象的<strong>地址空间</strong>，程序看到的地址又叫<strong>虚拟地址</strong>。它的目标包括：</p>
 <ol>
 <li>透明。对程序透明，每个程序只需要认知地址空间就行，不需要考虑自己的数据、代码是放在物理内存的哪个位置。</li>
@@ -253,32 +313,21 @@ body{background:#faf9de;}
 <h3 id="小结-1">小结</h3>
 <p>有了swap空间，地址空间大小限制就小了，程序的空间就大了，简单方便！但是，到磁盘读数据的代价是很大，最简单的方式是买更大的内存！</p>
 
-<div class="np"><a href=/posts/cs/design/4rules-of-simple-design/>← 简单设计的4个原则</a> <a href=/posts/cs/design/aposd/>《A Philosophy of Software Design》笔记 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

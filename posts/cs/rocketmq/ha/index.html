@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>RocketMQ HA实现</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>RocketMQ HA实现</strong>
-<hr> <h2 id="ha原理">HA原理</h2>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="RocketMQ HA实现细节。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">RocketMQ HA实现</h3>
+            
+            <small class="text-muted">Published January 25, 2019</small>
+        </div>
+
+        <article>
+            <h2 id="ha原理">HA原理</h2>
 <p>RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：</p>
 <ol>
 <li>等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。</li>
@@ -28,7 +88,7 @@ body{background:#faf9de;}
 <p><strong>为什么这样同步不会有问题呢？</strong></p>
 <p>那是因为同步的数据里面包含了具体消费队列ID，队列中的偏移量以及消息的偏移量，所以同步的时候能够写到同一个位置。</p>
 <h2 id="主结点同步逻辑">主结点同步逻辑</h2>
-<p><img src="/imgs/rocketmq/ha-master.png" alt=""></p>
+<p><img src="../../../../imgs/rocketmq/ha-master.png" alt=""></p>
 <p>发送一条消息的时候，在开启<strong>SYNC_MASTER</strong>情况下，需要四个线程合作才能完成消息的发送。</p>
 <ol>
 <li><strong>SendMessageProcessor</strong>负责处理接收发送消息的请求并落盘（异步或者同步），接着向<strong>GroupTransferService</strong>发送等待同步完成的请求，然后等待知道超时或者<strong>GroupTransferService</strong>通知同步完成。同时，还会同时<strong>WriteSocketService</strong>有数据可以写了。</li>
@@ -37,7 +97,7 @@ body{background:#faf9de;}
 <li><strong>ReadSocketService</strong>负责读取从结点上报上来的同步偏移量。更新变量<code>push2SlaveMaxOffset</code>和<code>slaveRequestOffset</code>并通知<strong>GroupTransferService</strong>。从而，它也会影响<strong>WriteSocketService</strong>的行为。同时，它还维护着和从结点连接的过期工作，如果超过指定时间没有收到消息就会断开连接，同时会停止<strong>WriteSocketService</strong>。</li>
 </ol>
 <h2 id="从结点同步逻辑">从结点同步逻辑</h2>
-<p><img src="/imgs/rocketmq/ha-slave.png" alt=""></p>
+<p><img src="../../../../imgs/rocketmq/ha-slave.png" alt=""></p>
 <p>从结点的同步逻辑相对简单主要做几件事情：</p>
 <ol>
 <li>管理和主结点的连接，如果超过一段时间没有收到主点结点的数据，就会断开连接。这个时间戳保存在变量<code>lastWriteTimestamp</code>中，刚刚连接上主结点和从主结点读到数据都会更新该变量。</li>
@@ -47,32 +107,21 @@ body{background:#faf9de;}
 <li>任何从连接中读数据的时候如果有错误就会断开连接。</li>
 </ol>
 
-<div class="np"><a href=/posts/cs/select-tech/>← 技术选型</a> <a href=/posts/cs/rocketmq/push-consumer/>RocketMQ push模式的实现细节 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

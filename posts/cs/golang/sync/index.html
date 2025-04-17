@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="sync.Map实现分析。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">sync.Map实现分析</h3>
+            
+            <small class="text-muted">Published May 29, 2019</small>
+        </div>
+
+        <article>
+            <p>golang的SDK中提供线程安全的map实现<code>sync.Map</code>。它是针对<code>RWMutex+map</code>的实现方案中存在cache line的false share提出来的。主要适用于两个场景：</p>
+<ol>
+<li>针对一个key一次写多次读。</li>
+<li>多个goroutine并发读写修改的key是没有交集。</li>
+</ol>
+<p>在这两种情况下，相比一个<code>Mutex</code>或者<code>RWMutex</code>加上普通的map，锁的竞争要少的多。那为什么呢？</p>
+<h3 id="数据结构">数据结构</h3>
+<pre tabindex="0"><code>type Map struct {
+  mu Mutex
+
+  // read contains the portion of the map&#39;s contents that are safe for
+  // concurrent access (with or without mu held).
+  //
+  // The read field itself is always safe to load, but must only be stored with
+  // mu held.
+  //
+  // Entries stored in read may be updated concurrently without mu, but updating
+  // a previously-expunged entry requires that the entry be copied to the dirty
+  // map and unexpunged with mu held.
+  read atomic.Value // readOnly
+
+  // dirty contains the portion of the map&#39;s contents that require mu to be
+  // held. To ensure that the dirty map can be promoted to the read map quickly,
+  // it also includes all of the non-expunged entries in the read map.
+  //
+  // Expunged entries are not stored in the dirty map. An expunged entry in the
+  // clean map must be unexpunged and added to the dirty map before a new value
+  // can be stored to it.
+  //
+  // If the dirty map is nil, the next write to the map will initialize it by
+  // making a shallow copy of the clean map, omitting stale entries.
+  dirty map[interface{}]*entry
+
+  // misses counts the number of loads since the read map was last updated that
+  // needed to lock mu to determine whether the key was present.
+  //
+  // Once enough misses have occurred to cover the cost of copying the dirty
+  // map, the dirty map will be promoted to the read map (in the unamended
+  // state) and the next store to the map will make a new dirty copy.
+  misses int
+}
+
+// readOnly is an immutable struct stored atomically in the Map.read field.
+type readOnly struct {
+  m       map[interface{}]*entry
+  amended bool // true if the dirty map contains some key not in m.
+}
+
+// An entry is a slot in the map corresponding to a particular key.
+type entry struct {
+  // p points to the interface{} value stored for the entry.
+  //
+  // If p == nil, the entry has been deleted and m.dirty == nil.
+  //
+  // If p == expunged, the entry has been deleted, m.dirty != nil, and the entry
+  // is missing from m.dirty.
+  //
+  // Otherwise, the entry is valid and recorded in m.read.m[key] and, if m.dirty
+  // != nil, in m.dirty[key].
+  //
+  // An entry can be deleted by atomic replacement with nil: when m.dirty is
+  // next created, it will atomically replace nil with expunged and leave
+  // m.dirty[key] unset.
+  //
+  // An entry&#39;s associated value can be updated by atomic replacement, provided
+  // p != expunged. If p == expunged, an entry&#39;s associated value can be updated
+  // only after first setting m.dirty[key] = e so that lookups using the dirty
+  // map find the entry.
+  p unsafe.Pointer // *interface{}
+}
+</code></pre><p><code>Map.read</code>包含了部分数据，读写请求优先考虑<code>read</code>，针对它的操作都是CAS，无锁的。</p>
+<p><code>Map.dirty</code>包含的数据是<code>read</code>的超集，对他的操作需要加锁。</p>
+<p><code>readOnly.m</code>表示当前<code>read</code>的数据，<code>readOnly.amended</code>表示是否有数据在<code>dirty</code>中。</p>
+<p><code>entry</code>保存具体数值的指针。有三种情况：</p>
+<ol>
+<li><code>nil</code>，表示已经删除，这个时候<code>dirty</code>中<code>entry</code>的值也是<code>nil</code>，因为他们是同一个<code>entry</code>的地址。</li>
+<li><code>expunged</code>，表示数据已经擦除，<code>entry</code>不在<code>dirty</code>中。</li>
+<li>具体的数据值，一定会在<code>dirty</code>中。</li>
+</ol>
+<h3 id="接口">接口</h3>
+<p><code>sync.Map</code>包含五个接口：<code>Load</code>、<code>Store</code>、<code>LoadOrStore</code>、<code>Delete</code>和<code>Range</code>。</p>
+<h4 id="loadstoreloadorstore和delete">Load、Store、LoadOrStore和Delete</h4>
+<p>这几个接口都有类似的模式：</p>
+<pre tabindex="0"><code>read, _ := m.read.Load().(readOnly)
+if e, ok := read.m[key]; ok {
+	ret := do_the_operation()
+	if ret is success {
+		return
+	}
+}
+m.mu.Lock()
+read, _ := m.read.Load().(readOnly)
+if e, ok := read.m[key]; ok {
+	ret := do_the_operation()
+} else if e, ok := m.dirty[key]; ok {
+	ret := do_the_operation()
+}
+m.mu.Unlock()
+</code></pre><p>利用<code>read</code>的CAS操作减少锁并发，同时由于并发存在获取锁之后还是有可能数据已经在<code>read</code>中，因此还是对<code>read</code>再做一次同样的操作，复用内存。如果数据仍然不在<code>read</code>中才会考虑操作<code>dirty</code>。针对数据是否在<code>read</code>中这几个接口的逻辑如下：</p>
+<p><code>read</code>包含了部分数据，如果<code>key</code>存在并而且与它对应的<code>entry</code>不是<code>expunged</code>，数据操作优先在这里进行。</p>
+<ol>
+<li><code>Store</code>：直接更新<code>entry</code>值。</li>
+<li><code>Load</code>：直接返回<code>entry</code>值。</li>
+<li><code>LoadOrStore</code>:针对<code>entry</code>做<code>tryLoadOrStore</code>操作。</li>
+<li><code>Delete</code>:把<code>entry</code>设置成<code>nil</code>。</li>
+</ol>
+<p>当数据不在<code>read</code>中时，就会涉及到<code>dirty</code>了：</p>
+<ol>
+<li><code>Store</code>：
+a. 如果<code>entry</code>在<code>read</code>中并且是<code>expunged</code>，则复用，同时把它修改成<code>nil</code>，然后把<code>entry</code>赋值到<code>dirty</code>，这样就避免了只在<code>read</code>不在<code>dirty</code>的情况。
+b. 如果<code>entry</code>在<code>dirty</code>中，那么更新<code>entry</code>值。
+c. 如果<code>entry</code>也不在<code>dirty</code>中，如果<code>dirty</code>是<code>nil</code>，则复制<code>read</code>中的<code>entry</code>值非<code>nil</code>的数据。然后，添加值到<code>dirty</code>。</li>
+<li><code>Load</code>：从<code>dirty</code>查找，同时增加<code>misses</code>。如果超过一定的阀值，就会发生数据从<code>dirty</code>到<code>read</code>的迁移。</li>
+<li><code>LoadOrStore</code>：流程和<code>Store</code>接口类似，只是返回值和对<code>entry</code>的处理逻辑不一样。
+a. 如果<code>entry</code>有值，则返回具体值以及存在的标识。
+b. 如果<code>entry</code>值为<code>nil</code>，设置<code>entry</code>为新的值并返回它和不存在标识。
+c. 如果<code>entry</code>值是<code>expunged</code>，则返回<code>nil</code>和存在标志，这个是比较特殊。在<code>LoadOrStore</code>同时，并发的把<code>entry</code>从<code>read</code>复制到<code>dirty</code>，这种情况就会发生。</li>
+</ol>
+<h4 id="range">Range</h4>
+<p><code>Range</code>接口相对简单，如果有部分数据在<code>dirty</code>中就会把<code>dirty</code>的数据提升到<code>read</code>中，并重置<code>dirty</code>。然后，遍历的是<code>dirty</code>数据。否则，只遍历<code>read</code>中的数据。这里不保证能遍历到之后添加的数据。</p>
+<p>通过上面的逻辑我们发现<code>read</code>和<code>dirty</code>直接数据流转逻辑如下：</p>
+<ol>
+<li><code>read</code>到<code>dirty</code>：在<code>Store</code>和<code>LoadOrStore</code>的时候，如果需要保存的key既不在<code>read</code>也不在<code>dirty</code>，而且这时<code>dirty</code>是<code>nil</code>，就会把<code>read</code>中的<code>nil</code>数据变成<code>expunged</code>，并复制除了这份以外的数据到<code>dirty</code>。</li>
+<li><code>dirty</code>到<code>read</code>：
+a. 在<code>Load</code>和<code>LoadOrStore</code>的时候，如果<code>read</code>中不存在，需要从<code>dirty</code>中获取数据，就会增加<code>misses</code>，当<code>misses</code>等于<code>dirty</code>的大小时，就会把<code>dirty</code>封装成<code>readOnly</code>，然后原子的赋值给<code>read</code>，并重置<code>dirty</code>。
+b. 在<code>Range</code>的时候，如果有数据不在<code>read</code>中同样会把<code>dirty</code>封装成<code>readOnly</code>，然后原子的赋值给<code>read</code>，并重置<code>dirty</code>数据。</li>
+</ol>
+<h4 id="疑问">疑问</h4>
+<ol>
+<li><strong>为什么需要expunged状态？</strong></li>
+</ol>
+<blockquote>
+<p>如果没有这个状态，更新已经删除的但是已经存在的数据就需要加锁了。</p></blockquote>
+<ol start="2">
+<li><strong>为什么newEntry的时候取的是参数interface{}的地址，这个地址不是栈上的么，会不会有问题？</strong></li>
+</ol>
+<blockquote>
+<p>参数<code>i</code>的地址被保存到<code>map</code>中时，变量<code>&amp;i</code>已经逃逸到堆上面去了。</p></blockquote>
+<h3 id="总结">总结</h3>
+<p>文中开头提到的两个主要使用场景的原因主要使用的以下技术：</p>
+<ol>
+<li>无锁的CAS操作。</li>
+<li>读写分离，通过一份只读的数据结合CAS操作减少锁竞争。</li>
+<li>延迟删除，只有当只读的数据被写的数据覆盖以后才会被gc回收。</li>
+<li>内存复用，已经删除的数据所在的内存，当同一个key赋值的时候，可以被重新被使用。</li>
+<li>分摊分析。</li>
+</ol>
+<h3 id="参考连接">参考连接</h3>
+<ol>
+<li><a href="https://github.com/golang/sync/commits/master/syncmap/map.go">https://github.com/golang/sync/commits/master/syncmap/map.go</a></li>
+<li><a href="https://golang.org/pkg/sync/#Map">https://golang.org/pkg/sync/#Map</a></li>
+</ol>
+
+        </article>
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
+</html>

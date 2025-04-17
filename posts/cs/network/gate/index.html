@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>网关</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>网关</strong>
-<hr> <p>解决跨网段访问。</p>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="网关。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">网关</h3>
+            
+            <small class="text-muted">Published April 30, 2019</small>
+        </div>
+
+        <article>
+            <p>解决跨网段访问。</p>
 <p>发包的目的地址和本机地址不在同一个网段的时候就会把包发给网关。网关把MAC头和IP头拿下来，根据IP地址和路由规则决定发往哪个结点。</p>
 <p>网关一般是路由器。</p>
 <h4 id="路由方式">路由方式</h4>
@@ -32,22 +92,19 @@ body{background:#faf9de;}
 <p>MAC源地址：A的MAC地址。
 MAC目的地址：G1中192.168.1.1网口的MAC地址。
 IP源地址：192.168.1.101。
-IP目的地址：192.168.4.101。</p>
-</blockquote>
+IP目的地址：192.168.4.101。</p></blockquote>
 <p>G1-&gt;G2的地址内容：</p>
 <blockquote>
 <p>MAC源地址：G1中192.168.56.1网口的地址。
 MAC目的地址：G2中192.168.56.2网口的地址。
 IP源地址：192.168.1.101。
-IP目的地址：192.168.4.101。</p>
-</blockquote>
+IP目的地址：192.168.4.101。</p></blockquote>
 <p>G2-&gt;B的地址内容：</p>
 <blockquote>
 <p>MAC源地址：G2中192.168.4.1网口的地址。
 MAC目的地址：B的MAC地址。
 IP源地址：192.168.1.101。
-IP目的地址：192.168.4.101。</p>
-</blockquote>
+IP目的地址：192.168.4.101。</p></blockquote>
 <p>问题：</p>
 <p>不同局域网内的ip地址会冲突。比如，你需要访问的地址和你局域网内的地址是一样的。怎么办，看看动态路由！</p>
 <p><strong>动态路由</strong></p>
@@ -59,49 +116,35 @@ IP目的地址：192.168.4.101。</p>
 <p>MAC源地址：A的MAC地址。
 MAC目的地址：G1中192.168.1.1网口的MAC地址。
 IP源地址：192.168.1.101。
-IP目的地址：192.168.56.2。</p>
-</blockquote>
+IP目的地址：192.168.56.2。</p></blockquote>
 <p>G1-&gt;G2的地址内容：</p>
 <blockquote>
 <p>MAC源地址：G1中192.168.56.1网口的地址。
 MAC目的地址：G2中192.168.56.2网口的地址。
 IP源地址：192.168.56.1。
-IP目的地址：192.168.56.2。</p>
-</blockquote>
+IP目的地址：192.168.56.2。</p></blockquote>
 <p>G2-&gt;B的地址内容：</p>
 <blockquote>
 <p>MAC源地址：G2中192.168.4.1网口的地址。
 MAC目的地址：B的MAC地址。
 IP源地址：192.168.56.1。
-IP目的地址：192.168.4.101。</p>
-</blockquote>
+IP目的地址：192.168.4.101。</p></blockquote>
 
-<div class="np"><a href=/posts/cs/golang/sync.map/>← sync.Map实现分析</a> <a href=/posts/cs/select-tech/>技术选型 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

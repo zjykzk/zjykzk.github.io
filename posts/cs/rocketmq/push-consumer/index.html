@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>RocketMQ push模式的实现细节</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>RocketMQ push模式的实现细节</strong>
-<hr> <p>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：</p>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="RocketMQ push模式功能和实现细节。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">RocketMQ push模式的实现细节</h3>
+            
+            <small class="text-muted">Published January 16, 2019</small>
+        </div>
+
+        <article>
+            <p>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：</p>
 <ol>
 <li>DefaultMQPushConsumerImpl：拉消息的类型。</li>
 <li>ProcessQueue：保存拉出来的消息。</li>
@@ -21,14 +81,14 @@ body{background:#faf9de;}
 <li>ReblanceService：负载均衡服务。</li>
 </ol>
 <p><strong>类关系</strong></p>
-<p><img src="/imgs/rocketmq/push-consumer-class.jpeg" alt=""></p>
+<p><img src="../../../../imgs/rocketmq/push-consumer-class.jpeg" alt=""></p>
 <p>（真想吐槽！）</p>
 <p><strong>执行过程</strong></p>
-<p><img src="/imgs/rocketmq/push-consumer-active.jpeg" alt=""></p>
+<p><img src="../../../../imgs/rocketmq/push-consumer-active.jpeg" alt=""></p>
 <h2 id="defaultmqpushconsumerimpl">DefaultMQPushConsumerImpl</h2>
 <p><code>DefaultMQPushConsumerImpl</code>实现了消费者的接口。同时是个启动者，通过它直接或间接启动了拉消息服务，消费消息服务。</p>
 <p>其中提供了一个重要的接口<code>pullMessage</code>。该接口的流程如下：</p>
-<p><img src="/imgs/rocketmq/push-consumer-pull.png" alt=""></p>
+<p><img src="../../../../imgs/rocketmq/push-consumer-pull.png" alt=""></p>
 <p>在拉消息过程中，做了流控，防止拉的太快，消费的太慢。主要从三个方面检测：</p>
 <ol>
 <li>从某个消费队列拉取的等待消费的消息数量。如果超过阀值，延迟50ms后再次拉取消息。阀值默认是1000。如果设置了topic级别的阀值（默认没有限制），在队列负载均衡以后会重新计算，具体为topic级别的阀值除以当前负责的消费队列数量。主要配置变量：<code>DefaultMQPushConsumerImpl.pullThresholdForQueue</code>和<code>DefaultMQPushConsumerImpl.pullThresholdForTopic</code>。</li>
@@ -64,7 +124,7 @@ body{background:#faf9de;}
 <p>顺序消费：依赖于process queue是否正在被消费，这样避免同时消费多个不同的消息，不然就没法保证有序了。</p>
 <h3 id="消费逻辑">消费逻辑</h3>
 <p>下图中左边是<em>并发消费</em>，右边是<em>顺序消费</em>。</p>
-<p><img src="/imgs/rocketmq/push-consumer-consume.jpeg" alt=""></p>
+<p><img src="../../../../imgs/rocketmq/push-consumer-consume.jpeg" alt=""></p>
 <p>消费消息的时候，在可能停顿的执行点上面都加上了process queue是否已经drop的检查。</p>
 <p>因为提交任务的方式不一样导致了不同模式下面消费逻辑的差别。</p>
 <p>并发消费：只考虑当前的消息即可。</p>
@@ -79,7 +139,7 @@ body{background:#faf9de;}
 <p>在负载均衡的时候，检查一个消费队列发现不属于自己或者长时间没有拉的时候就会把这个消费队列移除掉。移除的逻辑比较有意思，为了确保这个消费队列正在被消费不会被移除，这里使用了一个消费锁。移除的时候尝试获得这个锁，如果超过1s还没有获得就会等待下一次负载均衡的检查，如果获得了锁就会延迟20s再向broker发送解锁请求。这里的延迟，有个效果就是可能这时候已经向broker发送了拉消息的请求，如果在它返回之前又把队列分配给自己了，那么就有可能两个触发一个拉消息的请求，这个时候就会同时有两个拉消息的请求，那么拉出来重复的消息。</p>
 <h3 id="处理消费结果">处理消费结果</h3>
 <p>下图中左边是并发消费，右边是顺序消费。</p>
-<p><img src="/imgs/rocketmq/push-consumer-result.jpeg" alt=""></p>
+<p><img src="../../../../imgs/rocketmq/push-consumer-result.jpeg" alt=""></p>
 <p>处理消费结果的逻辑主要是处理消费失败的消息。</p>
 <p>并发消费：如果是在广播模式下，直接丢弃了。如果是在集群模式下面会尝试把消息发回broker，如果发送失败的话，就会把这些发送失败的消息延迟提交消费。</p>
 <p>顺序模式：如果是<code>ROLLBACK</code>，把消息放回，再次消费。如果是<code>SUSPEND_CURRENT_QUEUE_A_MOMENT</code>则会判断是否需要停止一段时间再消费。通过检查消费次数，当超过预定的值（默认是没有限制）就会把消息发回broker。如果消息都已经发回broker，就提交消息接下去消费，否则就停一会，把当前的消息延迟提交消费。</p>
@@ -87,32 +147,21 @@ body{background:#faf9de;}
 <p>并发消费：定时清理长时间没法消费的消息，默认是15分钟。</p>
 <p>顺序消费：在集群模式下面，定时向broker锁住message queue，锁的粒度是group+clientID。</p>
 
-<div class="np"><a href=/posts/cs/rocketmq/ha/>← RocketMQ HA实现</a> <a href=/posts/cs/rocketmq/offset/>RocketMQ offset管理 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

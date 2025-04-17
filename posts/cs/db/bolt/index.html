@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>bolt源码分析</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>bolt源码分析</strong>
-<hr> <p><a href="https://github.com/boltdb/bolt">bolt</a>数据库是golang开发的简单的kv数据库。代码十分精简，总共3000+行，学习数据库一个比较好的起点。</p>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="bolt源码分析" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">bolt源码分析</h3>
+            
+            <small class="text-muted">Published January 19, 2020</small>
+        </div>
+
+        <article>
+            <p><a href="https://github.com/boltdb/bolt">bolt</a>数据库是golang开发的简单的kv数据库。代码十分精简，总共3000+行，学习数据库一个比较好的起点。</p>
 <h2 id="数据结构">数据结构</h2>
 <p>bolt使用的数据结构按照数据保存的位置划分两类：内存和磁盘。</p>
 <p>内存中的数据结构核心是B+树，它根据key组织在一起。B+树中的每个结点，对应数据结构<a href="#node">node</a>，其中的内部信息通过数据结构<a href="#inode">inode</a>来描述。内存中其他主要数据结构还包括<a href="#meta">meta</a>和<a href="#freelist">freelist</a>。</p>
@@ -62,7 +122,7 @@ body{background:#faf9de;}
   vsize uint32            // value的大小
 }
 </code></pre><p>以上三者之间的关系如下图</p>
-<p><img src="/imgs/bolt/page-branch-leaf.jpg" alt="page-branch-leaf"></p>
+<p><img src="../../../../imgs/bolt/page-branch-leaf.jpg" alt="page-branch-leaf"></p>
 <h3 id="freelist">freelist</h3>
 <pre tabindex="0"><code>type freelist struct {
   ids     []pgid          // 空闲页的id数组
@@ -72,7 +132,7 @@ body{background:#faf9de;}
 </code></pre><p>bolt数据库采用了<a href="https://github.com/boltdb/bolt/blob/master/node.go#L359-L362">写时复制</a>的策略，因此数据更新的时候，会新建一个页保存更新以后的数据，那么原来的页就可以重复利用了。这些页通过freelist管理。因为<a href="#page">page</a>数据结构count地址的限制，它能保存的最大值是0xFFFF，所以空闲页数量大于0xFFFF的时候，需要添加一个长度头来表示有多少空闲页。</p>
 <p>pending的page需要确保没有被其他事务引用时才能释放被重新使用。所以，bolt的处理方式是在开始<a href="https://github.com/boltdb/bolt/blob/master/db.go#L537">写事务的时候</a>找到最小的事务id，然后把小于该事务id引用的page给释放掉。</p>
 <p>它和page的存储关系如下：</p>
-<p><img src="/imgs/bolt/page-freelist.jpg" alt=""></p>
+<p><img src="../../../../imgs/bolt/page-freelist.jpg" alt=""></p>
 <h3 id="bucket">Bucket</h3>
 <p>类似关系型数据库中的表。它可以包含子bucket。bolt中有一个根bucket，所有的数据和bucket都保存在这个根bucket中。每个bucket对应一棵B+树。</p>
 <p>bucket的数据很少时会做一个优化。这个条件是bucket对应的根数据页是叶子结点，同时它的数量(pageHeaderSize+leafPageElementSize+key size+value size)小于page size的1/4。</p>
@@ -96,7 +156,7 @@ type bucket struct {
   sequence uint64 // 单调递增序号，被NextSequence调用
 }
 </code></pre><p>它和page的关系如下：</p>
-<p><img src="/imgs/bolt/page-bucket.jpg" alt=""></p>
+<p><img src="../../../../imgs/bolt/page-bucket.jpg" alt=""></p>
 <h3 id="cursor">Cursor</h3>
 <p>有序遍历的游标，读写的时候用。只在一个事务中有效。遍历的时候如果修改了数据，它返回的数据是不确定的。</p>
 <p>通过栈的方式记录遍历的每层结点，栈顶是叶子结点。每次访问数据的时候需要遍历到叶子结点。因为叶子之间没有指针，所以需要回溯分支结点。</p>
@@ -140,15 +200,15 @@ type elemRef struct {
   checksum uint64                 // 元数据的校验和
 }
 </code></pre><p>它和page的关系如下：</p>
-<p><img src="/imgs/bolt/page-meta.jpg" alt=""></p>
+<p><img src="../../../../imgs/bolt/page-meta.jpg" alt=""></p>
 <h2 id="设计">设计</h2>
 <h3 id="存储">存储</h3>
 <p>单文件存储。读写单位是os的page size。通过多棵B+树组织在一起，不过这个B+树的叶子结点没有指向兄弟叶子结点的指针。每棵B+树和<a href="#bucket">Bucket</a>一一对应。</p>
 <p>通过内存映射读取数据。</p>
 <p>同时,需要管理空闲的磁盘空间,重复利用。</p>
-<h3 id="写时复制httpsgithubcomboltdbboltissues308issuecomment-74811638"><a href="https://github.com/boltdb/bolt/issues/308#issuecomment-74811638">写时复制</a></h3>
+<h3 id="写时复制"><a href="https://github.com/boltdb/bolt/issues/308#issuecomment-74811638">写时复制</a></h3>
 <p>当发生添加数据或者修改时，被修改的数据所在的page都会被写到新的page。这样的好处就是事务隔离实现比较简单。</p>
-<h3 id="元数据meta"><a href="#meta">元数据</a></h3>
+<h3 id="元数据"><a href="#meta">元数据</a></h3>
 <p>元数据描述了数据文件的结构，主要是B+树的结构。它保存在第0和1个page。</p>
 <p>两个meta数据，这是为了解决只有一个meta并且如果写meta数据时进程挂情况下，整个数据库就没法读取了。参考这个<a href="https://github.com/boltdb/bolt/issues/548#issuecomment-206414220">issue</a>。</p>
 <p>每个写事务都会关联一个meta，交替使用两个meta。事务0使用meta0，事务1使用meat1等等。按照txid大小、数据是否有效两个维度的优先级选择meta。commit的时候会把meta的txid写到page中去。page的选择也是交替的，根据<code>txid%2</code>选择page id。</p>
@@ -169,32 +229,21 @@ type elemRef struct {
 <h4 id="并发性">并发性</h4>
 <p>bolt数据库支持多个读事务和一个写事务同时进行。由于写事务分配数据的时候，因为超过文件大小，就需要重新做内存映射。为了避免读事务会读取这些数据，因此读事务开始的时候会获得内存映射的读锁。所以，因为这个锁有可能把写事务给阻塞。</p>
 
-<div class="np"><a href=/posts/cs/db/mysql-servertimezone/>← mysql连接中的serverTimezone参数解析</a> <a href=/posts/cs/linux/fix-bad-init/>initramfs中的init进程系统启动失败 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>

@@ -1,18 +1,78 @@
-<!DOCTYPE html>
-<html lang="zh">
-<meta charset=utf-8>
-<title>二阶段提交和三阶段提交</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<style>
-img{max-width:100%;height:auto}
-pre{max-width:100%;height:auto;white-space:pre-wrap}
-.np{display:flex;flex-direction:row;justify-content:space-between;padding-bottom:.5em;font-style:italic}
-body{background:#faf9de;}
-</style>
-<script> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ga('create', 'UA-43852829-1', 'auto'); ga('send', 'pageview'); </script>
-<script async src=//www.google-analytics.com/analytics.js></script><link rel=icon href="data:;base64,=">
-<strong>二阶段提交和三阶段提交</strong>
-<hr> <h2 id="缘起">缘起</h2>
+<!doctype html>
+<html lang="en-us"><head>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="2PC&amp;3PC" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">二阶段提交和三阶段提交</h3>
+            
+            <small class="text-muted">Published April 17, 2020</small>
+        </div>
+
+        <article>
+            <h2 id="缘起">缘起</h2>
 <p>事务是一段访问或者更新数据的程序。它的特点是ACID。本地事务只涉及到一个数据库能够保证事务ACID了。当涉及到多个不同数据库（广义的数据库，他们可以是MQ，甚至缓存）操作时，为了保证每个数据库的操作要么都成功或者都失败，就需要额外的技术来处理。这是因为单个数据库操作会失败，同时<strong>通信失败</strong>会导致整个事务无法感知这个失败。二阶段提交（2PC）或者三阶段提交（3PC）就是用来解决这个问题。</p>
 <p>一般来说这个有两个角色一个是事务协调者，简称<strong>TC</strong>，一个是事务参，简称<strong>TP</strong>。下文用简称来说明。</p>
 <h2 id="2pc">2PC</h2>
@@ -371,32 +431,21 @@ body{background:#faf9de;}
 <h2 id="终止协议">终止协议</h2>
 <p>不管是2PC还是3PC当<strong>TP</strong>恢复的时候，如果处在不确定状态就需要执行终止协议。在确定了事务状态的情况，最简单的做法等待恢复和TC之间的通信，获得事务状态。还有，通过其他<strong>TP</strong>的获得事务状态。如果事务状态还不确定，可以通过重新开始事务或者终止事务的方式搞定。详细的算法《Concurrency Control and Recovery in Database Systems》中7.5节有详细说明。</p>
 
-<div class="np"><a href=/posts/cs/design/coupling_cohesion/>← 高内聚和低耦合</a> <a href=/posts/cs/db/mysql-servertimezone/>mysql连接中的serverTimezone参数解析 →</a></div>
-<div class="np"> <a href="/">存档</a> <a href=/post/about>关于</a></div>
+        </article>
+    </div>
 
-<div id="gitalk-container"></div>
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-<script charset="utf-8">
-    const gitalk = new Gitalk({
-        clientID: '94870b3efea9c642b0e7',
-        clientSecret: '97e434f793caeaa7d09bf5a196cd6c84e6b4debc',
-        repo: 'zjykzk.github.io',
-        owner: 'zjykzk',
-        admin: ['zjykzk'],
-        id: location.pathname, 
-        distractionFreeMode: false 
-      })
+    
 
-    ;(function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('gitalk-container').innerHTML = 'Gitalk comments not available by default when the website is previewed locally.'
-            return
-
-        }
-        gitalk.render('gitalk-container')
-    })();
-</script>
-
-
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
 </html>
