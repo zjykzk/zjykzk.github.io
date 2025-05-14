@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="接口一些设计原则。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <p>什么是好的接口？怎么定义？</p>
+<p><em>How to Design a Good API and Why it Matters</em></p>
+<p>易学。</p>
+<p>易用，甚至不需要文档。</p>
+<p>难用错。</p>
+<p>方便阅读和维护使用接口的代码。</p>
+<p>足够的能力满足需求。</p>
+<p>方便扩展。</p>
+<p>易于解释。</p>
+<p>考虑性能。</p>
+<p>一些惯例？</p>
+<p>设计过程</p>
+<ol>
+<li>收集需求
+<ol>
+<li>收集更多的解决方案</li>
+<li>提取真正的需求，使用use-cases</li>
+<li>构建通用的东西会更简单，更有回报</li>
+</ol>
+</li>
+<li>从短小的spec开始，1页纸就够了
+<ol>
+<li>敏捷胜于完整。不需要完整的spec，提出方案讨论。</li>
+<li>开展讨论，认真吸收大家提出的方案。</li>
+<li>保持spec短小，方便修改。</li>
+<li>确定没问题以后补充完整。</li>
+</ol>
+</li>
+</ol>
+<p>RESTful实现需要在3级以上</p>
+<ol>
+<li>只使用http作为传输协议。</li>
+<li>引入资源概念。</li>
+<li>使用http的方法作为资源的不同操作，同时使用http的状态码表示不同的结果。</li>
+<li>API服务使用HATEOAS（获取资源的时候返回资源相关资源以及URI和操作方法，客户就可以知道怎么请求这些资源了）。</li>
+</ol>
+<p>错误处理</p>
+<p><a href="https://cloud.google.com/apis/design/errors">google cloud</a></p>
+<pre tabindex="0"><code>{
+  &#34;error&#34;: {
+    &#34;code&#34;: 401,
+    &#34;message&#34;: &#34;Request had invalid credentials.&#34;,
+    &#34;status&#34;: &#34;UNAUTHENTICATED&#34;,
+    &#34;details&#34;: [{
+      &#34;@type&#34;: &#34;type.googleapis.com/google.rpc.RetryInfo&#34;,
+      ...
+    }]
+  }
+}
+</code></pre><p><a href="https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#710-response-formats">microsoft</a></p>
+<pre tabindex="0"><code>{
+  &#34;error&#34;: {
+    &#34;code&#34;: &#34;BadArgument&#34;, // 必须的
+    &#34;message&#34;: &#34;Previous passwords may not be reused&#34;, // 必须的
+    &#34;target&#34;: &#34;password&#34;,
+    &#34;innererror&#34;: {
+      &#34;code&#34;: &#34;PasswordError&#34;,
+      &#34;innererror&#34;: {
+        &#34;code&#34;: &#34;PasswordDoesNotMeetPolicy&#34;,
+        &#34;minLength&#34;: &#34;6&#34;,
+        &#34;maxLength&#34;: &#34;64&#34;,
+        &#34;characterTypes&#34;: [&#34;lowerCase&#34;,&#34;upperCase&#34;,&#34;number&#34;,&#34;symbol&#34;],
+        &#34;minDistinctCharacterTypes&#34;: &#34;2&#34;,
+        &#34;innererror&#34;: {
+          &#34;code&#34;: &#34;PasswordReuseNotAllowed&#34;
+        }
+      }
+    }
+  }
+}
+</code></pre><p><a href="http://www.ruanyifeng.com/blog/2018/10/restful-api-best-practices.html">RESTful API 最佳实践</a></p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzA5NDg3MjAwMQ==&amp;mid=2457103117&amp;idx=1&amp;sn=ce97dcdb0349b44e9336a31749953a30&amp;chksm=87c8c3a3b0bf4ab54eea12fb58acdb34e7cef3a12ec8bea9062e81c2f7de4841016cfb027508&amp;scene=21#wechat_redirect">阿里研究员谷朴：API 设计最佳实践的思考</a></p>
+<p><a href="https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md">微软api设计指南</a></p>
+<p><a href="https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design">微软api设计的最佳实践</a></p>
+<p><a href="https://mathieu.fenniak.net/the-api-checklist/">api检查清单</a></p>
+<p><a href="https://cloud.google.com/apis/design/design_patterns">google云api设计模式</a></p>
+<p><a href="https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md">k8s api规范</a></p>
+<p><a href="https://www.programmableweb.com/news/how-to-design-great-apis-api-first-design-and-raml/how-to/2015/07/10">使用api first方法设计接口</a></p>
+<p><a href="https://www.programmableweb.com/news/introduction-to-api-first-design/analysis/2016/10/31">api-first设计方法</a></p>
+<p><a href="https://jsonapi.org/">https://jsonapi.org/</a></p>
+<p><a href="https://tools.ietf.org/html/rfc7807">rfc7807</a></p>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

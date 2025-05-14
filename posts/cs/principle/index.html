@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="写代码中好用的一些原则。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="测试">测试</h2>
+<p>一个软件的功能需要正确，那么需要测试。对于软件的成功来说，自己测试是成本最低的。这里的成本公司层面，个人层面等等。所以，在软件开发的每个任务，都需要测试。比如，ut，压力，导流。</p>
+<h2 id="mock结果">mock结果</h2>
+<p>在写ut过程中经常需要mock接口。mock接口的返回结果是目前实现下来最简单的。以前，会根据参数mock返回结果，起始反而增加复杂度。</p>
+<pre tabindex="0"><code>// Fooer the example interface
+type Fooer interface {
+    Foo() (int, error)
+}
+
+// tested func
+func haliFoo(foo Fooer) error {
+    c, err := foo.Foo()
+    if err != nil {
+        return err
+    }
+    // something others
+    _ = c
+    return nil
+}
+
+// doing testing
+type mockFooer struct {
+    fooErr error
+    fooRet int
+}
+
+type (f *mockFooer) Foo() (int, error) {
+    return f.fooRet, f.fooErr
+}
+
+func TestHaliFoo(t *testing.T) {
+    mf := &amp;mockFooer{}
+    // mock Foo return error
+    mf.fooErr = errors.New(&#34;bad fool&#34;)
+    assert.Equal(t, mf.fooErr, haliFoo(mf))
+}
+</code></pre><h2 id="依赖接口">依赖接口</h2>
+<p>抽象，依赖接口。具体通过参数注入。好处是减少对实现的依赖，方便测试。</p>
+<h2 id="tdd三大原则">TDD三大原则</h2>
+<ol>
+<li>在写代码前先写测试代码。</li>
+<li>仅写刚刚好测试无法通过的代码，编译不过也算是测试不通过。</li>
+<li>仅写通过测试的代码。</li>
+</ol>
+<p>三点重复循环。</p>
+<p>注意：这里写代码的粒度是需求，而不是实现。</p>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

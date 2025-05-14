@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Test on 老K随笔</title>
+    <link>http://localhost:1313/tags/test/</link>
+    <description>Recent content in Test on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>(c) 2025 zenk.</copyright>
+    <lastBuildDate>Wed, 05 Jun 2019 18:01:33 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/test/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>测试相关</title>
+      <link>http://localhost:1313/posts/cs/test/</link>
+      <pubDate>Wed, 05 Jun 2019 18:01:33 +0800</pubDate>
+      <guid>http://localhost:1313/posts/cs/test/</guid>
+      <description>&lt;h3 id=&#34;单元测试&#34;&gt;单元测试&lt;/h3&gt;&#xA;&lt;h4 id=&#34;为什么需要&#34;&gt;为什么需要&lt;/h4&gt;&#xA;&lt;p&gt;确保软件没有我难题，提升上线的自信。&lt;/p&gt;&#xA;&lt;h4 id=&#34;一些注意点&#34;&gt;一些注意点&lt;/h4&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;小步重构，目标是行为（behavior）不变，修改实现。&lt;/li&gt;&#xA;&lt;li&gt;单元测试，是正确重构的保障。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;尽量测试行为（behavior），不是测试实现&lt;/strong&gt;，这个很重要，不然实现改了测试也要跟着改，但是也无法完全避免针对实现的代码进行测试。&lt;/li&gt;&#xA;&lt;li&gt;新的需求来了，才需要写测试。&lt;/li&gt;&#xA;&lt;li&gt;测试单元的粒度是模块，不是类。&lt;/li&gt;&#xA;&lt;li&gt;需要测试的是模块的稳定API。&lt;/li&gt;&#xA;&lt;li&gt;测试覆盖的是用户用例（用户故事）。&lt;/li&gt;&#xA;&lt;li&gt;不要使用&lt;a href=&#34;https://www.ca.com/en/blog-agile-requirements-designer/guide-to-test-driven-development-tdd-vs-bdd-vs-atdd.html&#34;&gt;ATDD&lt;/a&gt;，使用TDD，并和产品代码使用同样的编程语言。&lt;/li&gt;&#xA;&lt;li&gt;使用“Given When Then”模式，给定上下文，设置输入，判定输出。&lt;/li&gt;&#xA;&lt;li&gt;测试之间应该互相独立，测试之后要删除fake数据。&lt;/li&gt;&#xA;&lt;li&gt;mock地方应该是模块的边界，比如说mock数据库。&lt;/li&gt;&#xA;&lt;li&gt;让测试跑的更快。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h4 id=&#34;tdd小结&#34;&gt;TDD小结&lt;/h4&gt;</description>
+    </item>
+  </channel>
+</rss>

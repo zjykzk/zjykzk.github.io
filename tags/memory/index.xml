@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Memory on 老K随笔</title>
+    <link>http://localhost:1313/tags/memory/</link>
+    <description>Recent content in Memory on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>(c) 2025 zenk.</copyright>
+    <lastBuildDate>Mon, 29 Oct 2018 17:30:38 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/memory/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>cache相关概念</title>
+      <link>http://localhost:1313/posts/cs/memory/cache/</link>
+      <pubDate>Mon, 29 Oct 2018 17:30:38 +0800</pubDate>
+      <guid>http://localhost:1313/posts/cs/memory/cache/</guid>
+      <description>&lt;h2 id=&#34;缘起&#34;&gt;缘起&lt;/h2&gt;&#xA;&lt;p&gt;由于程序的时间空间局部性原理以及CPU访问内存的开销，增加一层cache加速数据的访问。&lt;/p&gt;&#xA;&lt;h2 id=&#34;相关概念&#34;&gt;相关概念&lt;/h2&gt;&#xA;&lt;p&gt;cache中有三个核心概念：路（Way），组（Set），标记（Tag）。路和组用来组织cache，标记用来标识是否命中。这样的组织方式是性能和功耗折中的结果。这里组用的是虚拟地址，标记用的是物理地址。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;          0    way            n way&#xA;  0 set-&amp;gt;|tags|data|        |tags|data|&#xA;  1 set-&amp;gt;|---&amp;gt;|---&amp;gt;|-------&amp;gt;|----|---&amp;gt;|&#xA;             ...                ...&#xA;  n set-&amp;gt;|tags|data|        |tags|data|&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;通过查看&lt;code&gt;/sys/devices/system/cpu/cpu0/cache/index0&lt;/code&gt;查看cache大小。CPU &lt;code&gt;Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz&lt;/code&gt;一些特性：支持39bit的物理地址，48位虚拟地址，一级cache大小是32K，8路，64组，行大小64。因此，物理页大小4K=2^12，标记需要2^39/2^12=27bit，组需要6bit，字节需要6位。&lt;/p&gt;&#xA;&lt;h2 id=&#34;一致性协议&#34;&gt;一致性协议&lt;/h2&gt;&#xA;&lt;p&gt;// TODO&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

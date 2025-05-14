@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="常规的架构模式" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="分层架构">分层架构</h2>
+<p>最简单，使用最多的架构了。一般如果不考虑架构情况下，请直接用这个架构。</p>
+<p>顾名思义，分层架构分层很多层，一般三层，但是也有很多超过三层的。每层逻辑独立。每层之间通过接口交互，上层调用下层，并且<strong>不跨层调用</strong>。通过这种方式做到了每层的<strong>职责非常清晰，实现高内聚和低耦合</strong>。</p>
+<p>不允许跨层调用可以让依赖变得简单，易于维护。其实，有时候跨层调用却是有意义的，比如说提升性能，代价就是一层的修改会影响多层。</p>
+<p>在分层架构中，如果每层都没什么逻辑只是简单的传递调用，那就没什么意义了。有些业务逻辑是这样的，如果大部分业务逻辑都是这样的，考虑跨层调用。最好是补充这么做的文档，不然其他开发同事也可能就会做无理由的跨层调用了。</p>
+<p>// TODO pics</p>
+<h3 id="分析">分析</h3>
+<p><strong>响应度</strong></p>
+<p>低。主要在单体情况下，组件之间耦合性比较高。相对来说，修改还是比较耗时。</p>
+<p><strong>部署方便程度</strong></p>
+<p>低。在单体情况下，组件一修改其他都要升级。</p>
+<p><strong>可测试性</strong></p>
+<p>高。上层通过接口依赖下层，每层逻辑独立。测试的时候，依赖的接口很方便mock。</p>
+<p><strong>性能</strong></p>
+<p>低。多一层你就需要多一次请求调用。</p>
+<p><strong>扩展性</strong></p>
+<p>低。单体情况下，只能部署多个同样的实例。但是，一个实例包含着所有的逻辑，在物理上耦合在一起，没法针对性的做扩展。（再做一次垂直拆分吧！）</p>
+<p><strong>开发容易程度</strong></p>
+<p>高。架构比较流行，大家比较熟悉。同时还和公司的组织架构比较契合，公司一般有前端后端，后端又分写业务的，写基础设施的，刚好和把这些分层，符合康威定律。</p>
+<h2 id="事件驱动架构">事件驱动架构</h2>
+<p>事件驱动架构是分布式的异步架构，主要特点是业务拆分粒度细，清晰，每个业务单元高内聚，物理解耦，具有高扩展性。主要有两种拓扑结构：Mediator和Broker。</p>
+<h3 id="mediator">Mediator</h3>
+<p>Mediator拓扑由四个组件组成：event queue，event mediator，event channel，event processor。事件分为两种初始（initial event）事件和处理事件（processing event）。客户端通过event queue是把初始消息发送给event mediator。event mediator是一个中心协调者，负责业务逻辑分成多个步骤，每个步骤向event channel发送一个处理事件，并等待事件处理完成，event processor收到处理事件以后执行业务逻辑。</p>
+<p>// TODO pics</p>
+<h3 id="broker">Broker</h3>
+<p>Broker拓扑由两个组件组成：event channel和event processor。客户端往event channel发送需要处理的事件，event processor会监听event channel，当监听到自己负责的事件的时候，就会执行业务逻辑处理，处理完以后往event channel发送处理完成事件，使得其他event processor来处理接下来的业务逻辑。</p>
+<p>上面的event channel和event queue都可以通过消息队列来实现。</p>
+<p>// TODO pics</p>
+<h3 id="分析-1">分析</h3>
+<p>事件驱动架构适用于<strong>分布式异步</strong>场景，每个业务职责单一，划分清晰。分布式的问题在这个架构下面都有。分布式事务，请求追踪等等。其中，比较复杂的问题还有维护处理事件的协议，这个和业务逻辑是强耦合的，同时一个业务逻辑被拆分成了多个事件，因此一个业务场景需要多个事件的协议，每个协议还需要考虑版本号。</p>
+<p><strong>响应度</strong></p>
+<p>高。处理业务单元，逻辑简单，物理解耦，添加修改功能互相不影响。</p>
+<p><strong>部署方便程度</strong></p>
+<p>高。主要还是因为处理业务单元的特点可以方便部署。Mediator比Broker要难点，因为Mediator需要感知整体业务逻辑，业务逻辑的修改都涉及到Mediator。</p>
+<p><strong>可测试性</strong></p>
+<p>低。每个业务处理单元的测试还是比较简单的。但是，一个事件的整体流程测试就比较复杂。异步架构都有这个问题。</p>
+<p><strong>性能</strong></p>
+<p>高。因为有event channel的存在，会把请求堆积起来（往往event channel处理的都很快），快速响应客户端。同时，每个业务处理单元能够并行处理。因此，吞吐量会很高。</p>
+<p><strong>扩展性</strong></p>
+<p>高。业务处理单元特点，允许单独扩展互不影响。</p>
+<p><strong>开发容易程度</strong></p>
+<p>低。业务处理单元本身开发起来还是蛮简单的。复杂的地方还是异步架构的特点，一个业务逻辑经过event channel，还有event processor，每个地方都有可能失败，错误处理复杂。</p>
+<h2 id="微内核架构">微内核架构</h2>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">bolt源码分析</h3>
-            
-            <small class="text-muted">Published January 19, 2020</small>
-        </div>
-
-        <article>
-            <p><a href="https://github.com/boltdb/bolt">bolt</a>数据库是golang开发的简单的kv数据库。代码十分精简，总共3000+行，学习数据库一个比较好的起点。</p>
+    <div class="pl-sm-4 ml-sm-5">
+        <p><a href="https://github.com/boltdb/bolt">bolt</a>数据库是golang开发的简单的kv数据库。代码十分精简，总共3000+行，学习数据库一个比较好的起点。</p>
 <h2 id="数据结构">数据结构</h2>
 <p>bolt使用的数据结构按照数据保存的位置划分两类：内存和磁盘。</p>
 <p>内存中的数据结构核心是B+树，它根据key组织在一起。B+树中的每个结点，对应数据结构<a href="#node">node</a>，其中的内部信息通过数据结构<a href="#inode">inode</a>来描述。内存中其他主要数据结构还包括<a href="#meta">meta</a>和<a href="#freelist">freelist</a>。</p>
@@ -229,7 +222,6 @@ type elemRef struct {
 <h4 id="并发性">并发性</h4>
 <p>bolt数据库支持多个读事务和一个写事务同时进行。由于写事务分配数据的时候，因为超过文件大小，就需要重新做内存映射。为了避免读事务会读取这些数据，因此读事务开始的时候会获得内存映射的读锁。所以，因为这个锁有可能把写事务给阻塞。</p>
 
-        </article>
     </div>
 
     
@@ -245,5 +237,6 @@ type elemRef struct {
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

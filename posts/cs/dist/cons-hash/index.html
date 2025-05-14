@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">一致性hash算法</h3>
-            
-            <small class="text-muted">Published April 28, 2018</small>
-        </div>
-
-        <article>
-            <h2 id="一致性hash">一致性hash</h2>
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="一致性hash">一致性hash</h2>
 <h3 id="目标">目标</h3>
 <p>缓存的机器扩容、缩容时，尽量保持数据的命中率。常规的hash算法，<code>hash(key)mod N</code> （N表示缓存结点），当N变化时同一个key查询的缓存结点都会变化，导致缓存没有命中，造成很大的数据库压力。</p>
 <h3 id="原理">原理</h3>
@@ -88,7 +81,6 @@
 <p>在次基础上可以抽象出一层缓存的虚拟缓存结点，这样的好处是可以事先确定缓存结点数量，让数据均匀的分布在每个虚拟缓存结点上面。每个物理缓存结点对应一个或者多个缓存结点。如下图中，有个4个虚拟缓存结点<code>VH1/VH2/VH3/VH4</code>，两个物理缓存结点<code>H1/H2</code>，分别对应<code>VH1/VH2和VH3/VH4</code>。</p>
 <p><img src="../../../../imgs/dist/ch4.png" alt=""></p>
 
-        </article>
     </div>
 
     
@@ -104,5 +96,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

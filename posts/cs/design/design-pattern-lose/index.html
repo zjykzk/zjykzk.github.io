@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="设计模式比较/提要。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="template-mtehod模式和strategy模式">TEMPLATE MTEHOD模式和STRATEGY模式</h2>
+<!-- raw HTML omitted -->
+<p>两个模式都用于分离通用算法和具体实现细节。当时实现的方式不一样，TEMPLATE METHOD模式通过继承，而STRAGTEGY模式使用组合或者委托。因此，两者的比较变成了继承和委托的比较。</p>
+<table>
+  <thead>
+      <tr>
+          <th>模式</th>
+          <th>耦合度</th>
+          <th>灵活性</th>
+          <th>复杂度</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>TEMPLATE MTEHOD</td>
+          <td>高，和父类高度耦合</td>
+          <td>低，子类无法复用</td>
+          <td>低</td>
+      </tr>
+      <tr>
+          <td>STRATEGY</td>
+          <td>低，依赖于接口</td>
+          <td>高，具体的实现可以被不同的算法复用</td>
+          <td>高，多了接口，字段，间接调用</td>
+      </tr>
+  </tbody>
+</table>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

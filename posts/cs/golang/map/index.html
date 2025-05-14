@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">map 内部实现</h3>
-            
-            <small class="text-muted">Published June 15, 2017</small>
-        </div>
-
-        <article>
-            <h1 id="类型">类型</h1>
+    <div class="pl-sm-4 ml-sm-5">
+        <h1 id="类型">类型</h1>
 <p>golang中的map是一个 <strong>指针</strong>。当执行语句 <code>make(map[string]string)</code> 的时候，其实是调用了 <code>makemap</code> 函数：</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// file: runtime/hashmap.go:L222</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">makemap</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">maptype</span>, <span style="color:#a6e22e">hint64</span>, <span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">hmap</span>, <span style="color:#a6e22e">bucket</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">hmap</span>
@@ -197,7 +190,6 @@
 </ol>
 <p>每次获取一个元素的时候调用函数<code>mapiternext</code></p>
 
-        </article>
     </div>
 
     
@@ -213,5 +205,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

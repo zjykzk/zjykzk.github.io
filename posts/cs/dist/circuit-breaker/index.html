@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">熔断</h3>
-            
-            <small class="text-muted">Published October 12, 2018</small>
-        </div>
-
-        <article>
-            <h2 id="缘起">缘起</h2>
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="缘起">缘起</h2>
 <p>在分布式系统中，会有很多的RPC调用，当某个服务超载时候，继续接收请求只会让系统变得不可用，甚至会导致多个系统的连锁反应。因此在这样的情况下，最好是把后续的请求挡住，直接返回错误。等到系统恢复正常以后再处理请求。熔断借鉴了电闸中的保险丝功能，当因为某个意外原因（比如插座进水导致短路）导致线路中的电流过大而产生大量热量，保险丝就会被融化掉，从而中断线路中的电流，防止事故发生。</p>
 <h2 id="设计">设计</h2>
 <p>通俗来说，它是一个服务代理（逻辑上说），监测服务的状态，决定是否处理当前的请求，如果不处理返回错误。</p>
@@ -115,7 +108,6 @@
 </ol>
 <p>Hystrix维护了10个时间间隔为1秒的桶，用于记录请求处理结果成功、失败、超时、拒绝的数量。每过1秒就会创建一个新的桶，如果桶的数量超过10个，最旧的那个会被删除掉。</p>
 
-        </article>
     </div>
 
     
@@ -131,5 +123,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="消息队列RocketMQ的核心模块broker的设计与实现。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <h1 id="rocketmq-broker模块">rocketmq broker模块</h1>
+<p>broker模块是rocketmq的核心。主要功能：</p>
+<ol>
+<li>RPC接口</li>
+<li>管理消费者信息</li>
+<li>管理消息</li>
+<li>主重同步</li>
+<li>状态统计</li>
+</ol>
+<p><img src="../../../../imgs/rocketmq/broker.png" alt="broker"></p>
+<h2 id="messagestore">MessageStore</h2>
+<p><a href="../../../../post/cs/rocketmq/store/">消息管理模块</a>。</p>
+<h2 id="remotingserver">RemotingServer</h2>
+<p>处理请求的模块。包含：</p>
+<ol>
+<li>发消息</li>
+<li>拉消息</li>
+<li>消费者管理</li>
+<li>admin请求</li>
+<li>事务</li>
+<li>与namesrv/filterserver连接的客户端管理</li>
+</ol>
+<p>分几类请求，每类请求有自己的请求队列以及相应的处理请求的线程池，通过请求编码来绑定队列和线程池。</p>
+<p><img src="../../../../imgs/rocketmq/broker-remotingserver.png" alt="broker-remotingserver"></p>
+<h3 id="协议">协议</h3>
+<p>长度头的方式。</p>
+<pre tabindex="0"><code>|&lt;-- 4 byte --&gt;|&lt;--  4 byte --&gt;   |&lt;-------------- data -------&gt; |
++--------------+------------------+-------------+----------------+
+| total length |   header length  | header data | body data      |
++--------------+------------------+-------------+----------------+
+</code></pre><h3 id="数据封包">数据封包</h3>
+<ol>
+<li>JSON，默认</li>
+<li>ROCKETMQ，按照字段类型封包</li>
+</ol>
+<h2 id="brokerouterapi">BrokerOuterAPI</h2>
+<p>broker和namesrv以及主broker通信的API。主要包含：</p>
+<ol>
+<li>向namesrv注册broker</li>
+<li>向主broker拉取订阅信息</li>
+<li>向主broker拉取topic信息</li>
+</ol>
+<h2 id="pullrequestholdservice">PullRequestHoldService</h2>
+<p>当broker接收到拉取消息的请求，当前执行请求的时候，没有找到消息，同时判断消息在后面一段时间能够取到，该消息就会被本模块处理，也就是放入一个队列一段时间以后再处理。</p>
+<h3 id="再次拉取的条件">再次拉取的条件</h3>
+<ol>
+<li>请求的偏移量比当前的偏移量大</li>
+<li>请求偏移量偏移量为0</li>
+<li>请求没有匹配到</li>
+<li>请求偏移量下面的数据找不到</li>
+</ol>
+<h3 id="拉取时间">拉取时间</h3>
+<ol>
+<li>长模式，5秒，默认模式</li>
+<li>短模式，1秒</li>
+</ol>
+<h2 id="clienthousekeepingservice">ClientHouseKeepingService</h2>
+<p>负责清理broker和其他模块的异常连接，主要包括跟生产者、消费者以及FilterServer之间的连接。</p>
+<h2 id="brokerstatsmanager">BrokerStatsManager</h2>
+<p>管理broker统计信息。定时统计各种指标比如：tps/消息总数。</p>
+<h2 id="filterservermanager">FilterServerManager</h2>
+<p>负责通过JAVA代码过滤消息。提供拉取消息和注册过滤消息的JAVA代码的接口。</p>
+<h2 id="brokerfastfailure">BrokerFastFailure</h2>
+<p>每10ms检查等待写盘的消息，在磁盘IO过载或者等待时间过长情况下，返回系统繁忙。</p>
+<ol>
+<li>写消息的时候会有一个锁，当锁的时间过长时，表示系统页刷盘太慢，IO过载。这时，broker会把没有处理的消息都以系统繁忙的状态返回，直到系统恢复正常。</li>
+<li>检查发送消息的队列，把等待时间过长的消息以系统繁忙的状态返回，直到发送消息的队列为空为止。</li>
+</ol>
+<h2 id="其他">其他</h2>
+<p>broker还会周期性做其他事情</p>
+<ol>
+<li>持久化消费进度</li>
+<li>记录broker昨天和今天的生产和消费消息的总数</li>
+<li>持久化消费者的过滤条件</li>
+<li>保护broker：禁止消费进度大大落后当前消息的进度的消费者，原因会导致内存只为为这样的消费者使用，导致内存使用率太低，影响性能</li>
+<li>打印当前broker的性能水位：生产队列，消费队列的数量，以及他们的队首消息的延迟时间</li>
+<li>没有被索引和简历消费队列的消息量（大小）</li>
+<li>如果没有配置namesrv，获取namesrv列表</li>
+<li>如果是slave broker，从master broker同步：topic、消费者进度、订阅信息、延迟级别对应的延迟时间配置</li>
+</ol>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

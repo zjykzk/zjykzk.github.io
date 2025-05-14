@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">为什么main函数是终结者</h3>
-            
-            <small class="text-muted">Published November 16, 2018</small>
-        </div>
-
-        <article>
-            <p>来一个<code>hello, world!</code>。</p>
+    <div class="pl-sm-4 ml-sm-5">
+        <p>来一个<code>hello, world!</code>。</p>
 <pre tabindex="0"><code>package main
 
 func main() {
@@ -136,7 +129,6 @@ runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
 2364     BYTE    $0x90   // NOP
 </code></pre><p>因为压入goroutine栈的值是<code>runtime.goexit+sys.PCQuantum(=1)</code>，因此goroutine函数返回的时候会执行第<code>2361</code>行代码。</p>
 
-        </article>
     </div>
 
     
@@ -152,5 +144,6 @@ runtime.exit () at /home/zenk/tools/goroot/src/runtime/sys_linux_amd64.s:52
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

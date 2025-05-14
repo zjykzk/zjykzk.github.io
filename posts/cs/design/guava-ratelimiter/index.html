@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">guava中RateLimiter的设计</h3>
-            
-            <small class="text-muted">Published October 11, 2018</small>
-        </div>
-
-        <article>
-            <p>guava中的<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131">RateLimiter</a>实现了比较有意思的功能：</p>
+    <div class="pl-sm-4 ml-sm-5">
+        <p>guava中的<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131">RateLimiter</a>实现了比较有意思的功能：</p>
 <ol>
 <li>平滑。</li>
 <li>记录未使用的信息。</li>
@@ -132,7 +125,6 @@
 <p><strong>Warmup模式</strong></p>
 <p><code>storedPermitsToWaitTime(storedPermits,permitsToTake)</code>返回的是建模函数在<code>storedPermits,permitsToTake</code>之间的积分（图像面积）。</p>
 
-        </article>
     </div>
 
     
@@ -148,5 +140,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

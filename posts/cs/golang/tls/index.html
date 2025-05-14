@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">golang中的tls</h3>
-            
-            <small class="text-muted">Published February 27, 2018</small>
-        </div>
-
-        <article>
-            <p>在golang中，为了性能的目的，当前执行的<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332"><code>g</code></a>是保存在当前线程的TLS中的，而TLS的地址在结构体<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412"><code>m</code></a>里面。问题是怎么放进去的呢？</p>
+    <div class="pl-sm-4 ml-sm-5">
+        <p>在golang中，为了性能的目的，当前执行的<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L332"><code>g</code></a>是保存在当前线程的TLS中的，而TLS的地址在结构体<a href="https://github.com/golang/go/blob/release-branch.go1.8/src/runtime/runtime2.go#L412"><code>m</code></a>里面。问题是怎么放进去的呢？</p>
 <p>可以从程序的启动入手，顺藤摸瓜。</p>
 <p>编写一个打印<code>hello,world</code>的程序</p>
 <pre tabindex="0"><code>// hello.go
@@ -114,7 +107,6 @@ Entry point: 0x448f20
 508 	SYSCALL
 </code></pre><p>可以看到，这里调用了系统调用<a href="http://man7.org/linux/man-pages/man2/arch_prctl.2.html"><code>arch_prctl</code></a>，在linux下把<code>m0.tls+8</code>的地址保存到<code>fs</code>寄存器。到此，完成TLS的设置。</p>
 
-        </article>
     </div>
 
     
@@ -130,5 +122,6 @@ Entry point: 0x448f20
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">限流</h3>
-            
-            <small class="text-muted">Published August 30, 2018</small>
-        </div>
-
-        <article>
-            <h2 id="缘起">缘起</h2>
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="缘起">缘起</h2>
 <p>为了保证API的可用性，以及系统的可靠性，需要为API限速。不然，API请求量大到系统无法处理时就会出现系统变慢，甚至宕机的情况。常见的限速场景：</p>
 <ul>
 <li>挡住某个用户的过多请求（用户激增或者恶意请求），确保正常处理其他用户请求。</li>
@@ -115,7 +108,6 @@
 <h2 id="实现">实现</h2>
 <p>Guava中的<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L131">RateLimter</a>是一个平滑的基于令牌桶的实现，同时还实现了warm up特点的一个<a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/RateLimiter.java#L161">Ratelimiter</a>。</p>
 
-        </article>
     </div>
 
     
@@ -131,5 +123,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

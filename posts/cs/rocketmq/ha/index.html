@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">RocketMQ HA实现</h3>
-            
-            <small class="text-muted">Published January 25, 2019</small>
-        </div>
-
-        <article>
-            <h2 id="ha原理">HA原理</h2>
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="ha原理">HA原理</h2>
 <p>RocketMQ支持主结点的数据同步到从结点。同步的数据依赖于当前从结点的状态。从结点连接到主结点的时候会上报自己的当前commitlog的最大偏移量。主结点收到以后会根据这个值计算出传输的起始位置，如果上报的commitlog的最大偏移量：</p>
 <ol>
 <li>等于0，主结点会从当前最大偏移量减去一个log文件大小那个位置开始传输。如果小于0，那么从0开始传输。</li>
@@ -107,7 +100,6 @@
 <li>任何从连接中读数据的时候如果有错误就会断开连接。</li>
 </ol>
 
-        </article>
     </div>
 
     
@@ -123,5 +115,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

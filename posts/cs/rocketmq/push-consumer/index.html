@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">RocketMQ push模式的实现细节</h3>
-            
-            <small class="text-muted">Published January 16, 2019</small>
-        </div>
-
-        <article>
-            <p>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：</p>
+    <div class="pl-sm-4 ml-sm-5">
+        <p>Rocketmq使用常轮询的方式实现了push功能。主要包括几个组件：</p>
 <ol>
 <li>DefaultMQPushConsumerImpl：拉消息的类型。</li>
 <li>ProcessQueue：保存拉出来的消息。</li>
@@ -147,7 +140,6 @@
 <p>并发消费：定时清理长时间没法消费的消息，默认是15分钟。</p>
 <p>顺序消费：在集群模式下面，定时向broker锁住message queue，锁的粒度是group+clientID。</p>
 
-        </article>
     </div>
 
     
@@ -163,5 +155,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

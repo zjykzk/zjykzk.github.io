@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Web on 老K随笔</title>
+    <link>http://localhost:1313/tags/web/</link>
+    <description>Recent content in Web on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>(c) 2025 zenk.</copyright>
+    <lastBuildDate>Wed, 05 Jun 2019 15:33:58 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/web/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>前端学习的资料</title>
+      <link>http://localhost:1313/posts/cs/web/learn/</link>
+      <pubDate>Wed, 05 Jun 2019 15:33:58 +0800</pubDate>
+      <guid>http://localhost:1313/posts/cs/web/learn/</guid>
+      <description>&lt;h2 id=&#34;webpack&#34;&gt;webpack&lt;/h2&gt;&#xA;&lt;p&gt;webpack是一个前端的构建JavaScript模块脚本的工具。简单来说，通过配置文件（默认&lt;code&gt;webpack.config.js&lt;/code&gt;）指定输入和输出以及文件处理规则，webpack按照规则打包结果并按照输出格式输出。&lt;/p&gt;&#xA;&lt;p&gt;常见的操作：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;多个入口文件。&lt;/li&gt;&#xA;&lt;li&gt;通过babel-loader把es6或者jsx代码转换成es5版本。&lt;/li&gt;&#xA;&lt;li&gt;转换图片。&lt;/li&gt;&#xA;&lt;li&gt;CSS模块化。&lt;/li&gt;&#xA;&lt;li&gt;最小化js代码（UglifyJs）。&lt;/li&gt;&#xA;&lt;li&gt;通过环境变量进行条件编译。&lt;/li&gt;&#xA;&lt;li&gt;代码优化：拆分，抽取公共代码，异步加载。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://github.com/petehunt/webpack-howto&#34;&gt;webpack-howto&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://github.com/ruanyf/webpack-demos&#34;&gt;webpack-demos&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ol&gt;</description>
+    </item>
+  </channel>
+</rss>

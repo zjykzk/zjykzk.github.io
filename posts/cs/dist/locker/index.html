@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="分布式锁原理和实践" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <p>redis实现</p>
+<p><a href="https://github.com/redisson/redisson">redission</a></p>
+<pre tabindex="0"><code>// lock KEYS: locker key, ARGV: lease time millis, locker name
+// reenter locker
+if (redis.call(&#39;exists&#39;, KEYS[1]) == 0) then
+    redis.call(&#39;hset&#39;, KEYS[1], ARGV[2], 1);
+    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[1]);
+        return nil;
+end;
+if (redis.call(&#39;hexists&#39;, KEYS[1], ARGV[2]) == 1) then
+    redis.call(&#39;hincrby&#39;, KEYS[1], ARGV[2], 1);
+    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[1]);
+        return nil;
+end;
+return redis.call(&#39;pttl&#39;, KEYS[1]);
+
+// unlock KEYS: locker key, channel ARGV: unlock flag(0), lease time in millis, locker name
+if (redis.call(&#39;exists&#39;, KEYS[1]) == 0) then
+    redis.call(&#39;publish&#39;, KEYS[2], ARGV[1]);
+        return 1;
+end;
+if (redis.call(&#39;hexists&#39;, KEYS[1], ARGV[3]) == 0) then
+    return nil;
+end;
+local counter = redis.call(&#39;hincrby&#39;, KEYS[1], ARGV[3], -1);
+if (counter &gt; 0) then
+    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]);
+    return 0;        
+else
+    redis.call(&#39;del&#39;, KEYS[1]);
+    redis.call(&#39;publish&#39;, KEYS[2], ARGV[1]);
+    return 1;
+end;
+return nil;
+
+// force unlock KEYS: locker key, channel ARGV: unlock flag(0)
+if (redis.call(&#39;del&#39;, KEYS[1]) == 1) then
+    redis.call(&#39;publish&#39;, KEYS[2], ARGV[1]);
+    return 1
+else
+    return 0
+end
+</code></pre>
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

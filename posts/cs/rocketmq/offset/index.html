@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">RocketMQ offset管理</h3>
-            
-            <small class="text-muted">Published December 28, 2018</small>
-        </div>
-
-        <article>
-            <h2 id="作用">作用</h2>
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="作用">作用</h2>
 <p>记录每个消费队列的消费进度。以topic，group为单位。</p>
 <h2 id="类型">类型</h2>
 <p>根据保存的位置可以分为本地和远程两种类型。本地类型就是以文本文件的形式保存在客户端，内容是非正式的json数据，而远程类型是指数据保存在broker服务器上面，内容同样是非正式的json数据。</p>
@@ -121,7 +114,6 @@
 <li>如果新队列的消费队列不在旧队列中，删除消费进度。本地模式不会做删除操作，远程模式会把内存中的消费进度删除掉。同时，push模式下面会从存储中拉取消费进度并保存到内存。</li>
 </ol>
 
-        </article>
     </div>
 
     
@@ -137,5 +129,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

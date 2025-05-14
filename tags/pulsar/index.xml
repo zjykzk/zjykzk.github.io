@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pulsar on 老K随笔</title>
+    <link>http://localhost:1313/tags/pulsar/</link>
+    <description>Recent content in Pulsar on 老K随笔</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>(c) 2025 zenk.</copyright>
+    <lastBuildDate>Mon, 20 Aug 2018 16:31:35 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/pulsar/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>pulsar</title>
+      <link>http://localhost:1313/posts/cs/pulsar/pulsar/</link>
+      <pubDate>Mon, 20 Aug 2018 16:31:35 +0800</pubDate>
+      <guid>http://localhost:1313/posts/cs/pulsar/pulsar/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://streaml.io/blog/why-apache-pulsar&#34;&gt;https://streaml.io/blog/why-apache-pulsar&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://streaml.io/blog/why-apache-pulsar-part-2&#34;&gt;https://streaml.io/blog/why-apache-pulsar-part-2&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;介绍&#34;&gt;介绍&lt;/h2&gt;&#xA;&lt;p&gt;特点&lt;/p&gt;&#xA;&lt;p&gt;支持topic数量&lt;/p&gt;&#xA;&lt;p&gt;投递保证&lt;/p&gt;&#xA;&lt;p&gt;性能&lt;/p&gt;&#xA;&lt;p&gt;对比&lt;/p&gt;&#xA;&lt;h2 id=&#34;架构&#34;&gt;架构&lt;/h2&gt;&#xA;&lt;h2 id=&#34;协议&#34;&gt;协议&lt;/h2&gt;&#xA;&lt;h2 id=&#34;生成消费模型&#34;&gt;生成消费模型&lt;/h2&gt;&#xA;&lt;h2 id=&#34;存储&#34;&gt;存储&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;bookkeeper&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;集群怎么做的？&lt;/li&gt;&#xA;&lt;li&gt;面向record，有什么好处？&lt;/li&gt;&#xA;&lt;li&gt;如何写quorum，PendingAddOp会等待多个bookier写完，怎么确定没有重复写？&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://streaml.io/blog/why-bookkeeper-part-2&#34;&gt;https://streaml.io/blog/why-bookkeeper-part-2&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://bookkeeper.apache.org/distributedlog/technical-review/2016/09/19/kafka-vs-distributedlog.html&#34;&gt;https://bookkeeper.apache.org/distributedlog/technical-review/2016/09/19/kafka-vs-distributedlog.html&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://streaml.io/blog/why-apache-bookkeeper&#34;&gt;https://streaml.io/blog/why-apache-bookkeeper&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://streaml.io/blog/messaging-storage-or-both&#34;&gt;https://streaml.io/blog/messaging-storage-or-both&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://bookkeeper.apache.org/docs/latest/api/ledger-api/&#34;&gt;https://bookkeeper.apache.org/docs/latest/api/ledger-api/&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;bookkeeper中的journal文件写要求比较高，因为这个文件内容是同步写的，最好用SSD&lt;/p&gt;&#xA;&lt;p&gt;topic的映射&lt;/p&gt;&#xA;&lt;p&gt;message的映射&lt;/p&gt;&#xA;&lt;p&gt;读写逻辑&lt;/p&gt;&#xA;&lt;p&gt;高可用&lt;/p&gt;&#xA;&lt;h2 id=&#34;高可用&#34;&gt;高可用&lt;/h2&gt;&#xA;&lt;h2 id=&#34;高并发&#34;&gt;高并发&lt;/h2&gt;&#xA;&lt;h1 id=&#34;how-apache-pulsar-ensures-no-messages-lost-and-no-messages-duplicated&#34;&gt;How Apache Pulsar ensures no messages lost and no messages duplicated&lt;/h1&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://streaml.io/blog/pulsar-effectively-once-end-to-end&#34;&gt;https://streaml.io/blog/pulsar-effectively-once-end-to-end&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="cache的相关问题" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="缘起">缘起</h2>
+<p>由于程序的时间空间局部性原理以及CPU访问内存的开销，增加一层cache加速数据的访问。</p>
+<h2 id="相关概念">相关概念</h2>
+<p>cache中有三个核心概念：路（Way），组（Set），标记（Tag）。路和组用来组织cache，标记用来标识是否命中。这样的组织方式是性能和功耗折中的结果。这里组用的是虚拟地址，标记用的是物理地址。</p>
+<pre tabindex="0"><code>          0    way            n way
+  0 set-&gt;|tags|data|        |tags|data|
+  1 set-&gt;|---&gt;|---&gt;|-------&gt;|----|---&gt;|
+             ...                ...
+  n set-&gt;|tags|data|        |tags|data|
+</code></pre><p>通过查看<code>/sys/devices/system/cpu/cpu0/cache/index0</code>查看cache大小。CPU <code>Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz</code>一些特性：支持39bit的物理地址，48位虚拟地址，一级cache大小是32K，8路，64组，行大小64。因此，物理页大小4K=2^12，标记需要2^39/2^12=27bit，组需要6bit，字节需要6位。</p>
+<h2 id="一致性协议">一致性协议</h2>
+<p>// TODO</p>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

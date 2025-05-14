@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="IEEE 754" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">浮点数 IEEE 754</h3>
+            
+            <small class="text-muted">Published June 5, 2016</small>
+        </div>
+
+        <article>
+            <h2 id="表示">表示</h2>
+<p>标准IEEE 754中，浮点数由三部分组成符号、指数、尾数。</p>
+<ul>
+<li>符号：表示正负，用<strong>S</strong>表示，用<strong>Sn</strong>表示使用的bit数</li>
+<li>指数：2的幂次，用<strong>E</strong>表示，用<strong>En</strong>表示使用的bit数</li>
+<li>尾数：小数部分，用<strong>M</strong>表示，用<strong>Mn</strong>表示使用的bit数</li>
+</ul>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h3 id="单双精度的bit位数">单、双精度的bit位数</h3>
+<table>
+  <thead>
+      <tr>
+          <th>类型</th>
+          <th>Sn</th>
+          <th>En</th>
+          <th>Mn</th>
+          <th>Sn+En+Mn</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>单精度</td>
+          <td>1</td>
+          <td>8</td>
+          <td>23</td>
+          <td>32</td>
+      </tr>
+      <tr>
+          <td>双精度</td>
+          <td>1</td>
+          <td>11</td>
+          <td>52</td>
+          <td>64</td>
+      </tr>
+  </tbody>
+</table>
+<p>浮点数从二进制到十进制数值的转化分两种情况：</p>
+<ol>
+<li>normalized, E!=0</li>
+</ol>
+<p>公式：value = (-1)^S * 2^(E - 2^(En - 1) + 1) * (1+M/2^Mn)
+例子：</p>
+<p>1.5</p>
+<ul>
+<li>单精度</li>
+</ul>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li>双精度
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+</li>
+</ul>
+<ol start="2">
+<li>denormalized, E==0</li>
+</ol>
+<p>公式：value = (-1)^S * 2^(2 - 2^(En - 1)) * (M/2^Mn)</p>
+<h3 id="范围">范围</h3>
+<ul>
+<li>NAN:not a number，E==2^En - 1，M!=0</li>
+<li>无穷大(小)Infinity: E==2^En - 1, M == 0</li>
+<li>normalized: E!=0</li>
+<li>denormalized: E==0</li>
+<li>最大值：2^(2^(En-1)+1) * (2-2^-Mn)</li>
+<li>最小值：-2^(2 - 2^(En - 1)) * (1-1/2^Mn)</li>
+</ul>
+<h3 id="精度">精度</h3>
+<p>IEEE 754用有限的位数表示整个实数，肯定是不精确。主要表现在几个方面：</p>
+<ol>
+<li>无法覆盖所有实数，也就是说有些数根本无法表示，比如说：0.000000000000000000000001</li>
+<li>无法精确表达某些数，比如：0.3</li>
+<li>十进制精度(两浮点数的差，正确的小数个数)：1/2^Mn，单精度：1/2^23 = 0.0000001192092895507812，精确到6位；双精度：1/2^52 = 0.0000000000000002220446049250313，精确到15位。</li>
+</ol>
+<h2 id="加法">加法</h2>
+<h2 id="减法">减法</h2>
+
+        </article>
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

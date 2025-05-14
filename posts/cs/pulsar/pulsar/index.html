@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="pulsar下一代分布式消息系统" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <p><a href="https://streaml.io/blog/why-apache-pulsar">https://streaml.io/blog/why-apache-pulsar</a></p>
+<p><a href="https://streaml.io/blog/why-apache-pulsar-part-2">https://streaml.io/blog/why-apache-pulsar-part-2</a></p>
+<h2 id="介绍">介绍</h2>
+<p>特点</p>
+<p>支持topic数量</p>
+<p>投递保证</p>
+<p>性能</p>
+<p>对比</p>
+<h2 id="架构">架构</h2>
+<h2 id="协议">协议</h2>
+<h2 id="生成消费模型">生成消费模型</h2>
+<h2 id="存储">存储</h2>
+<p><strong>bookkeeper</strong></p>
+<ul>
+<li>集群怎么做的？</li>
+<li>面向record，有什么好处？</li>
+<li>如何写quorum，PendingAddOp会等待多个bookier写完，怎么确定没有重复写？</li>
+</ul>
+<p><a href="https://streaml.io/blog/why-bookkeeper-part-2">https://streaml.io/blog/why-bookkeeper-part-2</a></p>
+<p><a href="https://bookkeeper.apache.org/distributedlog/technical-review/2016/09/19/kafka-vs-distributedlog.html">https://bookkeeper.apache.org/distributedlog/technical-review/2016/09/19/kafka-vs-distributedlog.html</a></p>
+<p><a href="https://streaml.io/blog/why-apache-bookkeeper">https://streaml.io/blog/why-apache-bookkeeper</a></p>
+<p><a href="https://streaml.io/blog/messaging-storage-or-both">https://streaml.io/blog/messaging-storage-or-both</a></p>
+<p><a href="https://bookkeeper.apache.org/docs/latest/api/ledger-api/">https://bookkeeper.apache.org/docs/latest/api/ledger-api/</a></p>
+<p>bookkeeper中的journal文件写要求比较高，因为这个文件内容是同步写的，最好用SSD</p>
+<p>topic的映射</p>
+<p>message的映射</p>
+<p>读写逻辑</p>
+<p>高可用</p>
+<h2 id="高可用">高可用</h2>
+<h2 id="高并发">高并发</h2>
+<h1 id="how-apache-pulsar-ensures-no-messages-lost-and-no-messages-duplicated">How Apache Pulsar ensures no messages lost and no messages duplicated</h1>
+<p><a href="https://streaml.io/blog/pulsar-effectively-once-end-to-end">https://streaml.io/blog/pulsar-effectively-once-end-to-end</a></p>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="关于golang的spec的理解。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="可赋值性assignability">可赋值性（Assignability）</h2>
+<p><strong>可赋值性</strong>定义了一个变量能否赋值给另一个变量的规则。</p>
+<pre tabindex="0"><code>var (
+    x T
+    y V
+)
+x = y
+</code></pre><p>上述代码中如果<code>x=y</code>要成立，类型<code>T</code>和<code>V</code>需要满足以下几个条件：</p>
+<ol>
+<li>
+<p>相同的类型，比如他们都是类型<code>int</code>。</p>
+</li>
+<li>
+<p>相同的underlying type，同时<code>T</code>和<code>V</code>中至少有一个不是通过这样的形式<code>define typeName otherType</code>定义的。</p>
+<pre tabindex="0"><code>// case 1 failed，因为V就是string，内置类型也算是define定义出来出来的，只是预定义而已
+type T string
+type V = string
+
+// case 2 OK
+type T struct{}
+type V = T
+
+// case 3 failed，因为都使用了define定义新的类型
+type T struct{}
+type V T
+
+// case 4 failed，因为都使用了define定义新的类型
+type T string
+type V string
+</code></pre></li>
+<li>
+<p><code>T</code>是接口，<code>V</code>实现了该接口的方法。</p>
+</li>
+<li>
+<p><code>V</code>是可读写的<code>channel</code>类型，<code>T</code>也是channel类型不限制读写，他们的元素类型必须相同，同时<code>T</code>和<code>V</code>中至少有一个不是通过这样的形式<code>define typeName otherType</code>定义的。</p>
+</li>
+<li>
+<p><code>y</code>是预定义的<code>nil</code>值，那么<code>T</code>类型必须是指针类型、函数类型、slice、map、channel或者接口类型。</p>
+</li>
+<li>
+<p><code>y</code>是无类型的（<code>untyped</code>）的常量，这个常量值在<code>T</code>类型能表示范围内。</p>
+</li>
+</ol>
+<h2 id="类型同一性type-identity">类型同一性（Type identity）</h2>
+<p><strong>两个类型，要么一样要么不一样。</strong></p>
+<p><code>type typename struct{}</code>和<code>type typename existed-type</code>这样定义出来的类型是一个全新的类型，与其他现有的类型都不一样。如果两个类型要一样，那么他们的<code>underlying type</code>的结构必须是一致，也就是说他们结构定义以及对应的组成部分必须是一致的：</p>
+<ol>
+<li>数组：长度和元素的类型要一样。</li>
+<li>slice：元素类型要一样。</li>
+<li>结构体：字段的顺序、名字、类型和tags必须一致。不同包的<code>Non-exported</code>字段的名字一定是不一样的。</li>
+<li>指针：指向的类型要一样。</li>
+<li>函数：参数和返回值的个数和类型要一样。另外，要么都是变参，要么都不是。参数和返回值的参数名字不要求一样。</li>
+<li>接口：方法集合有一样的名字和函数类型，顺序没关系。不同包的<code>Non-exported</code>方法名字一定是不一样的。</li>
+<li>map：key类型和元素类型要一样。</li>
+<li>channel：元素类型和读写类型要一样。</li>
+</ol>
+<h2 id="方法集合method-sets">方法集合（Method sets）</h2>
+<p>一个类型会有一个相关联的方法集合。</p>
+<ol>
+<li>接口：方法集合就是它定义的方法。</li>
+<li>常规类型<code>T</code>：接收者类型为<code>T</code>的方法集合。</li>
+<li>指针类型<code>*T</code>：接收者类型为<code>*T</code>或者<code>T</code>的方法集合。</li>
+<li>结构体<code>S</code>含类型为<code>T</code>嵌入字段（embedded field）：<code>S</code>和<code>*S</code>的方法集合都包含<code>T</code>的方法集合，<code>*S</code>的方法集合还包含<code>*T</code>的方法集合。</li>
+<li>结构体<code>S</code>含类型为<code>*T</code>嵌入字段（embedded field）：<code>S</code>和<code>*S</code>的方法集合都包含<code>T</code>的方法集合以及<code>*T</code>的方法集合。</li>
+<li>其他类型没有方法集合。</li>
+</ol>
+<h2 id="对齐">对齐</h2>
+<p>数值类型的大小保证：</p>
+<pre tabindex="0"><code>type                                       size in bytes
+byte, uint8, int8                          1
+uint16, int16                              2
+uint32, int32, float32                     4
+uint64, int64, float64, complex64          8
+complex128                                 16
+</code></pre><p>对齐规则：</p>
+<ol>
+<li>任何类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>返回值至少为1。</li>
+<li>结构体变量<code>x</code>，<code>unsafe.Alignof(x)</code>返回值等于是结构体中所有字段的对齐值中的最大值，但是至少为1。</li>
+<li>数组变量<code>x</code>，<code>unsafe.Alignof(x)</code>返回值等于数组元素的对齐值。</li>
+</ol>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

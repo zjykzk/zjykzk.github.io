@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">slave和master同步连接经常重连，导致发送消息失败</h3>
-            
-            <small class="text-muted">Published October 22, 2018</small>
-        </div>
-
-        <article>
-            <h2 id="缘起">缘起</h2>
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="缘起">缘起</h2>
 <p>封装RocketMQ的组件boots-broker每天都返回几个的500。排查发现是因为slave向master同步消息的时候，由于没有及时向master报告自己的同步进度，从而master没有向slave及时同步消息，导致消息发送失败。</p>
 <h2 id="排查过程">排查过程</h2>
 <p>查看boots-broker日志，发现问题日志：</p>
@@ -99,7 +92,6 @@
 <h2 id="解决方案">解决方案</h2>
 <p>可以知道，连接经常断开显然会影响同步的效率。解决方案可以把master同步时间设置的比slave的同步长，比如slave的同步间隔为3s，master同步间隔为5s。</p>
 
-        </article>
     </div>
 
     
@@ -115,5 +107,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

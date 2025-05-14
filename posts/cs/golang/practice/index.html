@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>老K随笔</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="golang的一些实践习惯。" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-12 text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../../../" class="text-decoration-none">
+                    
+                        zenk
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../posts/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/zjykzk" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="原则">原则</h2>
+<p>Clarity：强调Readability。</p>
+<p>Simplicity：强调系统简单性。</p>
+<p>Productively：解决问题没有非本质的障碍，没有等待。</p>
+<h2 id="命名">命名</h2>
+<p>命名很重要。软件最重要的事情是应付复杂度，那么可读性就变得非常重要，基本上定义了软件的质量。命名就是影响可读性的关键。</p>
+<p><a href="https://talks.golang.org/2014/names.slide#3">好的名字的特点</a>：</p>
+<ol>
+<li>一致（容易猜测）。</li>
+<li>短小（容易书写）。</li>
+<li>精确（容易理解）。</li>
+</ol>
+<p><strong>长度</strong></p>
+<p>变量名的长度和它使用的距离成正比。</p>
+<p><strong>规则</strong></p>
+<ol>
+<li>使用驼峰命名</li>
+<li>缩写字母全部大写。</li>
+</ol>
+<p><strong>一些命名习惯</strong></p>
+<ol>
+<li>
+<p>名字尽量短小，主要包括参数，局部变量，接受者(receiver)，例如：<code>i &gt; index;r &gt; reader;b &gt; buffer</code>。</p>
+</li>
+<li>
+<p>数据库操作的常规命名：Insert/Remove/Update/Find。</p>
+</li>
+<li>
+<p>接口，只有一个方法，以&quot;er&quot;结尾，如果有多个那就需要尽量描述接口的名字。</p>
+</li>
+<li>
+<p>配置，变量用<code>conf</code>，类型用<code>XXXConfig</code>。</p>
+</li>
+<li>
+<p>创建对象统一用New，不用Create。</p>
+</li>
+<li>
+<p>接受者(receiver)，使用1-2个字符，每个方法的命名要一致。</p>
+</li>
+<li>
+<p>返回值命名的目的就是为了说明返回内容的意义。</p>
+</li>
+<li>
+<p>错误，类型定义以<code>Error</code>结尾，例如：<code>type FooError struct{}</code>；错误变量以<code>err/Err</code>开头<code>ErrFoo := FooError{}</code>。</p>
+</li>
+<li>
+<p>包，小写，短小精悍，通过包名知道包的作用，避免common/utils这样的包名；不能有复数的包名。</p>
+</li>
+</ol>
+<p><a href="https://blog.golang.org/package-names">https://blog.golang.org/package-names</a>
+<a href="https://rakyll.org/style-packages/">https://rakyll.org/style-packages/</a>
+<a href="https://github.com/bketelsen/talks/blob/master/slides/gcru18-best.md">https://github.com/bketelsen/talks/blob/master/slides/gcru18-best.md</a></p>
+<h2 id="注释">注释</h2>
+<p>// TODO</p>
+<h2 id="错误处理">错误处理</h2>
+<ol>
+<li>不好忽略每个错误，及时忽略需要注明原因。</li>
+<li>调用的接口返回错误，当返回该错误时最好做个封装指明错误的来源，方便做错误跟踪。</li>
+<li>每个模块返回的错误，在错误信息里面包含模块信息，一般会定义一个辅助方法。</li>
+</ol>
+<h2 id="包">包</h2>
+<p><strong>组织</strong></p>
+<ol>
+<li>同一个包中使用多个文件，每个文件负责不同的逻辑。</li>
+<li>把类型定义在它被使用的附近。</li>
+<li>按照功能组织代码，还不是类型。</li>
+<li>不导出main这个包中的任何东西，因为它是起点。</li>
+<li>internal包，如果子包的接口不暴露给外面，使用internal包来保护这些接口。</li>
+</ol>
+<p><strong>导入</strong></p>
+<ol>
+<li>使用虚拟URL，就是给一个包定义一个导入的路径，如果不按这个路径来就会出错，这个可以避免多副本的问题。</li>
+<li>包名应该和目录名一样。</li>
+<li>引用一个包的变量的时候，使用包名作为前缀，也就是说避免全部导入：<code>import . &quot;math&quot;</code>。</li>
+<li>导入干净的包路径，导入路径中不能有src/pkg。</li>
+</ol>
+<h2 id="接口">接口</h2>
+<p>接口的目的是抽象与解耦。接口定义的位置在使用者的源代码中，而不是实现者，这样的好处是使用者和实现者耦合性最低。</p>
+<p>接口定义位置的一些例外：</p>
+<ol>
+<li>
+<p><code>sort</code>包下面的<code>Interface</code>，类似这样的抽象数据结构。</p>
+</li>
+<li>
+<p>接口定义中引用了自己，比如定义一个Comparable接口。</p>
+<pre tabindex="0"><code>type Comparable interface {
+  Compare(o Comparable) int
+}
+</code></pre></li>
+</ol>
+<h2 id="并发">并发</h2>
+<p><strong>channel</strong></p>
+<ol>
+<li>明确channel的收发角色。</li>
+<li>向channel发送的数据时候，需要考虑消费者很慢的情况，需要文档说明。</li>
+<li>向channel发送的数据量没有限制的情况，考虑通过参数把channel传过来，这样可以方便用户自己调优。</li>
+<li>向channel发送的数据量有限制的情况，考虑返回一个拥有buffered的channel，因为自己能够控制大小。</li>
+</ol>
+<h2 id="值vs指针">值vs指针</h2>
+<p>在传递参数和返回参数的时候，如果不确定是用值还是指针，优先考虑值。因为，指针可能会有以下几个问题：</p>
+<ol>
+<li>大概率是在堆上分配的。</li>
+<li>糟糕的局部引用。</li>
+<li>编译器会对解除指针时做额外的检查。</li>
+<li>Cache层拷贝一堆对象，可以粗略的认为和拷贝一指针效率差不多，因为cache层和主存之间中以固定大小的数据进行传输。x86下面是64字节。</li>
+</ol>
+<h2 id="项目结构">项目结构</h2>
+<pre tabindex="0"><code>project-layout
+├── api
+├── assets
+├── build
+├── cmd
+├── configs
+├── deployments
+├── docs
+├── examples
+├── githooks
+├── init
+├── internal
+├── LICENSE.md
+├── Makefile
+├── pkg
+├── README.md
+├── scripts
+├── test
+├── third_party
+├── tools
+├── vendor
+├── web
+└── website
+</code></pre><p>细节参考https://github.com/golang-standards/project-layout。</p>
+<h3 id="test目录">test目录</h3>
+<p>mock代码目录：test/mocks/<!-- raw HTML omitted -->/<!-- raw HTML omitted -->.go</p>
+<p>测试数据目录：test/testdata</p>
+
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            (c) 2025 zenk.
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+
+    </body>
+</html>

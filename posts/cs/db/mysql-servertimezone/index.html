@@ -64,19 +64,11 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">mysql连接中的serverTimezone参数解析</h3>
-            
-            <small class="text-muted">Published February 12, 2020</small>
-        </div>
-
-        <article>
-            <p>在mysql连接的选项中参数<code>serverTimezone</code>用来指定服务器的时区.它的作用主要用于当我们传递时间类型的参数以及获取时间类型的数值时,转换成程序运行所在环境的时区所对应的时间.注意:如果传递字符串是没问题的,因为jdbc会把参数都转成字符串类型的sql传递到服务区上去.</p>
+    <div class="pl-sm-4 ml-sm-5">
+        <p>在mysql连接的选项中参数<code>serverTimezone</code>用来指定服务器的时区.它的作用主要用于当我们传递时间类型的参数以及获取时间类型的数值时,转换成程序运行所在环境的时区所对应的时间.注意:如果传递字符串是没问题的,因为jdbc会把参数都转成字符串类型的sql传递到服务区上去.</p>
 <p>如果不指定的情况下,会通过连接获取mysq服务器上面的时区.先获取变量<code>time_zone</code>值,如果是<code>SYSTEM</code>,就获取<code>system_time_zone</code>的值.参考代码:<code>com.mysql.cj.protocol.a.NativeProtocol.configureTimezone</code>.</p>
 <p>因此,关于<code>system_time_zone</code>值的设置的目的是为了解决你写入和读取的时间值一致性.如果你是读别人写的数据,那么需要把它设置成写入的时候指定的时区.</p>
 
-        </article>
     </div>
 
     
@@ -92,5 +84,6 @@
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>

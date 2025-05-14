@@ -64,15 +64,8 @@
     <hr />
 </header>
 <div class="container">
-    <div class="pl-sm-2">
-        <div class="mb-3">
-            <h3 class="mb-0">initramfs中的init进程系统启动失败</h3>
-            
-            <small class="text-muted">Published January 14, 2020</small>
-        </div>
-
-        <article>
-            <h2 id="缘起">缘起</h2>
+    <div class="pl-sm-4 ml-sm-5">
+        <h2 id="缘起">缘起</h2>
 <p>执行系统全量更新数据<code>yay -Syu</code>，更新了以下软件：</p>
 <pre tabindex="0"><code>upgraded grub (2:2.04-4 -&gt; 2:2.04-5)
 upgraded libjpeg-turbo (2.0.3-1 -&gt; 2.0.4-1)
@@ -99,7 +92,6 @@ Console: switching to colour frame buffer device 175x65
 <h2 id="覆盘">覆盘</h2>
 <p>系统更新以后不知道什么原因initramfs中缺失了很多动态连接库。最重要的是因为对initramfs系统不熟悉，导致没有地方下手，好在有google大法和archlinux的论坛，搞定。</p>
 
-        </article>
     </div>
 
     
@@ -115,5 +107,6 @@ Console: switching to colour frame buffer device 175x65
         and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
     </small>
 </footer>
-</body>
+
+    </body>
 </html>
