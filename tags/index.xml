@@ -7,13 +7,20 @@
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>(c) 2025 zenk.</copyright>
-    <lastBuildDate>Sat, 10 May 2025 21:10:21 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 20 May 2025 10:26:00 +0800</lastBuildDate>
     <atom:link href="http://zjykzk.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Golang</title>
       <link>http://zjykzk.github.io/tags/golang/</link>
-      <pubDate>Sat, 10 May 2025 21:10:21 +0800</pubDate>
+      <pubDate>Tue, 20 May 2025 10:26:00 +0800</pubDate>
       <guid>http://zjykzk.github.io/tags/golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tool</title>
+      <link>http://zjykzk.github.io/tags/tool/</link>
+      <pubDate>Tue, 20 May 2025 10:26:00 +0800</pubDate>
+      <guid>http://zjykzk.github.io/tags/tool/</guid>
       <description></description>
     </item>
     <item>
